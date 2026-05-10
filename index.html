@@ -94,7 +94,7 @@
         <i class="fa-solid fa-magnifying-glass text-2xl text-purple-400 mr-4"></i>
         <input id="search-input" type="text" 
                class="flex-1 bg-transparent outline-none text-lg placeholder:text-purple-300"
-               placeholder="검색어 또는 URL 입력 (성인 사이트도 차단 없음)" autocomplete="off">
+               placeholder="검색어 또는 URL을 입력하세요" autocomplete="off">
         <button id="clear-btn" class="hidden text-2xl text-purple-300 hover:text-white mr-4">✕</button>
         <button class="text-2xl text-purple-400 hover:text-white mr-3"><i class="fa-solid fa-microphone"></i></button>
         <button class="text-2xl text-purple-400 hover:text-white"><i class="fa-solid fa-image"></i></button>
@@ -112,7 +112,7 @@
   </main>
 
   <footer class="mt-auto py-6 text-center text-xs text-purple-400">
-    🇯🇵 일본 • FireDragon 135.0 • Full Uncensored Mode
+    🇯🇵 일본 • FireDragon 135.0
   </footer>
 
   <script>
@@ -130,12 +130,12 @@
         toggleBtn.innerHTML = isHidden ? '🔄' : '👁️';
       });
 
-      // ==================== FULL UNCENSORED 핵심 함수 ====================
-      function openUncensored(query) {
+      // ====================== FULL UNCENSORED + safe=off 강제 유지 ======================
+      function openFullUncensored(query) {
         query = query.trim();
         if (!query) return;
 
-        // 1. URL 직접 입력 → 바로 접속 (성인사이트도 차단 안 됨)
+        // URL 직접 입력 시 바로 접속
         if (query.match(/^https?:\/\//i) || query.includes('.')) {
           let url = query;
           if (!url.startsWith('http')) url = 'https://' + url;
@@ -143,29 +143,30 @@
           return;
         }
 
-        // 2. 일반 검색 → safe=off 강제 유지
+        // Google 검색 시 safe=off 강제 + 추가 필터 해제 파라미터
         const SEARCH_BASE = 'https://www.google.co.jp/search';
-        const PARAMS = 'gl=jp&hl=ko&safe=off';   // ← 핵심: 항상 safe=off
+        const PARAMS = 'gl=jp&hl=ko&safe=off&nfpr=1';   // nfpr=1 : No Filter 추가
         window.open(`${SEARCH_BASE}?q=${encodeURIComponent(query)}&${PARAMS}`, '_blank');
       }
 
-      // 버튼 클릭
-      document.getElementById('search-btn').addEventListener('click', () => openUncensored(input.value));
+      // 검색 버튼
+      document.getElementById('search-btn').addEventListener('click', () => openFullUncensored(input.value));
       
+      // I'm Feeling Lucky
       document.getElementById('lucky-btn').addEventListener('click', () => {
         const q = input.value.trim();
         if (q) {
           const SEARCH_BASE = 'https://www.google.co.jp/search';
-          window.open(`${SEARCH_BASE}?q=${encodeURIComponent(q)}&btnI=1&gl=jp&hl=ko&safe=off`, '_blank');
+          window.open(`${SEARCH_BASE}?q=${encodeURIComponent(q)}&btnI=1&gl=jp&hl=ko&safe=off&nfpr=1`, '_blank');
         }
       });
 
       // Enter 키
       input.addEventListener('keydown', e => {
-        if (e.key === 'Enter') openUncensored(input.value);
+        if (e.key === 'Enter') openFullUncensored(input.value);
       });
 
-      // Clear 버튼
+      // Clear
       input.addEventListener('input', () => {
         clearBtn.classList.toggle('hidden', !input.value);
       });
