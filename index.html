@@ -21,7 +21,7 @@
       color: #e9d5ff;
     }
 
-    header { gap: 20px !important; padding-right: 25px; }
+    header { gap: 22px !important; padding-right: 30px; }
 
     .search-bar {
       border: 1px solid rgba(192,132,252,0.6);
@@ -51,26 +51,27 @@
 
     #main-content.hidden { display: none !important; }
 
-    /* Japan IP 배지 - 헤더 버튼 절대 안 가림 */
-    .japan-ip {
+    /* 일본 WiFi IP 표시 */
+    .japan-wifi {
       position: fixed; 
       top: 18px; 
-      right: 140px;   /* 토글 버튼과 아바타를 피해 왼쪽으로 이동 */
-      background: linear-gradient(90deg, #22c55e, #86efac);
-      color: #0f172a;
-      padding: 6px 16px; 
+      right: 170px;
+      background: linear-gradient(90deg, #22c55e, #4ade80);
+      color: #052e16;
+      padding: 7px 18px; 
       border-radius: 9999px;
-      font-size: 13px; 
-      font-weight: 700;
-      z-index: 50;
-      box-shadow: 0 0 15px #22c55e;
+      font-size: 13.5px; 
+      font-weight: 800;
+      z-index: 60;
+      box-shadow: 0 0 20px #22c55e;
       white-space: nowrap;
+      letter-spacing: 0.5px;
     }
   </style>
 </head>
 <body class="flex flex-col min-h-screen">
 
-  <div class="japan-ip">🇯🇵 Japan IP Connected • Proxy Active</div>
+  <div class="japan-wifi">🇯🇵 Japan WiFi IP Connected • Proxy Active</div>
 
   <!-- TOP NAV -->
   <header class="flex justify-end items-center px-6 py-4 z-50" 
@@ -83,7 +84,6 @@
 
     <button id="apps-btn" class="w-10 h-10 flex items-center justify-center rounded-full hover:bg-white/10 text-xl">📱</button>
 
-    <!-- 로고+검색바 ON/OFF 버튼 (가려지지 않음) -->
     <button id="toggle-main-btn" title="로고 + 검색창 숨기기 / 보이기">👁️</button>
 
     <img src="https://cdn-ai.onspace.ai/onspace/project/uploads/cNeEsZ2cuNyHxmYfJ3dhx6/GoldFireDragonBrowser_logo-removebg-preview.png" 
@@ -98,7 +98,7 @@
       <div class="text-5xl font-black tracking-widest mt-6 text-white">
         FireDragon
       </div>
-      <div class="text-emerald-400 text-sm mt-2">🇯🇵 Japan Proxy • Full Uncensored</div>
+      <div class="text-emerald-400 text-sm mt-2">🇯🇵 Japan WiFi IP • Full Uncensored</div>
     </div>
 
     <div class="w-full max-w-[680px]">
@@ -124,7 +124,7 @@
   </main>
 
   <footer class="mt-auto py-6 text-center text-xs text-purple-400">
-    🇯🇵 일본 IP • FireDragon 135.0 • Full Uncensored
+    🇯🇵 Japan WiFi IP • FireDragon 135.0 • Full Uncensored
   </footer>
 
   <script>
@@ -136,18 +136,18 @@
 
       let isHidden = false;
 
-      // 로고 + 검색바 ON/OFF
       toggleBtn.addEventListener('click', () => {
         isHidden = !isHidden;
         mainContent.classList.toggle('hidden', isHidden);
         toggleBtn.innerHTML = isHidden ? '🔄' : '👁️';
       });
 
-      // 일본 IP 우회 + Full Uncensored
-      function openJapanProxy(query) {
+      // 일본 WiFi IP 우회 + Full Uncensored
+      function openJapanWiFiProxy(query) {
         query = query.trim();
         if (!query) return;
 
+        // URL 직접 입력
         if (query.match(/^https?:\/\//i) || query.includes('.')) {
           let url = query;
           if (!url.startsWith('http')) url = 'http://' + url;
@@ -155,12 +155,13 @@
           return;
         }
 
+        // Google 일본 서버 + 강력 우회
         const SEARCH_BASE = 'http://www.google.co.jp/search';
-        const PARAMS = 'gl=jp&hl=ko&safe=off&nfpr=1&filter=0&pws=0';
+        const PARAMS = 'gl=jp&hl=ko&safe=off&nfpr=1&filter=0&pws=0&uule=Japan';
         window.open(`${SEARCH_BASE}?q=${encodeURIComponent(query)}&${PARAMS}`, '_blank');
       }
 
-      document.getElementById('search-btn').addEventListener('click', () => openJapanProxy(input.value));
+      document.getElementById('search-btn').addEventListener('click', () => openJapanWiFiProxy(input.value));
       
       document.getElementById('lucky-btn').addEventListener('click', () => {
         const q = input.value.trim();
@@ -171,7 +172,7 @@
       });
 
       input.addEventListener('keydown', e => {
-        if (e.key === 'Enter') openJapanProxy(input.value);
+        if (e.key === 'Enter') openJapanWiFiProxy(input.value);
       });
 
       input.addEventListener('input', () => {
