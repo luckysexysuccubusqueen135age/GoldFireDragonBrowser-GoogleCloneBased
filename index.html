@@ -21,6 +21,10 @@
       color: #e9d5ff;
     }
 
+    header {
+      gap: 16px !important; /* 버튼 간격 넓힘 */
+    }
+
     .search-bar {
       border: 2px solid rgba(245,158,11,0.6);
       border-radius: 9999px;
@@ -39,6 +43,7 @@
       border-radius: 50%;
       font-size: 26px;
       transition: all 0.3s;
+      flex-shrink: 0;
     }
     #toggle-main-btn:hover {
       background: #dc2626;
@@ -60,18 +65,25 @@
 
   <div class="uncensored-badge">FULL UNCENSORED • SAFE=OFF</div>
 
-  <!-- TOP NAV -->
-  <header class="flex justify-end items-center px-6 py-4 gap-4 z-50" style="background: linear-gradient(to bottom, rgba(0,0,0,0.9), transparent);">
-    <a href="#" class="hover:text-white">Gmail</a>
-    <a href="#" class="hover:text-white">이미지</a>
-    <button id="apps-btn" class="w-10 h-10 flex items-center justify-center rounded-full hover:bg-white/10 text-2xl">🧩</button>
+  <!-- TOP NAV - 버튼 간격 넓힘 -->
+  <header class="flex justify-end items-center px-6 py-4 z-50" 
+          style="background: linear-gradient(to bottom, rgba(0,0,0,0.9), transparent);">
+    
+    <a href="#" class="hover:text-white px-3 py-1">Gmail</a>
+    <a href="#" class="hover:text-white px-3 py-1">이미지</a>
 
-    <button id="toggle-main-btn" title="로고 + 검색창 숨기기 / 보이기">
+    <button id="apps-btn" class="w-11 h-11 flex items-center justify-center rounded-full hover:bg-white/10 text-2xl flex-shrink-0">
+      🧩
+    </button>
+
+    <!-- 토글 버튼 -->
+    <button id="toggle-main-btn" title="로고 + 검색창 숨기기 / 보이기" class="flex-shrink-0">
       👁️
     </button>
 
+    <!-- 아바타 -->
     <img src="https://cdn-ai.onspace.ai/onspace/project/uploads/cNeEsZ2cuNyHxmYfJ3dhx6/GoldFireDragonBrowser_logo-removebg-preview.png" 
-         class="w-9 h-9 rounded-full cursor-pointer" title="FireDragon 계정">
+         class="w-9 h-9 rounded-full cursor-pointer ring-2 ring-purple-500/50 flex-shrink-0" title="FireDragon 계정">
   </header>
 
   <!-- MAIN CONTENT -->
@@ -125,23 +137,21 @@
 
       let isHidden = false;
 
-      // 로고+검색창 완전 토글 (진짜 작동)
+      // 토글 버튼
       toggleBtn.addEventListener('click', () => {
         isHidden = !isHidden;
         mainContent.classList.toggle('hidden', isHidden);
         toggleBtn.innerHTML = isHidden ? '🔄' : '👁️';
-        toggleBtn.title = isHidden ? "보이기" : "완전 숨기기";
+        toggleBtn.title = isHidden ? "로고 + 검색창 보이기" : "로고 + 검색창 숨기기";
       });
 
-      // FULL UNCENSORED 검색 (safe=off 강제)
+      // 검색 기능
       const SEARCH_BASE = 'https://www.google.co.jp/search';
       const PARAMS = 'gl=jp&hl=ko&safe=off';
 
       function doSearch() {
         const q = input.value.trim();
-        if (q) {
-          window.open(`${SEARCH_BASE}?q=${encodeURIComponent(q)}&${PARAMS}`, '_blank');
-        }
+        if (q) window.open(`${SEARCH_BASE}?q=${encodeURIComponent(q)}&${PARAMS}`, '_blank');
       }
 
       document.getElementById('search-btn').addEventListener('click', doSearch);
@@ -164,7 +174,6 @@
         input.focus();
       });
 
-      // ESC
       document.addEventListener('keydown', e => {
         if (e.key === 'Escape' && document.activeElement === input) {
           input.value = '';
