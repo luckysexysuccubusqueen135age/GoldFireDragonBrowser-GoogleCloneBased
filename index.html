@@ -24,7 +24,7 @@
     .search-bar {
       border: 1px solid rgba(192,132,252,0.6);
       border-radius: 9999px;
-      background: rgba(12, 4, 28, 0.8);
+      background: rgba(12, 4, 28, 0.82);
       backdrop-filter: blur(20px);
     }
     .search-bar:focus-within { 
@@ -94,7 +94,7 @@
         <i class="fa-solid fa-magnifying-glass text-2xl text-purple-400 mr-4"></i>
         <input id="search-input" type="text" 
                class="flex-1 bg-transparent outline-none text-lg placeholder:text-purple-300"
-               placeholder="검색어 또는 URL을 입력하세요" autocomplete="off">
+               placeholder="검색어 또는 URL 입력 (성인 사이트도 차단 없음)" autocomplete="off">
         <button id="clear-btn" class="hidden text-2xl text-purple-300 hover:text-white mr-4">✕</button>
         <button class="text-2xl text-purple-400 hover:text-white mr-3"><i class="fa-solid fa-microphone"></i></button>
         <button class="text-2xl text-purple-400 hover:text-white"><i class="fa-solid fa-image"></i></button>
@@ -112,7 +112,7 @@
   </main>
 
   <footer class="mt-auto py-6 text-center text-xs text-purple-400">
-    🇯🇵 일본 • FireDragon 135.0 • 안전하고 빠른 검색
+    🇯🇵 일본 • FireDragon 135.0 • Full Uncensored Mode
   </footer>
 
   <script>
@@ -130,29 +130,28 @@
         toggleBtn.innerHTML = isHidden ? '🔄' : '👁️';
       });
 
-      // ====================== 핵심: 성인사이트 차단 완전 해제 ======================
-      function openSite(query) {
+      // ==================== FULL UNCENSORED 핵심 함수 ====================
+      function openUncensored(query) {
         query = query.trim();
         if (!query) return;
 
-        // URL 형식이면 바로 접속 (http, https, www.)
-        if (query.match(/^https?:\/\//i) || query.match(/^www\./i)) {
+        // 1. URL 직접 입력 → 바로 접속 (성인사이트도 차단 안 됨)
+        if (query.match(/^https?:\/\//i) || query.includes('.')) {
           let url = query;
-          if (!query.startsWith('http')) url = 'https://' + query;
+          if (!url.startsWith('http')) url = 'https://' + url;
           window.open(url, '_blank');
           return;
         }
 
-        // 일반 검색은 safe=off 강제 적용
+        // 2. 일반 검색 → safe=off 강제 유지
         const SEARCH_BASE = 'https://www.google.co.jp/search';
-        const PARAMS = 'gl=jp&hl=ko&safe=off';
+        const PARAMS = 'gl=jp&hl=ko&safe=off';   // ← 핵심: 항상 safe=off
         window.open(`${SEARCH_BASE}?q=${encodeURIComponent(query)}&${PARAMS}`, '_blank');
       }
 
-      // 검색 버튼
-      document.getElementById('search-btn').addEventListener('click', () => openSite(input.value));
+      // 버튼 클릭
+      document.getElementById('search-btn').addEventListener('click', () => openUncensored(input.value));
       
-      // I'm Feeling Lucky
       document.getElementById('lucky-btn').addEventListener('click', () => {
         const q = input.value.trim();
         if (q) {
@@ -163,7 +162,7 @@
 
       // Enter 키
       input.addEventListener('keydown', e => {
-        if (e.key === 'Enter') openSite(input.value);
+        if (e.key === 'Enter') openUncensored(input.value);
       });
 
       // Clear 버튼
