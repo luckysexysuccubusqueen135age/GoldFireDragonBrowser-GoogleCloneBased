@@ -21,7 +21,10 @@
       color: #e9d5ff;
     }
 
-    header { gap: 16px !important; }
+    header {
+      gap: 18px !important;
+      padding-right: 20px;
+    }
 
     .search-bar {
       border: 2px solid rgba(245,158,11,0.7);
@@ -51,17 +54,26 @@
 
     #main-content.hidden { display: none !important; }
 
+    /* FULL UNCENSORED 배지 위치를 오른쪽 아래로 이동 → 헤더 버튼 절대 안 가림 */
     .uncensored-badge {
-      position: fixed; top: 20px; right: 20px;
-      background: #dc2626; color: white; padding: 4px 14px;
-      border-radius: 9999px; font-size: 13px; font-weight: bold;
-      z-index: 9999; box-shadow: 0 0 20px #dc2626;
+      position: fixed; 
+      bottom: 20px; 
+      right: 20px;
+      background: #dc2626; 
+      color: white; 
+      padding: 6px 16px;
+      border-radius: 9999px; 
+      font-size: 13px; 
+      font-weight: bold;
+      z-index: 9999; 
+      box-shadow: 0 0 20px #dc2626;
+      pointer-events: none;
     }
   </style>
 </head>
 <body class="flex flex-col min-h-screen">
 
-  <div class="uncensored-badge">FULL UNCENSORED MODE • SAFE=OFF</div>
+  <div class="uncensored-badge">FULL UNCENSORED • SAFE=OFF</div>
 
   <!-- TOP NAV -->
   <header class="flex justify-end items-center px-6 py-4 z-50" 
@@ -74,7 +86,7 @@
       🧩
     </button>
 
-    <!-- 로고+검색창 숨김 버튼 (유지) -->
+    <!-- 로고+검색창 ON/OFF 버튼 -->
     <button id="toggle-main-btn" title="로고 + 검색창 숨기기 / 보이기" class="flex-shrink-0">
       👁️
     </button>
@@ -117,10 +129,6 @@
     </div>
   </main>
 
-  <div class="fixed bottom-4 left-4 text-xs bg-black/70 px-5 py-2 rounded-full border border-red-500">
-    FULL UNCENSORED • SAFE SEARCH 완전 비활성화
-  </div>
-
   <footer class="mt-auto py-6 text-center text-xs text-purple-400">
     🇯🇵 일본 • FireDragon 135.0 FULL UNCENSORED
   </footer>
@@ -134,7 +142,6 @@
 
       let isHidden = false;
 
-      // 로고 + 검색창 숨김/보이기 (버튼 유지)
       toggleBtn.addEventListener('click', () => {
         isHidden = !isHidden;
         mainContent.classList.toggle('hidden', isHidden);
@@ -142,15 +149,12 @@
         toggleBtn.title = isHidden ? "로고 + 검색창 보이기" : "로고 + 검색창 숨기기";
       });
 
-      // FULL UNCENSORED 검색 (항상 safe=off 적용)
       const SEARCH_BASE = 'https://www.google.co.jp/search';
       const PARAMS = 'gl=jp&hl=ko&safe=off';
 
       function doSearch() {
         const q = input.value.trim();
-        if (q) {
-          window.open(`${SEARCH_BASE}?q=${encodeURIComponent(q)}&${PARAMS}`, '_blank');
-        }
+        if (q) window.open(`${SEARCH_BASE}?q=${encodeURIComponent(q)}&${PARAMS}`, '_blank');
       }
 
       document.getElementById('search-btn').addEventListener('click', doSearch);
