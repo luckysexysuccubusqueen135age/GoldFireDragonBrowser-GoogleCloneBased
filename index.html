@@ -5,7 +5,6 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>FireDragon Browser</title>
 
-  <!-- User-Agent + Japan Location -->
   <meta name="user-agent" content="Mozilla/9.0 (Windows NT 10.0; Win64; x64) Gecko/20100101 FireDragon/135.0 stealth privatebrowsing incognito windowedfullscreen"/>
   <meta name="location" content="Japan"/>
 
@@ -16,165 +15,120 @@
     * { box-sizing: border-box; }
     body {
       font-family: Arial, sans-serif;
-      background-color: #0a0010;
-      background-image: url('https://cdn-ai.onspace.ai/onspace/project/uploads/6SC2bAVvqSFMEGrGCS7FCM/GoldFireDragonBrowser_home_page.jpg');
-      background-size: cover;
-      background-position: center center;
-      background-repeat: no-repeat;
-      background-attachment: fixed;
+      background: #0a0010 url('https://cdn-ai.onspace.ai/onspace/project/uploads/6SC2bAVvqSFMEGrGCS7FCM/GoldFireDragonBrowser_home_page.jpg') center/cover no-repeat fixed;
+      margin: 0;
+      padding: 0;
+      min-height: 100vh;
+      color: #e9d5ff;
     }
 
-    .search-bar { 
-      border: 1px solid rgba(200,160,255,0.35); 
-      border-radius: 24px; 
-      background: rgba(12, 4, 28, 0.65); 
-      backdrop-filter: blur(16px); 
-      transition: box-shadow 0.2s ease, border-color 0.2s ease; 
+    .search-bar {
+      border: 1px solid rgba(200,160,255,0.4);
+      border-radius: 9999px;
+      background: rgba(12, 4, 28, 0.75);
+      backdrop-filter: blur(20px);
     }
-    .search-bar:hover { box-shadow: 0 2px 18px rgba(168,85,247,0.4); border-color: rgba(245,158,11,0.55); }
-    .search-bar:focus-within { box-shadow: 0 2px 24px rgba(168,85,247,0.55); border-color: rgba(245,158,11,0.8); }
-
-    .g-btn {
-      background: rgba(12, 4, 28, 0.6); 
-      border: 1px solid rgba(200,160,255,0.3); 
-      border-radius: 6px;
-      color: #e9d5ff; 
-      font-size: 14px; 
-      padding: 0 18px; 
-      height: 36px; 
-      cursor: pointer;
-    }
-    .g-btn:hover { 
-      border-color: rgba(245,158,11,0.75); 
-      background: rgba(168,85,247,0.28); 
-      color: #fff; 
-    }
+    .search-bar:focus-within { border-color: #f59e0b; box-shadow: 0 0 25px rgba(245,158,11,0.5); }
 
     #toggle-main-btn {
-      background: rgba(12, 4, 28, 0.7); 
-      border: 1px solid rgba(200,160,255,0.4);
-      color: #e9d5ff; 
-      width: 36px; 
-      height: 36px; 
+      width: 42px; height: 42px;
+      background: rgba(12,4,28,0.85);
+      border: 1px solid rgba(168,85,247,0.5);
       border-radius: 50%;
-      display: flex; 
-      align-items: center; 
-      justify-content: center; 
-      cursor: pointer;
+      font-size: 22px;
+      transition: all 0.3s ease;
     }
-    #toggle-main-btn:hover { 
-      background: rgba(168,85,247,0.3); 
-      border-color: #f59e0b; 
-      transform: scale(1.1); 
+    #toggle-main-btn:hover {
+      background: #a855f7;
+      transform: scale(1.1);
+      border-color: #f59e0b;
     }
-
-    .ua-info {
-      position: fixed; 
-      bottom: 12px; 
-      left: 12px; 
-      font-size: 11px; 
-      color: #a78bfa; 
-      background: rgba(12,4,28,0.7); 
-      padding: 4px 10px; 
-      border-radius: 9999px;
-      border: 1px solid rgba(168,85,247,0.3); 
-      backdrop-filter: blur(8px);
-      z-index: 200;
-    }
-
-    .location-jp { color: #f59e0b; font-weight: 600; }
 
     #main-content.hidden { display: none !important; }
+
+    .ua-info {
+      position: fixed; bottom: 12px; left: 12px;
+      font-size: 11px; padding: 5px 12px; border-radius: 9999px;
+      background: rgba(12,4,28,0.8); border: 1px solid #a855f7;
+      z-index: 999;
+    }
   </style>
 </head>
 <body class="flex flex-col min-h-screen">
 
-  <!-- ===== TOP NAV ===== -->
-  <header class="flex justify-end items-center px-4 py-3 gap-2 flex-shrink-0" style="background: linear-gradient(to bottom, rgba(0,0,0,0.6) 0%, transparent 100%);">
-    <a href="#" class="top-link">Gmail</a>
-    <a href="#" class="top-link">이미지</a>
+  <!-- TOP NAV -->
+  <header class="flex justify-end items-center px-6 py-4 gap-4" style="background: linear-gradient(to bottom, rgba(0,0,0,0.8), transparent);">
+    <a href="#" class="hover:underline">Gmail</a>
+    <a href="#" class="hover:underline">이미지</a>
 
-    <div class="relative" id="apps-wrapper">
-      <button class="icon-btn" id="apps-btn">
-        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="#c4b5fd">
-          <path d="M6 8c1.1 0 2-.9 2-2s-.9-2-2-2-2 .9-2 2 .9 2 2 2zm6 0c1.1 0 2-.9 2-2s-.9-2-2-2-2 .9-2 2 .9 2 2 2zm6 0c1.1 0 2-.9 2-2s-.9-2-2-2-2 .9-2 2 .9 2 2 2zM6 14c1.1 0 2-.9 2-2s-.9-2-2-2-2 .9-2 2 .9 2 2 2zm6 0c1.1 0 2-.9 2-2s-.9-2-2-2-2 .9-2 2 .9 2 2 2zm6 0c1.1 0 2-.9 2-2s-.9-2-2-2-2 .9-2 2 .9 2 2 2zM6 20c1.1 0 2-.9 2-2s-.9-2-2-2-2 .9-2 2 .9 2 2 2zm6 0c1.1 0 2-.9 2-2s-.9-2-2-2-2 .9-2 2 .9 2 2 2zm6 0c1.1 0 2-.9 2-2s-.9-2-2-2-2 .9-2 2 .9 2 2 2z"></path>
-        </svg>
-      </button>
-    </div>
-
-    <!-- 토글 버튼 -->
-    <button id="toggle-main-btn" title="로고 + 검색바 숨기기/보이기">
-      <i class="fa-solid fa-eye" style="font-size:18px;"></i>
+    <button id="apps-btn" class="w-9 h-9 flex items-center justify-center rounded-full hover:bg-white/10">
+      <i class="fa-solid fa-grid-2 text-xl"></i>
     </button>
 
-    <div class="ml-1 cursor-pointer" title="FireDragon 계정">
-      <img src="https://cdn-ai.onspace.ai/onspace/project/uploads/cNeEsZ2cuNyHxmYfJ3dhx6/GoldFireDragonBrowser_logo-removebg-preview.png" style="width:32px;height:32px;border-radius:50%;" alt="avatar"/>
-    </div>
+    <!-- 🔥 로고+검색 완전 숨김 버튼 -->
+    <button id="toggle-main-btn" title="로고 + 검색창 숨기기 / 보이기">
+      👁️
+    </button>
+
+    <img src="https://cdn-ai.onspace.ai/onspace/project/uploads/cNeEsZ2cuNyHxmYfJ3dhx6/GoldFireDragonBrowser_logo-removebg-preview.png" 
+         class="w-8 h-8 rounded-full cursor-pointer" title="FireDragon 계정">
   </header>
 
-  <!-- ===== MAIN CONTENT ===== -->
-  <main id="main-content" class="flex flex-col items-center justify-center flex-1 px-4 transition-all duration-300" style="margin-top: -60px;">
-    
+  <!-- MAIN CONTENT -->
+  <main id="main-content" class="flex-1 flex flex-col items-center justify-center px-4">
     <!-- Logo -->
-    <div class="mb-7 select-none flex flex-col items-center">
+    <div class="mb-10 text-center">
       <img src="https://cdn-ai.onspace.ai/onspace/project/uploads/cNeEsZ2cuNyHxmYfJ3dhx6/GoldFireDragonBrowser_logo-removebg-preview.png" 
-           style="width: clamp(80px, 14vw, 130px); height: auto; filter: drop-shadow(0 4px 20px rgba(168,85,247,0.6)) drop-shadow(0 0 40px rgba(245,158,11,0.25));" 
-           draggable="false"/>
-      <div style="font-size: clamp(24px, 4.5vw, 38px); font-family: 'Arial Black', sans-serif; font-weight: 900; letter-spacing: 2px; margin-top: 8px; 
-                  background: linear-gradient(90deg, #c084fc 0%, #f59e0b 45%, #c084fc 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent;">
+           class="mx-auto mb-4" style="width: clamp(100px, 18vw, 180px);" draggable="false">
+      <div class="text-5xl font-black tracking-widest bg-gradient-to-r from-purple-400 via-amber-400 to-purple-400 bg-clip-text text-transparent">
         FireDragon
       </div>
-      <div class="text-xs text-purple-300 mt-1 flex items-center gap-2">
-        <span>135.0 • Stealth • Incognito</span> 
-        <span class="location-jp">🇯🇵 일본</span>
+      <div class="text-sm text-purple-300 mt-2">
+        135.0 • Stealth • Private • Incognito • 🇯🇵 일본
       </div>
     </div>
 
-    <!-- Search -->
-    <div class="w-full max-w-[584px]">
-      <div class="search-wrap relative" id="search-wrap">
-        <div class="search-bar flex items-center px-4 py-3 gap-3">
-          <svg focusable="false" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="20" height="20">
-            <path fill="#c084fc" d="M15.5 14h-.79l-.28-.27A6.471 6.471 0 0 0 16 9.5 6.5 6.5 0 1 0 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z"></path>
-          </svg>
-          <input id="search-input" type="text" class="flex-1 bg-transparent border-none outline-none text-[#f3e8ff] text-[16px]" 
-                 placeholder="검색 또는 URL 입력" spellcheck="false"/>
-          <div class="flex items-center gap-1">
-            <button class="icon-btn" id="clear-btn" style="display:none;"><i class="fa-solid fa-xmark"></i></button>
-            <button class="icon-btn"><i class="fa-solid fa-microphone" style="color:#a855f7;"></i></button>
-            <button class="icon-btn"><i class="fa-solid fa-image" style="color:#f59e0b;"></i></button>
-          </div>
-        </div>
-        <div class="suggestions-box" id="suggestions-box"></div>
+    <!-- Search Bar -->
+    <div class="w-full max-w-[620px]">
+      <div class="search-bar flex items-center px-6 py-4 shadow-2xl">
+        <i class="fa-solid fa-magnifying-glass text-purple-400 text-2xl mr-4"></i>
+        <input id="search-input" type="text" 
+               class="flex-1 bg-transparent outline-none text-lg placeholder:text-purple-300"
+               placeholder="검색하거나 URL을 입력하세요" autocomplete="off">
+        <button id="clear-btn" class="hidden text-2xl text-purple-400 hover:text-white mr-3">
+          <i class="fa-solid fa-xmark"></i>
+        </button>
+        <button class="text-2xl text-purple-500 hover:text-purple-300 mr-3"><i class="fa-solid fa-microphone"></i></button>
+        <button class="text-2xl text-amber-400 hover:text-amber-300"><i class="fa-solid fa-image"></i></button>
       </div>
 
-      <div class="flex justify-center gap-3 mt-7">
-        <button class="g-btn" id="search-btn">FireDragon 검색</button>
-        <button class="g-btn" id="lucky-btn">I'm Feeling Lucky</button>
+      <!-- 검색 버튼 -->
+      <div class="flex justify-center gap-4 mt-8">
+        <button id="search-btn" class="px-8 py-3 bg-white/10 hover:bg-white/20 border border-purple-400 rounded-xl text-sm font-medium transition">
+          FireDragon 검색
+        </button>
+        <button id="lucky-btn" class="px-8 py-3 bg-white/10 hover:bg-white/20 border border-purple-400 rounded-xl text-sm font-medium transition">
+          I'm Feeling Lucky
+        </button>
       </div>
     </div>
   </main>
 
-  <!-- UA + Japan Info -->
+  <!-- Status -->
   <div class="ua-info">
     🇯🇵 일본 • FireDragon/135.0 • Stealth Private Incognito
   </div>
 
-  <!-- ===== FOOTER ===== -->
-  <footer class="flex-shrink-0" style="background: rgba(8,2,18,0.75); border-top: 1px solid rgba(168,85,247,0.2); backdrop-filter: blur(12px);">
-    <div class="px-5 py-3 text-sm flex items-center" style="color:rgba(196,160,255,0.6); border-bottom: 1px solid rgba(168,85,247,0.12);">
-      <span class="location-jp">🇯🇵 일본</span>
-    </div>
-    <div class="px-5 py-3 flex flex-col sm:flex-row justify-between items-center gap-2 text-sm">
-      <div class="flex flex-wrap gap-x-4 gap-y-1">
-        <a href="#" class="foot-link">광고</a>
-        <a href="#" class="foot-link">비즈니스</a>
-        <a href="#" class="foot-link">검색의 원리</a>
-      </div>
-      <div class="flex flex-wrap gap-x-4 gap-y-1">
-        <a href="#" class="foot-link">개인정보처리방침</a>
-        <a href="#" class="foot-link">이용약관</a>
-        <a href="#" class="foot-link">설정</a>
+  <!-- Footer -->
+  <footer class="mt-auto py-4 text-sm text-purple-300 border-t border-purple-900/50 bg-black/40">
+    <div class="max-w-5xl mx-auto px-6 flex flex-wrap justify-between items-center">
+      <div>🇯🇵 일본</div>
+      <div class="flex gap-6">
+        <a href="#" class="hover:text-amber-400">광고</a>
+        <a href="#" class="hover:text-amber-400">비즈니스</a>
+        <a href="#" class="hover:text-amber-400">검색의 원리</a>
+        <a href="#" class="hover:text-amber-400">개인정보처리방침</a>
+        <a href="#" class="hover:text-amber-400">이용약관</a>
       </div>
     </div>
   </footer>
@@ -183,47 +137,60 @@
     document.addEventListener('DOMContentLoaded', () => {
       const input = document.getElementById('search-input');
       const clearBtn = document.getElementById('clear-btn');
-      const toggleBtn = document.getElementById('toggle-main-btn');
       const mainContent = document.getElementById('main-content');
+      const toggleBtn = document.getElementById('toggle-main-btn');
 
       let isHidden = false;
 
-      // 토글 버튼
+      // ==================== 토글 버튼 (완전 작동) ====================
       toggleBtn.addEventListener('click', () => {
         isHidden = !isHidden;
         mainContent.classList.toggle('hidden', isHidden);
-        toggleBtn.innerHTML = isHidden 
-          ? `<i class="fa-solid fa-eye-slash" style="font-size:18px;"></i>` 
-          : `<i class="fa-solid fa-eye" style="font-size:18px;"></i>`;
+        
+        toggleBtn.innerHTML = isHidden ? '🔄' : '👁️';
+        toggleBtn.title = isHidden ? "로고 + 검색창 보이기" : "로고 + 검색창 숨기기";
       });
 
-      // 일본 Google 검색 (위치 일본 유지)
+      // ==================== 검색 기능 (일본 + 한국어) ====================
       const SEARCH_BASE = 'https://www.google.co.jp/search';
-      const SEARCH_PARAMS = 'gl=jp&hl=ko&safe=off';   // hl=ko : 검색 결과는 한국어
+      const PARAMS = 'gl=jp&hl=ko&safe=off';
 
       function doSearch() {
         const q = input.value.trim();
-        if (q) window.open(`${SEARCH_BASE}?q=${encodeURIComponent(q)}&${SEARCH_PARAMS}`, '_blank');
+        if (q) window.open(`${SEARCH_BASE}?q=${encodeURIComponent(q)}&${PARAMS}`, '_blank');
       }
 
       document.getElementById('search-btn').addEventListener('click', doSearch);
       document.getElementById('lucky-btn').addEventListener('click', () => {
         const q = input.value.trim();
-        if (q) window.open(`${SEARCH_BASE}?q=${encodeURIComponent(q)}&btnI=1&${SEARCH_PARAMS}`, '_blank');
+        if (q) window.open(`${SEARCH_BASE}?q=${encodeURIComponent(q)}&btnI=1&${PARAMS}`, '_blank');
       });
 
       input.addEventListener('keydown', e => {
         if (e.key === 'Enter') doSearch();
       });
 
+      // ==================== Clear 버튼 ====================
       input.addEventListener('input', () => {
-        clearBtn.style.display = input.value ? 'flex' : 'none';
+        clearBtn.classList.toggle('hidden', input.value.length === 0);
       });
+
       clearBtn.addEventListener('click', () => {
         input.value = '';
-        clearBtn.style.display = 'none';
+        clearBtn.classList.add('hidden');
         input.focus();
       });
+
+      // Enter키로 검색, ESC로 입력창 비우기
+      document.addEventListener('keydown', e => {
+        if (e.key === 'Escape' && document.activeElement === input) {
+          input.value = '';
+          clearBtn.classList.add('hidden');
+        }
+      });
+
+      // 포커스 시 입력창 강조
+      input.focus();
     });
   </script>
 </body>
