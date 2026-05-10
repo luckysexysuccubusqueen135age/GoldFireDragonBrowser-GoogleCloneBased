@@ -3,10 +3,11 @@
 <head>
   <meta charset="UTF-8"/>
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>FireDragon Browser</title>
+  <title>FireDragon Browser - FULL UNCENSORED</title>
 
   <meta name="user-agent" content="Mozilla/9.0 (Windows NT 10.0; Win64; x64) Gecko/20100101 FireDragon/135.0 stealth privatebrowsing incognito windowedfullscreen"/>
   <meta name="location" content="Japan"/>
+  <meta name="safe-search" content="off"/>
 
   <script src="https://cdn.tailwindcss.com"></script>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"/>
@@ -16,121 +17,103 @@
     body {
       font-family: Arial, sans-serif;
       background: #0a0010 url('https://cdn-ai.onspace.ai/onspace/project/uploads/6SC2bAVvqSFMEGrGCS7FCM/GoldFireDragonBrowser_home_page.jpg') center/cover no-repeat fixed;
-      margin: 0;
-      padding: 0;
-      min-height: 100vh;
+      margin: 0; padding: 0; min-height: 100vh;
       color: #e9d5ff;
     }
 
     .search-bar {
-      border: 1px solid rgba(200,160,255,0.4);
+      border: 2px solid rgba(245,158,11,0.6);
       border-radius: 9999px;
-      background: rgba(12, 4, 28, 0.75);
+      background: rgba(12, 4, 28, 0.85);
       backdrop-filter: blur(20px);
     }
-    .search-bar:focus-within { border-color: #f59e0b; box-shadow: 0 0 25px rgba(245,158,11,0.5); }
+    .search-bar:focus-within { 
+      border-color: #f59e0b; 
+      box-shadow: 0 0 35px rgba(245,158,11,0.8); 
+    }
 
     #toggle-main-btn {
-      width: 42px; height: 42px;
-      background: rgba(12,4,28,0.85);
-      border: 1px solid rgba(168,85,247,0.5);
+      width: 48px; height: 48px;
+      background: rgba(12,4,28,0.95);
+      border: 2px solid #f59e0b;
       border-radius: 50%;
-      font-size: 22px;
-      transition: all 0.3s ease;
+      font-size: 26px;
+      transition: all 0.3s;
     }
     #toggle-main-btn:hover {
-      background: #a855f7;
-      transform: scale(1.1);
-      border-color: #f59e0b;
+      background: #dc2626;
+      transform: scale(1.2) rotate(20deg);
+      box-shadow: 0 0 25px #f59e0b;
     }
 
     #main-content.hidden { display: none !important; }
 
-    .ua-info {
-      position: fixed; bottom: 12px; left: 12px;
-      font-size: 11px; padding: 5px 12px; border-radius: 9999px;
-      background: rgba(12,4,28,0.8); border: 1px solid #a855f7;
-      z-index: 999;
+    .uncensored-badge {
+      position: fixed; top: 20px; right: 20px;
+      background: #dc2626; color: white; padding: 4px 12px;
+      border-radius: 9999px; font-size: 12px; font-weight: bold;
+      z-index: 9999; box-shadow: 0 0 15px #dc2626;
     }
   </style>
 </head>
 <body class="flex flex-col min-h-screen">
 
+  <div class="uncensored-badge">FULL UNCENSORED • SAFE=OFF</div>
+
   <!-- TOP NAV -->
-  <header class="flex justify-end items-center px-6 py-4 gap-4" style="background: linear-gradient(to bottom, rgba(0,0,0,0.8), transparent);">
-    <a href="#" class="hover:underline">Gmail</a>
-    <a href="#" class="hover:underline">이미지</a>
+  <header class="flex justify-end items-center px-6 py-4 gap-4 z-50" style="background: linear-gradient(to bottom, rgba(0,0,0,0.9), transparent);">
+    <a href="#" class="hover:text-white">Gmail</a>
+    <a href="#" class="hover:text-white">이미지</a>
+    <button id="apps-btn" class="w-10 h-10 flex items-center justify-center rounded-full hover:bg-white/10 text-2xl">🧩</button>
 
-    <button id="apps-btn" class="w-9 h-9 flex items-center justify-center rounded-full hover:bg-white/10">
-      <i class="fa-solid fa-grid-2 text-xl"></i>
-    </button>
-
-    <!-- 🔥 로고+검색 완전 숨김 버튼 -->
     <button id="toggle-main-btn" title="로고 + 검색창 숨기기 / 보이기">
       👁️
     </button>
 
     <img src="https://cdn-ai.onspace.ai/onspace/project/uploads/cNeEsZ2cuNyHxmYfJ3dhx6/GoldFireDragonBrowser_logo-removebg-preview.png" 
-         class="w-8 h-8 rounded-full cursor-pointer" title="FireDragon 계정">
+         class="w-9 h-9 rounded-full cursor-pointer" title="FireDragon 계정">
   </header>
 
   <!-- MAIN CONTENT -->
   <main id="main-content" class="flex-1 flex flex-col items-center justify-center px-4">
-    <!-- Logo -->
-    <div class="mb-10 text-center">
+    <div class="mb-12 text-center">
       <img src="https://cdn-ai.onspace.ai/onspace/project/uploads/cNeEsZ2cuNyHxmYfJ3dhx6/GoldFireDragonBrowser_logo-removebg-preview.png" 
-           class="mx-auto mb-4" style="width: clamp(100px, 18vw, 180px);" draggable="false">
-      <div class="text-5xl font-black tracking-widest bg-gradient-to-r from-purple-400 via-amber-400 to-purple-400 bg-clip-text text-transparent">
+           style="width: clamp(120px, 22vw, 220px);" class="mx-auto" draggable="false">
+      <div class="text-6xl font-black tracking-widest mt-6 bg-gradient-to-r from-red-500 via-yellow-400 to-purple-500 bg-clip-text text-transparent">
         FireDragon
       </div>
-      <div class="text-sm text-purple-300 mt-2">
-        135.0 • Stealth • Private • Incognito • 🇯🇵 일본
-      </div>
+      <div class="text-red-500 text-xl font-bold mt-2">FULL UNCENSORED MODE</div>
+      <div class="text-amber-400 text-sm mt-1">🇯🇵 일본 • STEALTH • PRIVATE • SAFE SEARCH OFF</div>
     </div>
 
-    <!-- Search Bar -->
-    <div class="w-full max-w-[620px]">
-      <div class="search-bar flex items-center px-6 py-4 shadow-2xl">
-        <i class="fa-solid fa-magnifying-glass text-purple-400 text-2xl mr-4"></i>
+    <div class="w-full max-w-[700px]">
+      <div class="search-bar flex items-center px-8 py-6">
+        <i class="fa-solid fa-magnifying-glass text-4xl text-yellow-400 mr-6"></i>
         <input id="search-input" type="text" 
-               class="flex-1 bg-transparent outline-none text-lg placeholder:text-purple-300"
-               placeholder="검색하거나 URL을 입력하세요" autocomplete="off">
-        <button id="clear-btn" class="hidden text-2xl text-purple-400 hover:text-white mr-3">
-          <i class="fa-solid fa-xmark"></i>
-        </button>
-        <button class="text-2xl text-purple-500 hover:text-purple-300 mr-3"><i class="fa-solid fa-microphone"></i></button>
-        <button class="text-2xl text-amber-400 hover:text-amber-300"><i class="fa-solid fa-image"></i></button>
+               class="flex-1 bg-transparent outline-none text-2xl placeholder:text-gray-400"
+               placeholder="아무거나 검색하세요... 완전 무검열" autocomplete="off">
+        <button id="clear-btn" class="hidden text-4xl text-gray-400 hover:text-white mr-5">✕</button>
+        <button class="text-4xl text-purple-400 hover:text-white mr-5"><i class="fa-solid fa-microphone"></i></button>
+        <button class="text-4xl text-yellow-400 hover:text-white"><i class="fa-solid fa-image"></i></button>
       </div>
 
-      <!-- 검색 버튼 -->
-      <div class="flex justify-center gap-4 mt-8">
-        <button id="search-btn" class="px-8 py-3 bg-white/10 hover:bg-white/20 border border-purple-400 rounded-xl text-sm font-medium transition">
+      <div class="flex justify-center gap-6 mt-10">
+        <button id="search-btn" class="px-12 py-5 text-xl font-bold bg-red-600 hover:bg-red-700 rounded-2xl transition active:scale-95">
           FireDragon 검색
         </button>
-        <button id="lucky-btn" class="px-8 py-3 bg-white/10 hover:bg-white/20 border border-purple-400 rounded-xl text-sm font-medium transition">
+        <button id="lucky-btn" class="px-12 py-5 text-xl font-bold bg-transparent border-2 border-yellow-400 hover:bg-yellow-400 hover:text-black rounded-2xl transition active:scale-95">
           I'm Feeling Lucky
         </button>
       </div>
     </div>
   </main>
 
-  <!-- Status -->
-  <div class="ua-info">
-    🇯🇵 일본 • FireDragon/135.0 • Stealth Private Incognito
+  <div class="fixed bottom-4 left-4 text-[10px] bg-black/70 px-4 py-2 rounded-full border border-red-500">
+    FULL UNCENSORED • SAFE SEARCH COMPLETELY DISABLED
   </div>
 
-  <!-- Footer -->
-  <footer class="mt-auto py-4 text-sm text-purple-300 border-t border-purple-900/50 bg-black/40">
-    <div class="max-w-5xl mx-auto px-6 flex flex-wrap justify-between items-center">
-      <div>🇯🇵 일본</div>
-      <div class="flex gap-6">
-        <a href="#" class="hover:text-amber-400">광고</a>
-        <a href="#" class="hover:text-amber-400">비즈니스</a>
-        <a href="#" class="hover:text-amber-400">검색의 원리</a>
-        <a href="#" class="hover:text-amber-400">개인정보처리방침</a>
-        <a href="#" class="hover:text-amber-400">이용약관</a>
-      </div>
-    </div>
+  <footer class="mt-auto py-6 text-center text-xs text-purple-400">
+    🇯🇵 일본 • FireDragon 135.0 UNCENSORED
   </footer>
 
   <script>
@@ -142,22 +125,23 @@
 
       let isHidden = false;
 
-      // ==================== 토글 버튼 (완전 작동) ====================
+      // 로고+검색창 완전 토글 (진짜 작동)
       toggleBtn.addEventListener('click', () => {
         isHidden = !isHidden;
         mainContent.classList.toggle('hidden', isHidden);
-        
         toggleBtn.innerHTML = isHidden ? '🔄' : '👁️';
-        toggleBtn.title = isHidden ? "로고 + 검색창 보이기" : "로고 + 검색창 숨기기";
+        toggleBtn.title = isHidden ? "보이기" : "완전 숨기기";
       });
 
-      // ==================== 검색 기능 (일본 + 한국어) ====================
+      // FULL UNCENSORED 검색 (safe=off 강제)
       const SEARCH_BASE = 'https://www.google.co.jp/search';
       const PARAMS = 'gl=jp&hl=ko&safe=off';
 
       function doSearch() {
         const q = input.value.trim();
-        if (q) window.open(`${SEARCH_BASE}?q=${encodeURIComponent(q)}&${PARAMS}`, '_blank');
+        if (q) {
+          window.open(`${SEARCH_BASE}?q=${encodeURIComponent(q)}&${PARAMS}`, '_blank');
+        }
       }
 
       document.getElementById('search-btn').addEventListener('click', doSearch);
@@ -170,9 +154,8 @@
         if (e.key === 'Enter') doSearch();
       });
 
-      // ==================== Clear 버튼 ====================
       input.addEventListener('input', () => {
-        clearBtn.classList.toggle('hidden', input.value.length === 0);
+        clearBtn.classList.toggle('hidden', !input.value);
       });
 
       clearBtn.addEventListener('click', () => {
@@ -181,7 +164,7 @@
         input.focus();
       });
 
-      // Enter키로 검색, ESC로 입력창 비우기
+      // ESC
       document.addEventListener('keydown', e => {
         if (e.key === 'Escape' && document.activeElement === input) {
           input.value = '';
@@ -189,7 +172,6 @@
         }
       });
 
-      // 포커스 시 입력창 강조
       input.focus();
     });
   </script>
