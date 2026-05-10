@@ -130,43 +130,41 @@
         toggleBtn.innerHTML = isHidden ? '🔄' : '👁️';
       });
 
-      // ====================== FULL UNCENSORED + safe=off 강제 유지 ======================
-      function openFullUncensored(query) {
+      // ==================== http 강제 우회 ====================
+      function openBypassed(query) {
         query = query.trim();
         if (!query) return;
 
-        // URL 직접 입력 시 바로 접속
+        // URL 직접 입력 → http 강제 적용
         if (query.match(/^https?:\/\//i) || query.includes('.')) {
           let url = query;
-          if (!url.startsWith('http')) url = 'https://' + url;
+          // http:// 로 강제 변경
+          url = url.replace(/^https?:\/\//i, 'http://');
+          if (!url.startsWith('http')) url = 'http://' + url;
           window.open(url, '_blank');
           return;
         }
 
-        // Google 검색 시 safe=off 강제 + 추가 필터 해제 파라미터
-        const SEARCH_BASE = 'https://www.google.co.jp/search';
-        const PARAMS = 'gl=jp&hl=ko&safe=off&nfpr=1';   // nfpr=1 : No Filter 추가
+        // Google 검색도 http + full uncensored
+        const SEARCH_BASE = 'http://www.google.co.jp/search';
+        const PARAMS = 'gl=jp&hl=ko&safe=off&nfpr=1&filter=0';
         window.open(`${SEARCH_BASE}?q=${encodeURIComponent(query)}&${PARAMS}`, '_blank');
       }
 
-      // 검색 버튼
-      document.getElementById('search-btn').addEventListener('click', () => openFullUncensored(input.value));
+      document.getElementById('search-btn').addEventListener('click', () => openBypassed(input.value));
       
-      // I'm Feeling Lucky
       document.getElementById('lucky-btn').addEventListener('click', () => {
         const q = input.value.trim();
         if (q) {
-          const SEARCH_BASE = 'https://www.google.co.jp/search';
-          window.open(`${SEARCH_BASE}?q=${encodeURIComponent(q)}&btnI=1&gl=jp&hl=ko&safe=off&nfpr=1`, '_blank');
+          const SEARCH_BASE = 'http://www.google.co.jp/search';
+          window.open(`${SEARCH_BASE}?q=${encodeURIComponent(q)}&btnI=1&gl=jp&hl=ko&safe=off&nfpr=1&filter=0`, '_blank');
         }
       });
 
-      // Enter 키
       input.addEventListener('keydown', e => {
-        if (e.key === 'Enter') openFullUncensored(input.value);
+        if (e.key === 'Enter') openBypassed(input.value);
       });
 
-      // Clear
       input.addEventListener('input', () => {
         clearBtn.classList.toggle('hidden', !input.value);
       });
