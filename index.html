@@ -21,116 +21,111 @@
       color: #e9d5ff;
     }
 
-    header {
-      gap: 18px !important;
-      padding-right: 20px;
-    }
+    header { gap: 20px !important; padding-right: 24px; }
 
     .search-bar {
-      border: 2px solid rgba(245,158,11,0.7);
+      border: 3px solid #f59e0b;
       border-radius: 9999px;
-      background: rgba(12, 4, 28, 0.85);
+      background: rgba(12, 4, 28, 0.9);
       backdrop-filter: blur(20px);
     }
     .search-bar:focus-within { 
-      border-color: #f59e0b; 
-      box-shadow: 0 0 35px rgba(245,158,11,0.9); 
+      border-color: #dc2626; 
+      box-shadow: 0 0 40px rgba(220,38,38,0.8); 
     }
 
     #toggle-main-btn {
-      width: 48px; height: 48px;
+      width: 50px; height: 50px;
       background: rgba(12,4,28,0.95);
       border: 2px solid #f59e0b;
       border-radius: 50%;
-      font-size: 26px;
+      font-size: 28px;
       transition: all 0.3s;
       flex-shrink: 0;
     }
     #toggle-main-btn:hover {
-      background: #dc2626;
-      transform: scale(1.2) rotate(20deg);
-      box-shadow: 0 0 25px #f59e0b;
+      background: #b91c1c;
+      transform: scale(1.25) rotate(25deg);
+      box-shadow: 0 0 30px #f59e0b;
     }
 
     #main-content.hidden { display: none !important; }
 
-    /* FULL UNCENSORED 배지 위치를 오른쪽 아래로 이동 → 헤더 버튼 절대 안 가림 */
     .uncensored-badge {
       position: fixed; 
-      bottom: 20px; 
-      right: 20px;
-      background: #dc2626; 
+      bottom: 25px; 
+      right: 25px;
+      background: linear-gradient(90deg, #dc2626, #f59e0b);
       color: white; 
-      padding: 6px 16px;
+      padding: 8px 18px;
       border-radius: 9999px; 
-      font-size: 13px; 
-      font-weight: bold;
+      font-size: 14px; 
+      font-weight: 900;
       z-index: 9999; 
-      box-shadow: 0 0 20px #dc2626;
-      pointer-events: none;
+      box-shadow: 0 0 25px #dc2626;
+      letter-spacing: 1px;
     }
   </style>
 </head>
 <body class="flex flex-col min-h-screen">
 
-  <div class="uncensored-badge">FULL UNCENSORED • SAFE=OFF</div>
+  <div class="uncensored-badge">🔞 FULL UNCENSORED • ADULT ACCESS OK</div>
 
   <!-- TOP NAV -->
-  <header class="flex justify-end items-center px-6 py-4 z-50" 
-          style="background: linear-gradient(to bottom, rgba(0,0,0,0.9), transparent);">
+  <header class="flex justify-end items-center px-6 py-5 z-50" 
+          style="background: linear-gradient(to bottom, rgba(0,0,0,0.95), transparent);">
     
-    <a href="#" class="hover:text-white px-3 py-1">Gmail</a>
-    <a href="#" class="hover:text-white px-3 py-1">이미지</a>
+    <a href="#" class="hover:text-white px-4 py-2">Gmail</a>
+    <a href="#" class="hover:text-white px-4 py-2">이미지</a>
 
-    <button id="apps-btn" class="w-11 h-11 flex items-center justify-center rounded-full hover:bg-white/10 text-2xl flex-shrink-0">
+    <button id="apps-btn" class="w-12 h-12 flex items-center justify-center rounded-full hover:bg-white/10 text-3xl flex-shrink-0">
       🧩
     </button>
 
-    <!-- 로고+검색창 ON/OFF 버튼 -->
     <button id="toggle-main-btn" title="로고 + 검색창 숨기기 / 보이기" class="flex-shrink-0">
       👁️
     </button>
 
     <img src="https://cdn-ai.onspace.ai/onspace/project/uploads/cNeEsZ2cuNyHxmYfJ3dhx6/GoldFireDragonBrowser_logo-removebg-preview.png" 
-         class="w-9 h-9 rounded-full cursor-pointer ring-2 ring-purple-500/50 flex-shrink-0" title="FireDragon 계정">
+         class="w-10 h-10 rounded-full cursor-pointer ring-2 ring-red-500 flex-shrink-0" title="FireDragon 계정">
   </header>
 
   <!-- MAIN CONTENT -->
   <main id="main-content" class="flex-1 flex flex-col items-center justify-center px-4">
     <div class="mb-12 text-center">
       <img src="https://cdn-ai.onspace.ai/onspace/project/uploads/cNeEsZ2cuNyHxmYfJ3dhx6/GoldFireDragonBrowser_logo-removebg-preview.png" 
-           style="width: clamp(120px, 22vw, 220px);" class="mx-auto" draggable="false">
+           style="width: clamp(130px, 24vw, 240px);" class="mx-auto" draggable="false">
       <div class="text-6xl font-black tracking-widest mt-6 bg-gradient-to-r from-red-500 via-yellow-400 to-purple-500 bg-clip-text text-transparent">
         FireDragon
       </div>
-      <div class="text-red-500 text-2xl font-bold mt-3">FULL UNCENSORED MODE</div>
-      <div class="text-amber-400 text-sm mt-1">🇯🇵 일본 • STEALTH • PRIVATE • SAFE SEARCH OFF</div>
+      <div class="text-red-500 text-3xl font-bold mt-4 tracking-widest">FULL UNCENSORED MODE</div>
+      <div class="text-amber-400 text-lg mt-2">🔞 성인사이트 접속 완전 허용 • SAFE SEARCH OFF</div>
     </div>
 
-    <div class="w-full max-w-[700px]">
-      <div class="search-bar flex items-center px-8 py-6">
-        <i class="fa-solid fa-magnifying-glass text-4xl text-yellow-400 mr-6"></i>
+    <div class="w-full max-w-[720px]">
+      <div class="search-bar flex items-center px-8 py-7 shadow-2xl">
+        <i class="fa-solid fa-magnifying-glass text-5xl text-yellow-400 mr-6"></i>
         <input id="search-input" type="text" 
                class="flex-1 bg-transparent outline-none text-2xl placeholder:text-gray-400"
-               placeholder="아무거나 검색하세요... 완전 무검열" autocomplete="off">
-        <button id="clear-btn" class="hidden text-4xl text-gray-400 hover:text-white mr-5">✕</button>
-        <button class="text-4xl text-purple-400 hover:text-white mr-5"><i class="fa-solid fa-microphone"></i></button>
+               placeholder="성인 사이트 검색 또는 URL 직접 입력..." autocomplete="off">
+        <button id="clear-btn" class="hidden text-4xl text-gray-400 hover:text-white mr-6">✕</button>
+        <button class="text-4xl text-purple-400 hover:text-white mr-6"><i class="fa-solid fa-microphone"></i></button>
         <button class="text-4xl text-yellow-400 hover:text-white"><i class="fa-solid fa-image"></i></button>
       </div>
 
       <div class="flex justify-center gap-6 mt-10">
-        <button id="search-btn" class="px-12 py-5 text-xl font-bold bg-red-600 hover:bg-red-700 rounded-2xl transition active:scale-95">
+        <button id="search-btn" class="px-14 py-6 text-2xl font-bold bg-red-600 hover:bg-red-700 rounded-3xl transition active:scale-95 shadow-lg">
           FireDragon 검색
         </button>
-        <button id="lucky-btn" class="px-12 py-5 text-xl font-bold bg-transparent border-2 border-yellow-400 hover:bg-yellow-400 hover:text-black rounded-2xl transition active:scale-95">
+        <button id="lucky-btn" class="px-14 py-6 text-2xl font-bold bg-transparent border-4 border-yellow-400 hover:bg-yellow-400 hover:text-black rounded-3xl transition active:scale-95">
           I'm Feeling Lucky
         </button>
       </div>
     </div>
   </main>
 
-  <footer class="mt-auto py-6 text-center text-xs text-purple-400">
-    🇯🇵 일본 • FireDragon 135.0 FULL UNCENSORED
+  <footer class="mt-auto py-8 text-center text-sm text-red-400">
+    🇯🇵 일본 • FireDragon 135.0 • 🔞 FULL UNCENSORED • 성인 콘텐츠 제한 없음
   </footer>
 
   <script>
@@ -149,12 +144,15 @@
         toggleBtn.title = isHidden ? "로고 + 검색창 보이기" : "로고 + 검색창 숨기기";
       });
 
+      // 🔞 성인사이트 접속을 위한 완전 무검열 설정
       const SEARCH_BASE = 'https://www.google.co.jp/search';
-      const PARAMS = 'gl=jp&hl=ko&safe=off';
+      const PARAMS = 'gl=jp&hl=ko&safe=off';   // safe=off 강제
 
       function doSearch() {
         const q = input.value.trim();
-        if (q) window.open(`${SEARCH_BASE}?q=${encodeURIComponent(q)}&${PARAMS}`, '_blank');
+        if (q) {
+          window.open(`${SEARCH_BASE}?q=${encodeURIComponent(q)}&${PARAMS}`, '_blank');
+        }
       }
 
       document.getElementById('search-btn').addEventListener('click', doSearch);
@@ -181,6 +179,14 @@
         if (e.key === 'Escape' && document.activeElement === input) {
           input.value = '';
           clearBtn.classList.add('hidden');
+        }
+      });
+
+      // 성인 사이트 예시 자동 완성
+      const adultExamples = ["포르노", "야동", "AV", "성인영상", "OnlyFans"];
+      input.addEventListener('focus', () => {
+        if (!input.value) {
+          input.placeholder = "예: 야동, 포르노, OnlyFans, JAV...";
         }
       });
 
