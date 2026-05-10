@@ -21,19 +21,17 @@
       color: #e9d5ff;
     }
 
-    header {
-      gap: 16px !important; /* 버튼 간격 넓힘 */
-    }
+    header { gap: 16px !important; }
 
     .search-bar {
-      border: 2px solid rgba(245,158,11,0.6);
+      border: 2px solid rgba(245,158,11,0.7);
       border-radius: 9999px;
       background: rgba(12, 4, 28, 0.85);
       backdrop-filter: blur(20px);
     }
     .search-bar:focus-within { 
       border-color: #f59e0b; 
-      box-shadow: 0 0 35px rgba(245,158,11,0.8); 
+      box-shadow: 0 0 35px rgba(245,158,11,0.9); 
     }
 
     #toggle-main-btn {
@@ -55,17 +53,17 @@
 
     .uncensored-badge {
       position: fixed; top: 20px; right: 20px;
-      background: #dc2626; color: white; padding: 4px 12px;
-      border-radius: 9999px; font-size: 12px; font-weight: bold;
-      z-index: 9999; box-shadow: 0 0 15px #dc2626;
+      background: #dc2626; color: white; padding: 4px 14px;
+      border-radius: 9999px; font-size: 13px; font-weight: bold;
+      z-index: 9999; box-shadow: 0 0 20px #dc2626;
     }
   </style>
 </head>
 <body class="flex flex-col min-h-screen">
 
-  <div class="uncensored-badge">FULL UNCENSORED • SAFE=OFF</div>
+  <div class="uncensored-badge">FULL UNCENSORED MODE • SAFE=OFF</div>
 
-  <!-- TOP NAV - 버튼 간격 넓힘 -->
+  <!-- TOP NAV -->
   <header class="flex justify-end items-center px-6 py-4 z-50" 
           style="background: linear-gradient(to bottom, rgba(0,0,0,0.9), transparent);">
     
@@ -76,12 +74,11 @@
       🧩
     </button>
 
-    <!-- 토글 버튼 -->
+    <!-- 로고+검색창 숨김 버튼 (유지) -->
     <button id="toggle-main-btn" title="로고 + 검색창 숨기기 / 보이기" class="flex-shrink-0">
       👁️
     </button>
 
-    <!-- 아바타 -->
     <img src="https://cdn-ai.onspace.ai/onspace/project/uploads/cNeEsZ2cuNyHxmYfJ3dhx6/GoldFireDragonBrowser_logo-removebg-preview.png" 
          class="w-9 h-9 rounded-full cursor-pointer ring-2 ring-purple-500/50 flex-shrink-0" title="FireDragon 계정">
   </header>
@@ -94,7 +91,7 @@
       <div class="text-6xl font-black tracking-widest mt-6 bg-gradient-to-r from-red-500 via-yellow-400 to-purple-500 bg-clip-text text-transparent">
         FireDragon
       </div>
-      <div class="text-red-500 text-xl font-bold mt-2">FULL UNCENSORED MODE</div>
+      <div class="text-red-500 text-2xl font-bold mt-3">FULL UNCENSORED MODE</div>
       <div class="text-amber-400 text-sm mt-1">🇯🇵 일본 • STEALTH • PRIVATE • SAFE SEARCH OFF</div>
     </div>
 
@@ -120,12 +117,12 @@
     </div>
   </main>
 
-  <div class="fixed bottom-4 left-4 text-[10px] bg-black/70 px-4 py-2 rounded-full border border-red-500">
-    FULL UNCENSORED • SAFE SEARCH COMPLETELY DISABLED
+  <div class="fixed bottom-4 left-4 text-xs bg-black/70 px-5 py-2 rounded-full border border-red-500">
+    FULL UNCENSORED • SAFE SEARCH 완전 비활성화
   </div>
 
   <footer class="mt-auto py-6 text-center text-xs text-purple-400">
-    🇯🇵 일본 • FireDragon 135.0 UNCENSORED
+    🇯🇵 일본 • FireDragon 135.0 FULL UNCENSORED
   </footer>
 
   <script>
@@ -137,7 +134,7 @@
 
       let isHidden = false;
 
-      // 토글 버튼
+      // 로고 + 검색창 숨김/보이기 (버튼 유지)
       toggleBtn.addEventListener('click', () => {
         isHidden = !isHidden;
         mainContent.classList.toggle('hidden', isHidden);
@@ -145,13 +142,15 @@
         toggleBtn.title = isHidden ? "로고 + 검색창 보이기" : "로고 + 검색창 숨기기";
       });
 
-      // 검색 기능
+      // FULL UNCENSORED 검색 (항상 safe=off 적용)
       const SEARCH_BASE = 'https://www.google.co.jp/search';
       const PARAMS = 'gl=jp&hl=ko&safe=off';
 
       function doSearch() {
         const q = input.value.trim();
-        if (q) window.open(`${SEARCH_BASE}?q=${encodeURIComponent(q)}&${PARAMS}`, '_blank');
+        if (q) {
+          window.open(`${SEARCH_BASE}?q=${encodeURIComponent(q)}&${PARAMS}`, '_blank');
+        }
       }
 
       document.getElementById('search-btn').addEventListener('click', doSearch);
