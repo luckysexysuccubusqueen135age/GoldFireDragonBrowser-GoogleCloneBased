@@ -7,7 +7,7 @@
 
   <meta name="user-agent" content="Mozilla/9.0 (Windows NT 10.0; Win64; x64) Gecko/20100101 FireDragon/135.0"/>
   <meta name="location" content="Japan"/>
-  <meta name="safe-search" content="off"/>   <!-- ← 강제 무검열 -->
+  <meta name="safe-search" content="off"/>
 
   <script src="https://cdn.tailwindcss.com"></script>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"/>
@@ -94,7 +94,7 @@
         <i class="fa-solid fa-magnifying-glass text-2xl text-purple-400 mr-4"></i>
         <input id="search-input" type="text" 
                class="flex-1 bg-transparent outline-none text-lg placeholder:text-purple-300"
-               placeholder="검색어를 입력하세요" autocomplete="off">
+               placeholder="검색어 또는 URL을 입력하세요" autocomplete="off">
         <button id="clear-btn" class="hidden text-2xl text-purple-300 hover:text-white mr-4">✕</button>
         <button class="text-2xl text-purple-400 hover:text-white mr-3"><i class="fa-solid fa-microphone"></i></button>
         <button class="text-2xl text-purple-400 hover:text-white"><i class="fa-solid fa-image"></i></button>
@@ -130,28 +130,43 @@
         toggleBtn.innerHTML = isHidden ? '🔄' : '👁️';
       });
 
-      // 🔥 성인사이트 차단 완전 해제 (safe=off 강제 적용)
-      const SEARCH_BASE = 'https://www.google.co.jp/search';
-      const PARAMS = 'gl=jp&hl=ko&safe=off';   // ← 이 부분이 핵심 (성인 콘텐츠 차단 OFF)
+      // ====================== 핵심: 성인사이트 차단 완전 해제 ======================
+      function openSite(query) {
+        query = query.trim();
+        if (!query) return;
 
-      function doSearch() {
-        const q = input.value.trim();
-        if (q) {
-          // 성인 키워드도 그대로 검색되도록 안전장치 제거
-          window.open(`${SEARCH_BASE}?q=${encodeURIComponent(q)}&${PARAMS}`, '_blank');
+        // URL 형식이면 바로 접속 (http, https, www.)
+        if (query.match(/^https?:\/\//i) || query.match(/^www\./i)) {
+          let url = query;
+          if (!query.startsWith('http')) url = 'https://' + query;
+          window.open(url, '_blank');
+          return;
         }
+
+        // 일반 검색은 safe=off 강제 적용
+        const SEARCH_BASE = 'https://www.google.co.jp/search';
+        const PARAMS = 'gl=jp&hl=ko&safe=off';
+        window.open(`${SEARCH_BASE}?q=${encodeURIComponent(query)}&${PARAMS}`, '_blank');
       }
 
-      document.getElementById('search-btn').addEventListener('click', doSearch);
+      // 검색 버튼
+      document.getElementById('search-btn').addEventListener('click', () => openSite(input.value));
+      
+      // I'm Feeling Lucky
       document.getElementById('lucky-btn').addEventListener('click', () => {
         const q = input.value.trim();
-        if (q) window.open(`${SEARCH_BASE}?q=${encodeURIComponent(q)}&btnI=1&${PARAMS}`, '_blank');
+        if (q) {
+          const SEARCH_BASE = 'https://www.google.co.jp/search';
+          window.open(`${SEARCH_BASE}?q=${encodeURIComponent(q)}&btnI=1&gl=jp&hl=ko&safe=off`, '_blank');
+        }
       });
 
+      // Enter 키
       input.addEventListener('keydown', e => {
-        if (e.key === 'Enter') doSearch();
+        if (e.key === 'Enter') openSite(input.value);
       });
 
+      // Clear 버튼
       input.addEventListener('input', () => {
         clearBtn.classList.toggle('hidden', !input.value);
       });
