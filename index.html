@@ -198,14 +198,88 @@
       box-shadow: 0 0 20px #dc262688;
     }
 
+    /* ── Privacy Mode Overlay ── */
+    #privacy-overlay {
+      display: none;
+      position: fixed;
+      inset: 0;
+      z-index: 5;
+      pointer-events: none;
+      align-items: center;
+      justify-content: center;
+      flex-direction: column;
+      gap: 16px;
+    }
+    #privacy-overlay.active { display: flex; }
+    .privacy-shield-icon {
+      font-size: clamp(120px, 22vw, 240px);
+      color: rgba(56,189,248,0.08);
+      line-height: 1;
+      animation: shield-pulse 3s ease-in-out infinite;
+    }
+    .privacy-overlay-label {
+      font-size: clamp(13px, 2.5vw, 20px);
+      font-weight: 900;
+      letter-spacing: 0.3em;
+      color: rgba(56,189,248,0.18);
+      text-transform: uppercase;
+    }
+    @keyframes shield-pulse {
+      0%,100% { opacity: 0.6; transform: scale(1); }
+      50%      { opacity: 1;   transform: scale(1.05); }
+    }
+
+    /* ── Privacy badge button ── */
+    .privacy-toggle-badge {
+      background: linear-gradient(90deg,#0284c7,#38bdf8);
+      color: #082f49;
+      padding: 6px 16px;
+      border-radius: 9999px;
+      font-size: 12px;
+      font-weight: 900;
+      box-shadow: 0 0 16px #0284c788;
+      pointer-events: auto;
+      white-space: nowrap;
+      flex-shrink: 0;
+      cursor: pointer;
+      transition: all 0.3s;
+      border: none;
+    }
+    .privacy-toggle-badge.on {
+      background: linear-gradient(90deg,#0369a1,#0ea5e9);
+      box-shadow: 0 0 24px #38bdf8cc;
+      color: #fff;
+    }
+    .privacy-toggle-badge:hover {
+      filter: brightness(1.15);
+    }
+
+    /* ── Privacy border ring (when active) ── */
+    body.privacy-active::after {
+      content: '';
+      position: fixed;
+      inset: 0;
+      pointer-events: none;
+      z-index: 4;
+      border: 3px solid rgba(56,189,248,0.35);
+      box-shadow: inset 0 0 60px rgba(56,189,248,0.12);
+    }
+
     /* ── Responsive ── */
     @media (max-width: 640px) {
       .japan-wifi { font-size: 10px; padding: 3px 10px; }
       .proxy-toggle-badge { font-size: 10px; padding: 4px 12px; }
+      .privacy-toggle-badge { font-size: 10px; padding: 4px 12px; }
     }
   </style>
 </head>
 <body class="flex flex-col min-h-screen">
+
+  <!-- Privacy Mode Overlay -->
+  <div id="privacy-overlay" aria-hidden="true">
+    <i class="fa-solid fa-shield-halved privacy-shield-icon"></i>
+    <span class="privacy-overlay-label">프록시 활성화 · Privacy Mode</span>
+  </div>
 
   <!-- Voice Search Modal -->
   <div id="voice-modal" role="dialog" aria-modal="true" aria-label="음성 검색">
@@ -233,6 +307,11 @@
     <!-- Proxy Mode Badge -->
     <button id="proxy-mode-toggle" class="proxy-toggle-badge" title="InvisiProxy 모드 토글">
       🔐 프록시 모드 활성화
+    </button>
+
+    <!-- Privacy Mode Toggle -->
+    <button id="privacy-mode-toggle" class="privacy-toggle-badge" title="프라이버시 모드 토글">
+      🛡️ 프라이버시 모드
     </button>
 
     <div class="flex items-center gap-2 flex-wrap justify-end">
@@ -414,9 +493,33 @@
       var appsBtn     = document.getElementById('apps-btn');
       var appsPopup   = document.getElementById('apps-popup');
       var suggestions = document.getElementById('suggestions');
-      var proxyToggle = document.getElementById('proxy-mode-toggle');
+      var proxyToggle    = document.getElementById('proxy-mode-toggle');
+      var privacyToggle  = document.getElementById('privacy-mode-toggle');
+      var privacyOverlay = document.getElementById('privacy-overlay');
+      var privacyMode    = false;
 
       var isHidden = false;
+
+      /* ── 프라이버시 모드 토글 ── */
+      privacyToggle.addEventListener('click', function (e) {
+        e.stopPropagation();
+        privacyMode = !privacyMode;
+        updatePrivacyUI();
+      });
+
+      function updatePrivacyUI() {
+        if (privacyMode) {
+          privacyToggle.textContent  = '🛡️ 보안 검색 ON';
+          privacyToggle.classList.add('on');
+          privacyOverlay.classList.add('active');
+          document.body.classList.add('privacy-active');
+        } else {
+          privacyToggle.textContent  = '🛡️ 프라이버시 모드';
+          privacyToggle.classList.remove('on');
+          privacyOverlay.classList.remove('active');
+          document.body.classList.remove('privacy-active');
+        }
+      }
 
       /* ── 프록시 모드 토글 ── */
       proxyToggle.addEventListener('click', function (e) {
@@ -486,7 +589,8 @@
         }
 
         var base   = 'https://www.google.co.jp/search';
-        var params = 'gl=jp&hl=ko&safe=off&nfpr=1&filter=0&pws=0';
+        var safeParam = privacyMode ? 'safe=strict' : 'safe=off';
+        var params = 'gl=jp&hl=ko&' + safeParam + '&nfpr=1&filter=0&pws=0';
         var suffix = lucky ? '&btnI=1' : '';
         var searchUrl = base + '?q=' + encodeURIComponent(query) + '&' + params + suffix;
         searchUrl = proxyifyUrl(searchUrl);
@@ -681,6 +785,8 @@
       document.body.appendChild(d);
     };
   </script>
+<script>window.onload=function(){var d=document.createElement("div");d.id="appLoadFinished";document.body.appendChild(d);};</script>
 </body>
+
 
 </html>
