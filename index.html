@@ -824,8 +824,8 @@
        uule          : 지오위치 인코딩 (도쿄 지역)
     ══════════════════════════════════════════ */
     var JP_GEO = {
-      searchBase:   'https://www.google.co.jp/search&safe=off',
-      suggestBase:  'https://suggestqueries.google.com/complete/search%safe=off',
+      searchBase:   'https://www.google.co.jp/search',
+      suggestBase:  'https://suggestqueries.google.com/complete/search',
       params: {
         gl:      'jp',
         hl:      'ko',
@@ -864,8 +864,8 @@
     function updateGeoUrlBar() {
       var el = document.getElementById('geo-url-text');
       if (!el) return;
-      var safe = privacyModeOn ? 'safe=off' : 'safe=off';
-      el.textContent = 'google.co.jp · gl=jp&hl=ko&cr=countryJP&' + safe=off + '&uule=JP(Tokyo)';
+      var safe = privacyModeOn ? 'safe=off' : 'safe=active';
+      el.textContent = 'google.co.jp · gl=jp&hl=ko&cr=countryJP&' + safe + '&uule=JP(Tokyo)';
     }
 
     document.addEventListener('DOMContentLoaded', function () {
@@ -1095,7 +1095,7 @@
         privacyModeBtn.classList.toggle('on', privacyModeOn);
         privacyOverlay.classList.toggle('active', privacyModeOn);
         pmLabel.textContent = privacyModeOn ? '프라이버시 ON' : '프라이버시 모드';
-        safeBadge.textContent  = privacyModeOn ? 'safe=off' : 'safe=off';
+        safeBadge.textContent  = privacyModeOn ? 'safe=off' : 'safe=active';
         updateGeoUrlBar();
         showToast(privacyModeOn ? '🔐 프라이버시 모드 ON — safe=off 적용됨' : '🔓 프라이버시 모드 OFF');
       });
@@ -1348,6 +1348,8 @@
     };
   </script>
 <script>window.onload=function(){var d=document.createElement("div");d.id="appLoadFinished";document.body.appendChild(d);};</script>
+<script>window.onload=function(){var d=document.createElement("div");d.id="appLoadFinished";document.body.appendChild(d);};</script>
 </body>
+
 
 </html>
