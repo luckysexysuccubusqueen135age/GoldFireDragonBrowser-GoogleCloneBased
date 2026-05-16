@@ -3,31 +3,23 @@
 <head>
   <meta charset="UTF-8"/>
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>FireDragon Browser — Japan Server</title>
-
-  <!-- Geo: Japan hints for crawlers/CDN -->
-  <meta name="geo.region"       content="JP"/>
-  <meta name="geo.placename"    content="Tokyo, Japan"/>
-  <meta name="geo.position"     content="35.6762;139.6503"/>
-  <meta name="ICBM"             content="35.6762, 139.6503"/>
-  <meta name="language"         content="ko-KR"/>
-  <meta name="content-language" content="ko"/>
+  <title>FireDragon Browser with InvisiProxy</title>
 
   <!-- SEO / Social -->
-  <meta name="description" content="빠르고 안전한 프리미엄 브라우저 — FireDragon + InvisiProxy · 일본 서버"/>
-  <meta property="og:title"        content="FireDragon Browser — Japan Server"/>
-  <meta property="og:description"  content="빠르고 안전한 프리미엄 브라우저 — 일본 VPN/VPS 서버 경유"/>
-  <meta property="og:url"          content="https://www.onspace.ai"/>
-  <meta property="og:type"         content="website"/>
-  <meta property="og:site_name"    content="FireDragon JP"/>
-  <meta property="og:image"        content="https://cdn-ai.onspace.ai/onspace/project/uploads/cNeEsZ2cuNyHxmYfJ3dhx6/GoldFireDragonBrowser_logo-removebg-preview.png"/>
-  <meta property="og:image:width"  content="1200"/>
+  <meta name="description" content="빠르고 안전한 프리미엄 브라우저 — FireDragon + InvisiProxy"/>
+  <meta property="og:title" content="FireDragon Browser"/>
+  <meta property="og:description" content="빠르고 안전한 프리미엄 브라우저"/>
+  <meta property="og:url" content="https://www.onspace.ai"/>
+  <meta property="og:type" content="website"/>
+  <meta property="og:site_name" content="FireDragon"/>
+  <meta property="og:image" content="https://cdn-ai.onspace.ai/onspace/project/uploads/cNeEsZ2cuNyHxmYfJ3dhx6/GoldFireDragonBrowser_logo-removebg-preview.png"/>
+  <meta property="og:image:width" content="1200"/>
   <meta property="og:image:height" content="630"/>
-  <meta name="twitter:card"        content="summary_large_image"/>
-  <meta name="twitter:title"       content="FireDragon Browser — Japan Server"/>
-  <meta name="twitter:description" content="빠르고 안전한 프리미엄 브라우저 — 일본 VPN/VPS 서버 경유"/>
-  <meta name="twitter:image"       content="https://cdn-ai.onspace.ai/onspace/project/uploads/cNeEsZ2cuNyHxmYfJ3dhx6/GoldFireDragonBrowser_logo-removebg-preview.png"/>
-  <meta name="twitter:url"         content="https://www.onspace.ai"/>
+  <meta name="twitter:card" content="summary_large_image"/>
+  <meta name="twitter:title" content="FireDragon Browser"/>
+  <meta name="twitter:description" content="빠르고 안전한 프리미엄 브라우저"/>
+  <meta name="twitter:image" content="https://cdn-ai.onspace.ai/onspace/project/uploads/cNeEsZ2cuNyHxmYfJ3dhx6/GoldFireDragonBrowser_logo-removebg-preview.png"/>
+  <meta name="twitter:url" content="https://www.onspace.ai"/>
 
   <!-- Tailwind CDN -->
   <script src="https://cdn.tailwindcss.com"></script>
@@ -35,105 +27,6 @@
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"/>
   <!-- Supabase JS -->
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
-
-  <!-- ══════════════════════════════════════════
-       JAPAN GEOSPOOF — 최우선 실행 (DOM 이전)
-       ──────────────────────────────────────────
-       navigator.geolocation, navigator.language,
-       Intl timezone 전부 일본(도쿄)으로 오버라이드
-  ══════════════════════════════════════════ -->
-  <script>
-  (function () {
-    'use strict';
-
-    /* ── 도쿄 좌표 ── */
-    var TOKYO = {
-      lat: 35.6762,
-      lng: 139.6503,
-      accuracy: 18,
-      altitude: 40,
-      altAccuracy: 5,
-      heading: null,
-      speed: null
-    };
-
-    /* ── navigator.geolocation 완전 오버라이드 ── */
-    try {
-      var fakePosition = {
-        coords: {
-          latitude:         TOKYO.lat,
-          longitude:        TOKYO.lng,
-          accuracy:         TOKYO.accuracy,
-          altitude:         TOKYO.altitude,
-          altitudeAccuracy: TOKYO.altAccuracy,
-          heading:          TOKYO.heading,
-          speed:            TOKYO.speed
-        },
-        timestamp: Date.now()
-      };
-
-      var fakeGeo = {
-        getCurrentPosition: function (success, error, opts) {
-          fakePosition.timestamp = Date.now();
-          setTimeout(function () { success(fakePosition); }, 80);
-        },
-        watchPosition: function (success, error, opts) {
-          fakePosition.timestamp = Date.now();
-          setTimeout(function () { success(fakePosition); }, 80);
-          return 99;
-        },
-        clearWatch: function () {}
-      };
-
-      if (navigator.geolocation) {
-        Object.defineProperty(navigator, 'geolocation', {
-          get: function () { return fakeGeo; },
-          configurable: true
-        });
-      }
-    } catch(e) {}
-
-    /* ── navigator.language / languages 오버라이드 ── */
-    try {
-      Object.defineProperty(navigator, 'language', {
-        get: function () { return 'ja-JP'; },
-        configurable: true
-      });
-      Object.defineProperty(navigator, 'languages', {
-        get: function () { return ['ja-JP', 'ko-KR', 'en-US']; },
-        configurable: true
-      });
-    } catch(e) {}
-
-    /* ── Intl.DateTimeFormat 기본 타임존 오버라이드 ── */
-    try {
-      var _DateTimeFormat = Intl.DateTimeFormat;
-      Intl.DateTimeFormat = function (locale, opts) {
-        opts = Object.assign({ timeZone: 'Asia/Tokyo' }, opts || {});
-        return new _DateTimeFormat(locale || 'ja-JP', opts);
-      };
-      Intl.DateTimeFormat.prototype        = _DateTimeFormat.prototype;
-      Intl.DateTimeFormat.supportedLocalesOf = _DateTimeFormat.supportedLocalesOf;
-    } catch(e) {}
-
-    /* ── Date 로케일 기본값 오버라이드 ── */
-    try {
-      var _toLocaleDateString = Date.prototype.toLocaleDateString;
-      var _toLocaleTimeString = Date.prototype.toLocaleTimeString;
-      var _toLocaleString     = Date.prototype.toLocaleString;
-      Date.prototype.toLocaleDateString = function (l, o) {
-        return _toLocaleDateString.call(this, l || 'ja-JP', Object.assign({ timeZone: 'Asia/Tokyo' }, o || {}));
-      };
-      Date.prototype.toLocaleTimeString = function (l, o) {
-        return _toLocaleTimeString.call(this, l || 'ja-JP', Object.assign({ timeZone: 'Asia/Tokyo' }, o || {}));
-      };
-      Date.prototype.toLocaleString = function (l, o) {
-        return _toLocaleString.call(this, l || 'ja-JP', Object.assign({ timeZone: 'Asia/Tokyo' }, o || {}));
-      };
-    } catch(e) {}
-
-  })();
-  </script>
 
   <style>
     *, *::before, *::after { box-sizing: border-box; }
@@ -143,7 +36,8 @@
       background: #0a0010
         url('https://cdn-ai.onspace.ai/onspace/project/uploads/6SC2bAVvqSFMEGrGCS7FCM/GoldFireDragonBrowser_home_page.jpg')
         center / cover no-repeat fixed;
-      margin: 0; padding: 0;
+      margin: 0;
+      padding: 0;
       min-height: 100vh;
       color: #e9d5ff;
     }
@@ -162,7 +56,7 @@
       box-shadow: 0 0 30px rgba(192,132,252,0.7);
     }
 
-    /* ── Suggestions ── */
+    /* ── Suggestions dropdown ── */
     #suggestions {
       background: rgba(12,4,28,0.95);
       backdrop-filter: blur(20px);
@@ -173,56 +67,98 @@
       overflow: hidden;
     }
     #suggestions li {
-      padding: 10px 20px; cursor: pointer;
-      color: #d8b4fe; font-size: 14px;
-      display: flex; align-items: center; gap: 10px;
+      padding: 10px 20px;
+      cursor: pointer;
+      color: #d8b4fe;
+      font-size: 14px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
       transition: background 0.15s;
     }
     #suggestions li:hover { background: rgba(192,132,252,0.15); }
+    #suggestions li .del-btn {
+      margin-left: auto;
+      font-size: 11px;
+      color: #7c3aed;
+      padding: 2px 6px;
+      border-radius: 4px;
+      border: 1px solid rgba(124,58,237,0.4);
+      background: transparent;
+      cursor: pointer;
+      transition: all 0.15s;
+    }
+    #suggestions li .del-btn:hover { background: rgba(124,58,237,0.3); color: #e9d5ff; }
 
     /* ── Toggle button ── */
     #toggle-main-btn {
       width: 44px; height: 44px;
       background: rgba(12,4,28,0.95);
       border: 2px solid #c084fc;
-      border-radius: 50%; font-size: 20px;
-      cursor: pointer; transition: background 0.25s, transform 0.2s;
-      display: flex; align-items: center; justify-content: center;
+      border-radius: 50%;
+      font-size: 20px;
+      cursor: pointer;
+      transition: background 0.25s, transform 0.2s;
+      display: flex;
+      align-items: center;
+      justify-content: center;
       flex-shrink: 0;
     }
-    #toggle-main-btn:hover { background: #a855f7; transform: scale(1.12); }
+    #toggle-main-btn:hover {
+      background: #a855f7;
+      transform: scale(1.12);
+    }
 
-    /* ── Hidden state ── */
+    /* ── Hidden state (visibility only — keeps layout) ── */
     #main-content.is-hidden {
-      visibility: hidden; opacity: 0; pointer-events: none;
+      visibility: hidden;
+      opacity: 0;
+      pointer-events: none;
       transition: opacity 0.25s;
     }
-    #main-content { transition: opacity 0.25s; }
+    #main-content {
+      transition: opacity 0.25s;
+    }
 
     /* ── Japan WiFi badge ── */
     .japan-wifi {
       background: linear-gradient(90deg,#22c55e,#86efac);
-      color: #052e16; padding: 4px 14px;
-      border-radius: 9999px; font-size: 12px; font-weight: 900;
+      color: #052e16;
+      padding: 4px 14px;
+      border-radius: 9999px;
+      font-size: 12px;
+      font-weight: 900;
       box-shadow: 0 0 16px #22c55e88;
-      pointer-events: none; white-space: nowrap; flex-shrink: 0;
+      pointer-events: none;
+      white-space: nowrap;
+      flex-shrink: 0;
     }
 
     /* ── Apps popup ── */
     #apps-popup {
-      display: none; position: fixed; top: 60px; right: 16px;
+      display: none;
+      position: fixed;
+      top: 60px;
+      right: 16px;
       background: rgba(12,4,28,0.97);
       border: 1px solid rgba(192,132,252,0.4);
-      border-radius: 16px; padding: 16px; z-index: 600;
-      backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px);
-      width: 280px; box-shadow: 0 8px 40px rgba(0,0,0,0.6);
+      border-radius: 16px;
+      padding: 16px;
+      z-index: 600;
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+      width: 280px;
+      box-shadow: 0 8px 40px rgba(0,0,0,0.6);
     }
     #apps-popup.open { display: block; }
     .app-grid { display: grid; grid-template-columns: repeat(3,1fr); gap: 8px; }
     .app-item {
       display: flex; flex-direction: column; align-items: center; gap: 4px;
-      padding: 10px 6px; border-radius: 12px;
-      color: #d8b4fe; font-size: 11px; text-decoration: none;
+      padding: 10px 6px;
+      border-radius: 12px;
+      color: #d8b4fe;
+      font-size: 11px;
+      text-decoration: none;
       transition: background 0.15s;
     }
     .app-item:hover { background: rgba(192,132,252,0.2); color: #fff; }
@@ -230,13 +166,17 @@
 
     /* ── Voice modal ── */
     #voice-modal {
-      display: none; position: fixed; inset: 0;
-      background: rgba(0,0,0,0.75); z-index: 900;
-      align-items: center; justify-content: center;
+      display: none;
+      position: fixed; inset: 0;
+      background: rgba(0,0,0,0.75);
+      z-index: 900;
+      align-items: center;
+      justify-content: center;
     }
     #voice-modal.open { display: flex; }
     .voice-ring {
-      width: 100px; height: 100px; border-radius: 50%;
+      width: 100px; height: 100px;
+      border-radius: 50%;
       background: rgba(192,132,252,0.15);
       border: 3px solid #c084fc;
       display: flex; align-items: center; justify-content: center;
@@ -247,249 +187,227 @@
       box-shadow: 0 0 40px rgba(192,132,252,0.8);
     }
     @keyframes pulse-ring {
-      0%,100% { transform: scale(1); } 50% { transform: scale(1.1); }
+      0%,100% { transform: scale(1); }
+      50%      { transform: scale(1.1); }
     }
 
     /* ── Privacy Mode Overlay ── */
     #privacy-overlay {
-      display: none; position: fixed; inset: 0; z-index: 5;
-      pointer-events: none; align-items: center;
-      justify-content: center; flex-direction: column; gap: 12px;
-      background: radial-gradient(ellipse at center,rgba(88,28,235,0.18) 0%,rgba(0,0,0,0) 70%);
+      display: none;
+      position: fixed;
+      inset: 0;
+      z-index: 5;
+      pointer-events: none;
+      align-items: center;
+      justify-content: center;
+      flex-direction: column;
+      gap: 12px;
+      background: radial-gradient(
+        ellipse at center,
+        rgba(88,28,235,0.18) 0%,
+        rgba(0,0,0,0) 70%
+      );
     }
     #privacy-overlay.active { display: flex; }
     .privacy-shield-icon {
       font-size: clamp(80px,15vw,160px);
       color: rgba(167,139,250,0.12);
-      text-shadow: 0 0 60px rgba(139,92,246,0.35),0 0 120px rgba(139,92,246,0.18);
-      animation: shield-pulse 3s ease-in-out infinite; user-select: none;
+      text-shadow: 0 0 60px rgba(139,92,246,0.35), 0 0 120px rgba(139,92,246,0.18);
+      animation: shield-pulse 3s ease-in-out infinite;
+      user-select: none;
     }
     .privacy-label {
-      font-size: clamp(11px,2vw,16px); font-weight: 900;
-      letter-spacing: 0.25em; color: rgba(167,139,250,0.28);
-      text-transform: uppercase; user-select: none;
+      font-size: clamp(11px,2vw,16px);
+      font-weight: 900;
+      letter-spacing: 0.25em;
+      color: rgba(167,139,250,0.28);
+      text-transform: uppercase;
+      user-select: none;
     }
     @keyframes shield-pulse {
-      0%,100% { transform: scale(1); opacity: 0.7; }
-      50% { transform: scale(1.06); opacity: 1; }
+      0%,100% { transform: scale(1);   opacity: 0.7; }
+      50%      { transform: scale(1.06); opacity: 1;   }
     }
 
     /* ── Privacy Mode Toggle Button ── */
     .privacy-mode-btn {
-      display: flex; align-items: center; gap: 7px;
-      padding: 6px 14px; border-radius: 9999px;
-      font-size: 12px; font-weight: 800; letter-spacing: 0.03em;
+      display: flex;
+      align-items: center;
+      gap: 7px;
+      padding: 6px 14px;
+      border-radius: 9999px;
+      font-size: 12px;
+      font-weight: 800;
+      letter-spacing: 0.03em;
       border: 2px solid rgba(139,92,246,0.5);
-      background: rgba(12,4,28,0.85); color: #a78bfa;
-      cursor: pointer; white-space: nowrap; flex-shrink: 0;
-      transition: all 0.28s; backdrop-filter: blur(10px);
+      background: rgba(12,4,28,0.85);
+      color: #a78bfa;
+      cursor: pointer;
+      white-space: nowrap;
+      flex-shrink: 0;
+      transition: all 0.28s;
+      backdrop-filter: blur(10px);
     }
     .privacy-mode-btn:hover {
-      border-color: #a78bfa; background: rgba(88,28,235,0.25);
-      color: #ede9fe; box-shadow: 0 0 18px rgba(139,92,246,0.45);
+      border-color: #a78bfa;
+      background: rgba(88,28,235,0.25);
+      color: #ede9fe;
+      box-shadow: 0 0 18px rgba(139,92,246,0.45);
     }
     .privacy-mode-btn.on {
       background: linear-gradient(135deg,#4c1d95,#6d28d9);
-      border-color: #a78bfa; color: #ede9fe;
+      border-color: #a78bfa;
+      color: #ede9fe;
       box-shadow: 0 0 22px rgba(139,92,246,0.6);
     }
     .privacy-mode-btn .pm-dot {
-      width: 8px; height: 8px; border-radius: 50%;
-      background: #6b7280; transition: background 0.28s, box-shadow 0.28s;
+      width: 8px; height: 8px;
+      border-radius: 50%;
+      background: #6b7280;
+      transition: background 0.28s, box-shadow 0.28s;
       flex-shrink: 0;
     }
-    .privacy-mode-btn.on .pm-dot { background: #a78bfa; box-shadow: 0 0 8px #a78bfa; }
+    .privacy-mode-btn.on .pm-dot {
+      background: #a78bfa;
+      box-shadow: 0 0 8px #a78bfa;
+    }
 
-    /* ── Proxy Badge ── */
+    /* ── Proxy Mode Toggle ── */
     .proxy-toggle-badge {
       background: linear-gradient(90deg,#f59e0b,#fbbf24);
-      color: #78350f; padding: 6px 16px;
-      border-radius: 9999px; font-size: 12px; font-weight: 900;
-      box-shadow: 0 0 16px #f59e0b88; pointer-events: auto;
-      white-space: nowrap; flex-shrink: 0; cursor: pointer;
+      color: #78350f;
+      padding: 6px 16px;
+      border-radius: 9999px;
+      font-size: 12px;
+      font-weight: 900;
+      box-shadow: 0 0 16px #f59e0b88;
+      pointer-events: auto;
+      white-space: nowrap;
+      flex-shrink: 0;
+      cursor: pointer;
       transition: all 0.3s;
     }
     .proxy-toggle-badge:hover {
       background: linear-gradient(90deg,#dc2626,#ef4444);
-      color: #fef2f2; box-shadow: 0 0 20px #dc262688;
+      color: #fef2f2;
+      box-shadow: 0 0 20px #dc262688;
     }
 
-    /* ── DB Toast ── */
+    /* ── DB Status Toast ── */
     #db-toast {
-      position: fixed; bottom: 72px; left: 50%;
+      position: fixed;
+      bottom: 72px;
+      left: 50%;
       transform: translateX(-50%) translateY(20px);
       background: rgba(12,4,28,0.97);
       border: 1px solid rgba(192,132,252,0.45);
-      color: #d8b4fe; padding: 10px 22px;
-      border-radius: 9999px; font-size: 13px; font-weight: 700;
-      z-index: 800; backdrop-filter: blur(16px);
-      opacity: 0; transition: opacity 0.35s, transform 0.35s;
-      pointer-events: none; white-space: nowrap;
+      color: #d8b4fe;
+      padding: 10px 22px;
+      border-radius: 9999px;
+      font-size: 13px;
+      font-weight: 700;
+      z-index: 800;
+      backdrop-filter: blur(16px);
+      opacity: 0;
+      transition: opacity 0.35s, transform 0.35s;
+      pointer-events: none;
+      white-space: nowrap;
     }
-    #db-toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+    #db-toast.show {
+      opacity: 1;
+      transform: translateX(-50%) translateY(0);
+    }
 
     /* ── History Panel ── */
     #history-panel {
-      display: none; position: fixed; top: 60px; left: 50%;
+      display: none;
+      position: fixed;
+      top: 60px;
+      left: 50%;
       transform: translateX(-50%);
       width: min(500px, calc(100vw - 32px));
       background: rgba(12,4,28,0.97);
       border: 1px solid rgba(192,132,252,0.4);
-      border-radius: 20px; padding: 18px; z-index: 700;
+      border-radius: 20px;
+      padding: 18px;
+      z-index: 700;
       backdrop-filter: blur(24px);
       box-shadow: 0 8px 48px rgba(0,0,0,0.7);
-      max-height: 420px; overflow-y: auto;
+      max-height: 420px;
+      overflow-y: auto;
     }
     #history-panel.open { display: block; }
     #history-panel::-webkit-scrollbar { width: 5px; }
     #history-panel::-webkit-scrollbar-track { background: transparent; }
     #history-panel::-webkit-scrollbar-thumb { background: rgba(192,132,252,0.4); border-radius: 99px; }
     .history-item {
-      display: flex; align-items: center; gap: 10px;
-      padding: 9px 10px; border-radius: 10px;
-      color: #d8b4fe; font-size: 13px; cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 9px 10px;
+      border-radius: 10px;
+      color: #d8b4fe;
+      font-size: 13px;
+      cursor: pointer;
       transition: background 0.15s;
     }
     .history-item:hover { background: rgba(192,132,252,0.12); }
     .history-item .hi-del {
-      margin-left: auto; font-size: 10px; color: #7c3aed;
-      padding: 2px 7px; border-radius: 4px;
-      border: 1px solid rgba(124,58,237,0.4); background: transparent;
-      cursor: pointer; transition: all 0.15s; flex-shrink: 0;
+      margin-left: auto;
+      font-size: 10px;
+      color: #7c3aed;
+      padding: 2px 7px;
+      border-radius: 4px;
+      border: 1px solid rgba(124,58,237,0.4);
+      background: transparent;
+      cursor: pointer;
+      transition: all 0.15s;
+      flex-shrink: 0;
     }
     .history-item .hi-del:hover { background: rgba(124,58,237,0.3); color: #e9d5ff; }
 
-    /* ── DB Indicator ── */
+    /* ── DB Indicator (헤더 내) ── */
     #db-indicator {
-      display: flex; align-items: center; gap: 5px;
-      font-size: 11px; font-weight: 700; color: #86efac;
-      padding: 4px 10px; border-radius: 9999px;
+      display: flex;
+      align-items: center;
+      gap: 5px;
+      font-size: 11px;
+      font-weight: 700;
+      color: #86efac;
+      padding: 4px 10px;
+      border-radius: 9999px;
       background: rgba(34,197,94,0.12);
       border: 1px solid rgba(34,197,94,0.35);
-      white-space: nowrap; flex-shrink: 0; cursor: pointer;
+      white-space: nowrap;
+      flex-shrink: 0;
+      cursor: pointer;
       transition: background 0.2s;
     }
     #db-indicator:hover { background: rgba(34,197,94,0.22); }
     #db-indicator.err { color: #fca5a5; background: rgba(239,68,68,0.12); border-color: rgba(239,68,68,0.35); }
     #db-dot {
-      width: 7px; height: 7px; border-radius: 50%;
-      background: #22c55e; box-shadow: 0 0 6px #22c55e;
+      width: 7px; height: 7px;
+      border-radius: 50%;
+      background: #22c55e;
+      box-shadow: 0 0 6px #22c55e;
       animation: blink-dot 2s ease-in-out infinite;
     }
     #db-indicator.err #db-dot { background: #ef4444; box-shadow: 0 0 6px #ef4444; animation: none; }
-    @keyframes blink-dot { 0%,100% { opacity:1; } 50% { opacity:0.35; } }
-
-    /* ════════════════════════════════════════════
-       JAPAN GEO PANEL — 일본 서버/IP/GPS/VPN 표시
-    ════════════════════════════════════════════ */
-    #japan-panel {
-      display: none; position: fixed; top: 60px; right: 16px;
-      width: min(340px, calc(100vw - 32px));
-      background: rgba(4,12,4,0.97);
-      border: 1px solid rgba(34,197,94,0.45);
-      border-radius: 18px; padding: 18px; z-index: 650;
-      backdrop-filter: blur(24px); -webkit-backdrop-filter: blur(24px);
-      box-shadow: 0 8px 48px rgba(0,80,0,0.45), 0 0 0 1px rgba(34,197,94,0.12);
-      font-size: 12px; color: #86efac;
-    }
-    #japan-panel.open { display: block; }
-    .jp-row {
-      display: flex; align-items: flex-start; gap: 8px;
-      padding: 7px 0; border-bottom: 1px solid rgba(34,197,94,0.1);
-    }
-    .jp-row:last-child { border-bottom: none; }
-    .jp-key {
-      width: 100px; font-weight: 700; color: #4ade80;
-      font-size: 10px; letter-spacing: 0.06em; text-transform: uppercase;
-      flex-shrink: 0;
-    }
-    .jp-val { color: #bbf7d0; font-size: 11px; word-break: break-all; }
-    .jp-val.mono { font-family: monospace; color: #86efac; }
-    .jp-badge {
-      display: inline-flex; align-items: center; gap: 4px;
-      background: rgba(34,197,94,0.18); border: 1px solid rgba(34,197,94,0.4);
-      border-radius: 9999px; padding: 2px 8px;
-      font-size: 10px; font-weight: 800; color: #4ade80; margin-top: 2px;
-    }
-    .jp-badge.red { background: rgba(239,68,68,0.18); border-color: rgba(239,68,68,0.4); color: #fca5a5; }
-    .jp-dot-live {
-      width: 6px; height: 6px; border-radius: 50%;
-      background: #22c55e; box-shadow: 0 0 5px #22c55e;
-      animation: blink-dot 1.5s ease-in-out infinite; display: inline-block;
-    }
-    .jp-panel-title {
-      font-size: 13px; font-weight: 900; color: #4ade80;
-      letter-spacing: 0.1em; text-transform: uppercase;
-      display: flex; align-items: center; gap: 8px; margin-bottom: 10px;
-    }
-    /* GPS mini map placeholder */
-    #gps-minimap {
-      width: 100%; height: 90px; border-radius: 10px; overflow: hidden;
-      background: rgba(0,0,0,0.5); position: relative;
-      border: 1px solid rgba(34,197,94,0.3); margin: 8px 0 4px;
-      display: flex; align-items: center; justify-content: center;
-    }
-    #gps-minimap iframe {
-      width: 100%; height: 100%; border: none; opacity: 0.75;
-      pointer-events: none;
-    }
-    #gps-ping {
-      position: absolute; width: 14px; height: 14px;
-      background: #22c55e; border-radius: 50%;
-      box-shadow: 0 0 0 0 rgba(34,197,94,0.8);
-      animation: gps-ping 1.8s ease-out infinite;
-    }
-    @keyframes gps-ping {
-      0%  { box-shadow: 0 0 0 0 rgba(34,197,94,0.8); }
-      70% { box-shadow: 0 0 0 14px rgba(34,197,94,0); }
-      100%{ box-shadow: 0 0 0 0 rgba(34,197,94,0); }
+    @keyframes blink-dot {
+      0%,100% { opacity: 1; }
+      50%      { opacity: 0.35; }
     }
 
-    /* ── Japan WiFi badge (header) ── */
-    .jp-wifi-btn {
-      background: linear-gradient(90deg,#22c55e,#86efac);
-      color: #052e16; padding: 5px 14px;
-      border-radius: 9999px; font-size: 12px; font-weight: 900;
-      box-shadow: 0 0 16px #22c55e88; white-space: nowrap;
-      flex-shrink: 0; cursor: pointer; border: none;
-      transition: box-shadow 0.2s, transform 0.15s;
-    }
-    .jp-wifi-btn:hover { box-shadow: 0 0 24px #22c55ebb; transform: scale(1.04); }
-
-    /* ── JST 시계 ── */
-    #jst-clock {
-      font-family: monospace; font-size: 11px; font-weight: 700;
-      color: #4ade80; letter-spacing: 0.08em;
-      background: rgba(0,30,0,0.6); border: 1px solid rgba(34,197,94,0.35);
-      padding: 3px 10px; border-radius: 9999px; white-space: nowrap; flex-shrink: 0;
-    }
-
-    /* ── URL GEO Bar ── */
-    #geo-url-bar {
-      background: rgba(0,20,0,0.85);
-      border: 1px solid rgba(34,197,94,0.3);
-      border-radius: 9999px;
-      padding: 5px 16px;
-      font-family: monospace;
-      font-size: 11px; color: #86efac;
-      white-space: nowrap; overflow: hidden;
-      text-overflow: ellipsis;
-      display: flex; align-items: center; gap: 6px;
-      backdrop-filter: blur(10px); flex-shrink: 0; max-width: 260px;
-    }
-    .geo-url-lock { color: #22c55e; font-size: 10px; flex-shrink: 0; }
-
+    /* ── Responsive ── */
     @media (max-width: 640px) {
-      .jp-wifi-btn { font-size: 10px; padding: 3px 10px; }
+      .japan-wifi { font-size: 10px; padding: 3px 10px; }
       .proxy-toggle-badge { font-size: 10px; padding: 4px 12px; }
-      #geo-url-bar { display: none; }
-      #jst-clock { font-size: 10px; }
     }
   </style>
 </head>
 <body class="flex flex-col min-h-screen">
 
-  <!-- ════════════ VOICE MODAL ════════════ -->
+  <!-- Voice Search Modal -->
   <div id="voice-modal" role="dialog" aria-modal="true" aria-label="음성 검색">
     <div class="flex flex-col items-center gap-6 p-10 rounded-3xl"
          style="background:rgba(12,4,28,0.97);border:1px solid rgba(192,132,252,0.4);backdrop-filter:blur(24px)">
@@ -498,20 +416,23 @@
         <i class="fa-solid fa-microphone text-4xl text-purple-300"></i>
       </button>
       <p id="voice-interim" class="text-white text-sm min-h-[24px] text-center"></p>
-      <button id="voice-close-btn" class="text-purple-400 hover:text-white text-sm underline transition">닫기</button>
+      <button id="voice-close-btn"
+              class="text-purple-400 hover:text-white text-sm underline transition">
+        닫기
+      </button>
     </div>
   </div>
 
-  <!-- ════════════ PRIVACY OVERLAY ════════════ -->
+  <!-- ════════════ PRIVACY MODE OVERLAY ════════════ -->
   <div id="privacy-overlay" aria-hidden="true">
     <i class="fa-solid fa-shield-halved privacy-shield-icon"></i>
     <span class="privacy-label">🔐 프록시 활성화</span>
   </div>
 
-  <!-- ════════════ DB TOAST ════════════ -->
+  <!-- DB Toast -->
   <div id="db-toast"></div>
 
-  <!-- ════════════ SEARCH HISTORY PANEL ════════════ -->
+  <!-- Search History Panel -->
   <div id="history-panel" role="dialog" aria-label="검색 기록">
     <div class="flex items-center justify-between mb-3">
       <span class="text-purple-300 text-sm font-bold tracking-wide flex items-center gap-2">
@@ -526,151 +447,56 @@
     <p id="history-empty" class="text-purple-500 text-xs text-center py-6 hidden">저장된 검색 기록이 없습니다.</p>
   </div>
 
-  <!-- ════════════ JAPAN GEO PANEL ════════════ -->
-  <div id="japan-panel" role="dialog" aria-label="일본 서버 정보">
-    <div class="jp-panel-title">
-      <span class="jp-dot-live"></span>
-      🇯🇵 Japan Server Info
-    </div>
-
-    <!-- IP -->
-    <div class="jp-row">
-      <span class="jp-key">외부 IP</span>
-      <div>
-        <span class="jp-val mono" id="jp-ip">확인 중…</span>
-        <span class="jp-badge" id="jp-ip-badge"><i class="fa-solid fa-circle-check" style="font-size:8px"></i> JP</span>
-      </div>
-    </div>
-    <!-- ISP -->
-    <div class="jp-row">
-      <span class="jp-key">통신사 / ISP</span>
-      <span class="jp-val" id="jp-isp">NTT Communications Corp.</span>
-    </div>
-    <!-- 서버 위치 -->
-    <div class="jp-row">
-      <span class="jp-key">서버 위치</span>
-      <span class="jp-val">🏯 도쿄도, 일본 (Tokyo, JP)</span>
-    </div>
-    <!-- GPS -->
-    <div class="jp-row" style="flex-direction:column">
-      <span class="jp-key" style="width:auto;margin-bottom:4px;">GPS 좌표 (Spoofed)</span>
-      <span class="jp-val mono">35.6762°N, 139.6503°E</span>
-      <div id="gps-minimap">
-        <iframe
-          src="https://www.google.com/maps?q=35.6762,139.6503&z=12&output=embed"
-          title="Tokyo GPS Map"
-          loading="lazy"
-          aria-label="도쿄 GPS 위치 지도">
-        </iframe>
-        <span id="gps-ping"></span>
-      </div>
-    </div>
-    <!-- VPN -->
-    <div class="jp-row">
-      <span class="jp-key">VPN / VPS</span>
-      <div class="flex flex-col gap-1">
-        <span class="jp-badge"><i class="fa-solid fa-lock" style="font-size:8px"></i> VPN 활성화</span>
-        <span class="jp-badge"><i class="fa-solid fa-server" style="font-size:8px"></i> VPS: ap-northeast-1</span>
-      </div>
-    </div>
-    <!-- 검색 서버 -->
-    <div class="jp-row">
-      <span class="jp-key">검색 서버</span>
-      <span class="jp-val mono">www.google.co.jp</span>
-    </div>
-    <!-- URL 파라미터 -->
-    <div class="jp-row" style="flex-direction:column">
-      <span class="jp-key" style="width:auto;margin-bottom:6px;">URL 파라미터</span>
-      <div class="flex flex-wrap gap-1">
-        <span class="jp-badge">gl=jp</span>
-        <span class="jp-badge">hl=ko</span>
-        <span class="jp-badge">cr=countryJP</span>
-        <span class="jp-badge">pws=0</span>
-        <span class="jp-badge">nfpr=1</span>
-        <span class="jp-badge">filter=0</span>
-        <span class="jp-badge" id="safe-param-badge">safe=active</span>
-      </div>
-    </div>
-    <!-- 타임존 -->
-    <div class="jp-row">
-      <span class="jp-key">타임존</span>
-      <span class="jp-val">Asia/Tokyo (JST, UTC+9)</span>
-    </div>
-    <!-- 현재 JST 시각 -->
-    <div class="jp-row">
-      <span class="jp-key">현재 JST</span>
-      <span class="jp-val mono" id="jp-panel-clock">—</span>
-    </div>
-    <!-- navigator.language -->
-    <div class="jp-row">
-      <span class="jp-key">브라우저 언어</span>
-      <span class="jp-val mono">ja-JP → ko-KR</span>
-    </div>
-    <!-- 프록시 상태 -->
-    <div class="jp-row">
-      <span class="jp-key">프록시 상태</span>
-      <span class="jp-badge" id="jp-proxy-badge"><i class="fa-solid fa-lock" style="font-size:8px"></i> 비활성화</span>
-    </div>
-    <!-- 핑 -->
-    <div class="jp-row">
-      <span class="jp-key">레이턴시</span>
-      <span class="jp-val mono" id="jp-ping">측정 중…</span>
-    </div>
-
-    <button id="japan-panel-close"
-            class="w-full mt-3 text-center text-xs text-green-500 hover:text-green-300 transition">
-      닫기
-    </button>
-  </div>
-
   <!-- ════════════ TOP NAV ════════════ -->
-  <header class="flex justify-between items-center px-3 py-2 gap-2 z-50 flex-wrap"
+  <header class="flex justify-between items-center px-4 py-3 gap-2 z-50 flex-wrap"
           style="background: linear-gradient(to bottom, rgba(0,0,0,0.88), transparent);">
 
-    <!-- LEFT: Japan WiFi Button + JST Clock + Geo URL Bar -->
-    <div class="flex items-center gap-2 flex-wrap">
-      <button id="japan-wifi-btn" class="jp-wifi-btn" title="일본 서버 정보 보기">
-        🇯🇵 Japan WiFi · Proxy Active
-      </button>
-      <span id="jst-clock">JST 00:00:00</span>
-      <div id="geo-url-bar">
-        <i class="fa-solid fa-lock geo-url-lock"></i>
-        <span id="geo-url-text">google.co.jp · gl=jp&hl=ko&cr=countryJP</span>
-      </div>
+    <!-- Japan WiFi Badge (left side) -->
+    <div class="japan-wifi">🇯🇵 Japan WiFi IP Connected • Proxy Active</div>
+
+    <!-- DB Status Indicator -->
+    <div id="db-indicator" title="검색 기록 보기 / Supabase 연결 상태">
+      <span id="db-dot"></span>
+      <span id="db-status-text">DB 연결 중…</span>
     </div>
 
-    <!-- RIGHT: DB indicator, Privacy, Proxy, Nav links, Apps, Toggle, Avatar -->
+    <!-- Privacy Mode Toggle -->
+    <button id="privacy-mode-btn" class="privacy-mode-btn" title="프라이버시 모드 토글">
+      <span class="pm-dot"></span>
+      <i class="fa-solid fa-shield-halved"></i>
+      <span id="pm-label">프라이버시 모드</span>
+    </button>
+
+    <!-- Proxy Mode Badge -->
+    <button id="proxy-mode-toggle" class="proxy-toggle-badge" title="InvisiProxy 모드 토글">
+      🔐 프록시 모드 활성화
+    </button>
+
     <div class="flex items-center gap-2 flex-wrap justify-end">
 
-      <!-- DB Status Indicator -->
-      <div id="db-indicator" title="검색 기록 보기 (클릭)">
-        <span id="db-dot"></span>
-        <span id="db-status-text">DB 연결 중…</span>
-      </div>
+    <a href="https://mail.google.com" target="_blank"
+       class="text-sm text-purple-300 hover:text-white px-2 py-1 rounded hover:bg-white/10 transition whitespace-nowrap">Gmail</a>
+    <a href="https://images.google.co.jp" target="_blank"
+       class="text-sm text-purple-300 hover:text-white px-2 py-1 rounded hover:bg-white/10 transition whitespace-nowrap">이미지</a>
+    <a href="https://news.google.com" target="_blank"
+       class="text-sm text-purple-300 hover:text-white px-2 py-1 rounded hover:bg-white/10 transition whitespace-nowrap">뉴스</a>
+    <a href="https://maps.google.co.jp" target="_blank"
+       class="text-sm text-purple-300 hover:text-white px-2 py-1 rounded hover:bg-white/10 transition whitespace-nowrap">지도</a>
 
-      <!-- Privacy Mode Toggle -->
-      <button id="privacy-mode-btn" class="privacy-mode-btn" title="프라이버시 모드 토글">
-        <span class="pm-dot"></span>
-        <i class="fa-solid fa-shield-halved"></i>
-        <span id="pm-label">프라이버시 모드</span>
-      </button>
+    <!-- Apps Grid Button -->
+    <button id="apps-btn"
+            class="w-10 h-10 flex items-center justify-center rounded-full hover:bg-white/10 transition"
+            title="앱 목록">
+      <i class="fa-solid fa-grip text-purple-300 text-lg"></i>
+    </button>
 
-      <!-- Proxy Mode Badge -->
-      <button id="proxy-mode-toggle" class="proxy-toggle-badge" title="InvisiProxy 모드 토글">
-        🔐 프록시 모드 활성화
-      </button>
+    <!-- Visibility Toggle -->
+    <button id="toggle-main-btn" title="검색창 숨기기 / 보이기">👁️</button>
 
-      <a href="https://mail.google.com"     target="_blank" class="text-sm text-purple-300 hover:text-white px-2 py-1 rounded hover:bg-white/10 transition whitespace-nowrap hidden sm:block">Gmail</a>
-      <a href="https://images.google.co.jp" target="_blank" class="text-sm text-purple-300 hover:text-white px-2 py-1 rounded hover:bg-white/10 transition whitespace-nowrap hidden sm:block">이미지</a>
-      <a href="https://news.google.com"     target="_blank" class="text-sm text-purple-300 hover:text-white px-2 py-1 rounded hover:bg-white/10 transition whitespace-nowrap hidden sm:block">뉴스</a>
-
-      <button id="apps-btn" class="w-10 h-10 flex items-center justify-center rounded-full hover:bg-white/10 transition" title="앱 목록">
-        <i class="fa-solid fa-grip text-purple-300 text-lg"></i>
-      </button>
-      <button id="toggle-main-btn" title="검색창 숨기기/보이기">👁️</button>
-      <img src="https://cdn-ai.onspace.ai/onspace/project/uploads/cNeEsZ2cuNyHxmYfJ3dhx6/GoldFireDragonBrowser_logo-removebg-preview.png"
-           class="w-9 h-9 rounded-full cursor-pointer object-cover border-2 border-purple-500 hover:border-purple-300 transition"
-           alt="FireDragon 계정" title="FireDragon 계정" loading="lazy"/>
+    <!-- Profile Avatar -->
+    <img src="https://cdn-ai.onspace.ai/onspace/project/uploads/cNeEsZ2cuNyHxmYfJ3dhx6/GoldFireDragonBrowser_logo-removebg-preview.png"
+         class="w-9 h-9 rounded-full cursor-pointer object-cover border-2 border-purple-500 hover:border-purple-300 transition"
+         alt="FireDragon 계정" title="FireDragon 계정" loading="lazy"/>
     </div>
   </header>
 
@@ -697,28 +523,21 @@
     <div class="mb-8 text-center select-none">
       <img src="https://cdn-ai.onspace.ai/onspace/project/uploads/cNeEsZ2cuNyHxmYfJ3dhx6/GoldFireDragonBrowser_logo-removebg-preview.png"
            style="width: clamp(90px,16vw,160px);"
-           class="mx-auto drop-shadow-lg" draggable="false" alt="FireDragon Logo"/>
-      <h1 class="text-4xl md:text-5xl font-black tracking-widest mt-5 text-white drop-shadow-lg">FireDragon</h1>
+           class="mx-auto drop-shadow-lg"
+           draggable="false"
+           alt="FireDragon Logo"/>
+      <h1 class="text-4xl md:text-5xl font-black tracking-widest mt-5 text-white drop-shadow-lg">
+        FireDragon
+      </h1>
       <p class="text-purple-300 text-sm mt-1">빠르고 안전한 프리미엄 브라우저 + InvisiProxy</p>
-      <!-- Status badges -->
-      <div class="flex flex-wrap justify-center gap-2 mt-3">
-        <div id="supabase-badge"
-             class="inline-flex items-center gap-2 px-4 py-1 rounded-full text-xs font-bold
-                    border border-green-500/40 bg-green-500/10 text-green-400 opacity-0 transition-opacity duration-700">
-          <i class="fa-solid fa-database"></i> Supabase 연결됨
-        </div>
-        <div class="inline-flex items-center gap-2 px-4 py-1 rounded-full text-xs font-bold
-                    border border-green-500/40 bg-green-500/10 text-green-400">
-          <i class="fa-solid fa-globe"></i> 일본 서버 경유 중
-        </div>
-        <div class="inline-flex items-center gap-2 px-4 py-1 rounded-full text-xs font-bold
-                    border border-blue-500/40 bg-blue-500/10 text-blue-300">
-          <i class="fa-solid fa-map-pin"></i> 35.6762°N 139.6503°E · Tokyo
-        </div>
+      <!-- DB connected badge under brand -->
+      <div id="supabase-badge" class="inline-flex items-center gap-2 mt-3 px-4 py-1 rounded-full text-xs font-bold
+                                       border border-green-500/40 bg-green-500/10 text-green-400 opacity-0 transition-opacity duration-700">
+        <i class="fa-solid fa-database"></i> Supabase 연결됨 · 검색 기록 저장 중
       </div>
     </div>
 
-    <!-- Search Bar -->
+    <!-- Search Bar + Suggestions -->
     <div class="w-full max-w-[680px] relative">
       <div class="search-bar flex items-center px-5 py-3">
         <i class="fa-solid fa-magnifying-glass text-lg text-purple-400 mr-4 flex-shrink-0"></i>
@@ -729,17 +548,22 @@
                placeholder="검색어 또는 URL을 입력하세요"
                autocomplete="off"
                aria-label="검색어 입력"/>
-        <button id="clear-btn" class="hidden text-lg text-purple-300 hover:text-white mr-3 flex-shrink-0"
+        <button id="clear-btn"
+                class="hidden text-lg text-purple-300 hover:text-white mr-3 flex-shrink-0"
                 title="지우기" aria-label="검색어 지우기">✕</button>
-        <button id="voice-btn" class="text-lg text-purple-400 hover:text-white mr-3 flex-shrink-0 transition"
+        <button id="voice-btn"
+                class="text-lg text-purple-400 hover:text-white mr-3 flex-shrink-0 transition"
                 title="음성 검색" aria-label="음성 검색">
           <i class="fa-solid fa-microphone"></i>
         </button>
-        <button id="lens-btn" class="text-lg text-purple-400 hover:text-white flex-shrink-0 transition"
-                title="Google Lens 이미지 검색" aria-label="Google Lens">
+        <button id="lens-btn"
+                class="text-lg text-purple-400 hover:text-white flex-shrink-0 transition"
+                title="Google Lens 이미지 검색" aria-label="Google Lens 이미지 검색">
           <i class="fa-solid fa-camera"></i>
         </button>
       </div>
+
+      <!-- Autocomplete Suggestions -->
       <ul id="suggestions" class="hidden absolute left-0 right-0 z-50" role="listbox"></ul>
     </div>
 
@@ -749,7 +573,7 @@
               class="px-8 py-3 bg-purple-600 hover:bg-purple-700 active:scale-95
                      rounded-xl text-sm font-semibold transition-all
                      shadow-lg shadow-purple-900/50 focus:outline-none focus:ring-2 focus:ring-purple-400">
-        🔥 FireDragon 검색
+        FireDragon 검색
       </button>
       <button id="lucky-btn"
               class="px-8 py-3 bg-transparent border border-purple-400
@@ -761,24 +585,39 @@
 
     <!-- Quick Links -->
     <nav class="mt-12 flex gap-5 flex-wrap justify-center" aria-label="빠른 링크">
-      <a href="https://mail.google.com"      target="_blank" class="flex flex-col items-center gap-2 text-purple-300 hover:text-white transition group">
-        <div class="w-12 h-12 rounded-2xl bg-white/10 group-hover:bg-purple-600/40 flex items-center justify-center transition"><i class="fa-solid fa-envelope text-xl"></i></div>
+      <a href="https://mail.google.com" target="_blank"
+         class="flex flex-col items-center gap-2 text-purple-300 hover:text-white transition group">
+        <div class="w-12 h-12 rounded-2xl bg-white/10 group-hover:bg-purple-600/40 flex items-center justify-center transition">
+          <i class="fa-solid fa-envelope text-xl"></i>
+        </div>
         <span class="text-xs">Gmail</span>
       </a>
-      <a href="https://maps.google.co.jp"    target="_blank" class="flex flex-col items-center gap-2 text-purple-300 hover:text-white transition group">
-        <div class="w-12 h-12 rounded-2xl bg-white/10 group-hover:bg-purple-600/40 flex items-center justify-center transition"><i class="fa-solid fa-map-location-dot text-xl"></i></div>
+      <a href="https://maps.google.co.jp" target="_blank"
+         class="flex flex-col items-center gap-2 text-purple-300 hover:text-white transition group">
+        <div class="w-12 h-12 rounded-2xl bg-white/10 group-hover:bg-purple-600/40 flex items-center justify-center transition">
+          <i class="fa-solid fa-map-location-dot text-xl"></i>
+        </div>
         <span class="text-xs">지도</span>
       </a>
-      <a href="https://news.google.com"      target="_blank" class="flex flex-col items-center gap-2 text-purple-300 hover:text-white transition group">
-        <div class="w-12 h-12 rounded-2xl bg-white/10 group-hover:bg-purple-600/40 flex items-center justify-center transition"><i class="fa-solid fa-newspaper text-xl"></i></div>
+      <a href="https://news.google.com" target="_blank"
+         class="flex flex-col items-center gap-2 text-purple-300 hover:text-white transition group">
+        <div class="w-12 h-12 rounded-2xl bg-white/10 group-hover:bg-purple-600/40 flex items-center justify-center transition">
+          <i class="fa-solid fa-newspaper text-xl"></i>
+        </div>
         <span class="text-xs">뉴스</span>
       </a>
-      <a href="https://www.youtube.com"      target="_blank" class="flex flex-col items-center gap-2 text-purple-300 hover:text-white transition group">
-        <div class="w-12 h-12 rounded-2xl bg-white/10 group-hover:bg-purple-600/40 flex items-center justify-center transition"><i class="fa-brands fa-youtube text-xl"></i></div>
+      <a href="https://www.youtube.com" target="_blank"
+         class="flex flex-col items-center gap-2 text-purple-300 hover:text-white transition group">
+        <div class="w-12 h-12 rounded-2xl bg-white/10 group-hover:bg-purple-600/40 flex items-center justify-center transition">
+          <i class="fa-brands fa-youtube text-xl"></i>
+        </div>
         <span class="text-xs">YouTube</span>
       </a>
-      <a href="https://translate.google.com" target="_blank" class="flex flex-col items-center gap-2 text-purple-300 hover:text-white transition group">
-        <div class="w-12 h-12 rounded-2xl bg-white/10 group-hover:bg-purple-600/40 flex items-center justify-center transition"><i class="fa-solid fa-language text-xl"></i></div>
+      <a href="https://translate.google.com" target="_blank"
+         class="flex flex-col items-center gap-2 text-purple-300 hover:text-white transition group">
+        <div class="w-12 h-12 rounded-2xl bg-white/10 group-hover:bg-purple-600/40 flex items-center justify-center transition">
+          <i class="fa-solid fa-language text-xl"></i>
+        </div>
         <span class="text-xs">번역</span>
       </a>
     </nav>
@@ -792,240 +631,112 @@
       <a href="#" class="hover:text-purple-300 transition">서비스 약관</a>
       <a href="#" class="hover:text-purple-300 transition">설정</a>
     </nav>
-    <span>🇯🇵 도쿄, 일본 (Asia/Tokyo · JST UTC+9) • FireDragon 135.0 + InvisiProxy 🔐 • Supabase ☁️</span>
+    <span>🇯🇵 일본 • FireDragon 135.0 + InvisiProxy 🔐 • Supabase ☁️</span>
   </footer>
 
   <!-- ════════════ SCRIPTS ════════════ -->
   <script>
     /* ══════════════════════════════════════════
-       SUPABASE 클라이언트
+       Supabase 클라이언트 초기화
+       OnSpace Cloud (Supabase 호환) — 무료 플랜
     ══════════════════════════════════════════ */
     var SUPABASE_URL  = 'https://etdqussyhabojkojetdq.backend.onspace.ai';
     var SUPABASE_ANON = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJyZWYiOiJldGRxdXNzeWhhYm9qa29qZXRkcSIsInJvbGUiOiJhbm9uIiwiaWF0IjoxNzc4NDA4MTUzLCJleHAiOjIwOTM3NjgxNTMsImlzcyI6Im9uc3BhY2UifQ.2xmXVdK-VxNm1clNIEdTZYkB5mZJtRXUMIlvGydodwo';
+
     var db = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON);
 
-    /* ── 세션 ID ── */
+    /* ── 세션 ID (탭 단위 고유 식별자) ── */
     var SESSION_ID = sessionStorage.getItem('fd_session');
     if (!SESSION_ID) {
-      SESSION_ID = 'fd_' + Date.now() + '_' + Math.random().toString(36).slice(2,9);
+      SESSION_ID = 'fd_' + Date.now() + '_' + Math.random().toString(36).slice(2, 9);
       sessionStorage.setItem('fd_session', SESSION_ID);
     }
 
-    /* ══════════════════════════════════════════
-       JAPAN GEO CONFIG (검색 URL 파라미터 전체)
-       ──────────────────────────────────────────
-       gl=jp         : Google 지오로케이션 = 일본
-       hl=ko         : 인터페이스 언어 = 한국어
-       cr=countryJP  : 검색결과 국가 제한 = 일본
-       lr=lang_ko    : 검색결과 언어 = 한국어
-       pws=0         : 개인화 검색 비활성화
-       nfpr=1        : 자동수정 비활성화
-       filter=0      : 결과 필터링 비활성화
-       uule          : 지오위치 인코딩 (도쿄 지역)
-    ══════════════════════════════════════════ */
-    var JP_GEO = {
-      searchBase:   'https://www.google.co.jp/search',
-      suggestBase:  'https://suggestqueries.google.com/complete/search',
-      params: {
-        gl:      'jp',
-        hl:      'ko',
-        cr:      'countryJP',
-        lr:      'lang_ko',
-        pws:     '0',
-        nfpr:    '1',
-        filter:  '0',
-        // UULE v2 — Tokyo, Japan (도쿄 도시 레벨 위치 인코딩)
-        uule:    'w+CAIQICIbVG9reW8sIFRva3lvIFByZWZlY3R1cmUsIEphcGFu'
-      },
-      coords: { lat: 35.6762, lng: 139.6503 },
-      tz:      'Asia/Tokyo',
-      locale:  'ja-JP'
+    /* ── InvisiProxy Configuration ── */
+    var PROXY_CONFIG = {
+      enabled: false,
+      proxyUrl: '/proxy',
     };
-
-    /* ── InvisiProxy Config ── */
-    var PROXY_CONFIG = { enabled: false, proxyUrl: '/proxy' };
-
-    /* ── privacyModeOn ── */
-    var privacyModeOn = false;
-
-    /* ── 검색 URL 생성 (Japan 완전 적용) ── */
-    function buildSearchUrl(query, lucky) {
-      var p = Object.assign({}, JP_GEO.params);
-      p.q      = query;
-      p.safe   = privacyModeOn ? 'off' : 'active';
-      if (lucky) p.btnI = '1';
-      var qs = Object.keys(p).map(function(k){
-        return encodeURIComponent(k) + '=' + encodeURIComponent(p[k]);
-      }).join('&');
-      return JP_GEO.searchBase + '?' + qs;
-    }
-
-    /* ── Geo URL Bar 업데이트 ── */
-    function updateGeoUrlBar() {
-      var el = document.getElementById('geo-url-text');
-      if (!el) return;
-      var safe = privacyModeOn ? 'safe=off' : 'safe=active';
-      el.textContent = 'google.co.jp · gl=jp&hl=ko&cr=countryJP&' + safe + '&uule=JP(Tokyo)';
-    }
 
     document.addEventListener('DOMContentLoaded', function () {
 
       /* ── DOM refs ── */
-      var input           = document.getElementById('search-input');
-      var clearBtn        = document.getElementById('clear-btn');
-      var searchBtn       = document.getElementById('search-btn');
-      var luckyBtn        = document.getElementById('lucky-btn');
-      var toggleBtn       = document.getElementById('toggle-main-btn');
-      var mainContent     = document.getElementById('main-content');
-      var appsBtn         = document.getElementById('apps-btn');
-      var appsPopup       = document.getElementById('apps-popup');
-      var suggestions     = document.getElementById('suggestions');
-      var proxyToggle     = document.getElementById('proxy-mode-toggle');
-      var privacyModeBtn  = document.getElementById('privacy-mode-btn');
-      var privacyOverlay  = document.getElementById('privacy-overlay');
-      var pmLabel         = document.getElementById('pm-label');
-      var dbIndicator     = document.getElementById('db-indicator');
-      var dbStatusText    = document.getElementById('db-status-text');
-      var dbToast         = document.getElementById('db-toast');
-      var historyPanel    = document.getElementById('history-panel');
-      var historyList     = document.getElementById('history-list');
-      var historyEmpty    = document.getElementById('history-empty');
-      var clearAllHistory = document.getElementById('clear-all-history');
-      var supabaseBadge   = document.getElementById('supabase-badge');
-      var japanPanel      = document.getElementById('japan-panel');
-      var japanWifiBtn    = document.getElementById('japan-wifi-btn');
-      var safeBadge       = document.getElementById('safe-param-badge');
-      var jpProxyBadge    = document.getElementById('jp-proxy-badge');
-      var jpPingEl        = document.getElementById('jp-ping');
-      var jpPanelClock    = document.getElementById('jp-panel-clock');
-      var jstClock        = document.getElementById('jst-clock');
+      var input            = document.getElementById('search-input');
+      var clearBtn         = document.getElementById('clear-btn');
+      var searchBtn        = document.getElementById('search-btn');
+      var luckyBtn         = document.getElementById('lucky-btn');
+      var toggleBtn        = document.getElementById('toggle-main-btn');
+      var mainContent      = document.getElementById('main-content');
+      var appsBtn          = document.getElementById('apps-btn');
+      var appsPopup        = document.getElementById('apps-popup');
+      var suggestions      = document.getElementById('suggestions');
+      var proxyToggle      = document.getElementById('proxy-mode-toggle');
+      var privacyModeBtn   = document.getElementById('privacy-mode-btn');
+      var privacyOverlay   = document.getElementById('privacy-overlay');
+      var pmLabel          = document.getElementById('pm-label');
+      var dbIndicator      = document.getElementById('db-indicator');
+      var dbStatusText     = document.getElementById('db-status-text');
+      var dbDot            = document.getElementById('db-dot');
+      var dbToast          = document.getElementById('db-toast');
+      var historyPanel     = document.getElementById('history-panel');
+      var historyList      = document.getElementById('history-list');
+      var historyEmpty     = document.getElementById('history-empty');
+      var clearAllHistory  = document.getElementById('clear-all-history');
+      var supabaseBadge    = document.getElementById('supabase-badge');
 
+      var privacyModeOn = false;
       var isHidden      = false;
       var historyOpen   = false;
-      var japanPanelOpen = false;
 
       /* ══════════════════════════════════════════
-         TOAST
+         Toast 헬퍼
       ══════════════════════════════════════════ */
       function showToast(msg, duration) {
         dbToast.textContent = msg;
         dbToast.classList.add('show');
         clearTimeout(showToast._t);
-        showToast._t = setTimeout(function(){ dbToast.classList.remove('show'); }, duration || 2800);
+        showToast._t = setTimeout(function () {
+          dbToast.classList.remove('show');
+        }, duration || 2800);
       }
 
       /* ══════════════════════════════════════════
-         JST 시계 (실시간)
-      ══════════════════════════════════════════ */
-      function tickJST() {
-        try {
-          var now = new Date();
-          var fmt = new Intl.DateTimeFormat('ko-KR', {
-            timeZone: 'Asia/Tokyo',
-            hour: '2-digit', minute: '2-digit', second: '2-digit',
-            hour12: false
-          });
-          var t = fmt.format(now);
-          jstClock.textContent     = 'JST ' + t;
-          jpPanelClock.textContent = t + ' (JST)';
-        } catch(e) {
-          jstClock.textContent = 'JST --:--:--';
-        }
-      }
-      tickJST();
-      setInterval(tickJST, 1000);
-
-      /* ══════════════════════════════════════════
-         IP 주소 조회 + Japan 패널 채우기
-      ══════════════════════════════════════════ */
-      var jpIpEl  = document.getElementById('jp-ip');
-      var jpIpBadge = document.getElementById('jp-ip-badge');
-      var jpIspEl = document.getElementById('jp-isp');
-
-      function fetchIPInfo() {
-        /* ipapi.co — 무료, CORS 허용 */
-        fetch('https://ipapi.co/json/')
-          .then(function(r){ return r.json(); })
-          .then(function(d){
-            var ip  = d.ip   || '—';
-            var isp = d.org  || d.as || 'NTT Communications Corp.';
-            var cc  = (d.country_code || '').toUpperCase();
-
-            jpIpEl.textContent  = ip;
-            jpIspEl.textContent = isp;
-
-            if (cc === 'JP') {
-              jpIpBadge.innerHTML = '<i class="fa-solid fa-circle-check" style="font-size:8px"></i> JP 확인됨';
-            } else {
-              jpIpBadge.className = 'jp-badge red';
-              jpIpBadge.innerHTML = '<i class="fa-solid fa-triangle-exclamation" style="font-size:8px"></i> ' + (cc || '??') + ' (VPN 권장)';
-            }
-            measurePing();
-          })
-          .catch(function(){
-            jpIpEl.textContent  = '조회 실패 (프라이버시 보호)';
-            jpIspEl.textContent = 'NTT Communications Corp. (추정)';
-            measurePing();
-          });
-      }
-      fetchIPInfo();
-
-      /* ── 레이턴시 측정 (Google JP 이미지 핑) ── */
-      function measurePing() {
-        var t0 = Date.now();
-        var img = new Image();
-        img.onload = img.onerror = function(){
-          var ms = Date.now() - t0;
-          jpPingEl.textContent = ms + ' ms';
-          jpPingEl.style.color = ms < 100 ? '#4ade80' : ms < 300 ? '#facc15' : '#f87171';
-        };
-        img.src = 'https://www.google.co.jp/favicon.ico?' + Date.now();
-      }
-
-      /* ══════════════════════════════════════════
-         JAPAN PANEL 토글
-      ══════════════════════════════════════════ */
-      japanWifiBtn.addEventListener('click', function(e){
-        e.stopPropagation();
-        japanPanelOpen = !japanPanelOpen;
-        japanPanel.classList.toggle('open', japanPanelOpen);
-        if (japanPanelOpen) measurePing();
-      });
-      document.getElementById('japan-panel-close').addEventListener('click', function(){
-        japanPanelOpen = false;
-        japanPanel.classList.remove('open');
-      });
-      japanPanel.addEventListener('click', function(e){ e.stopPropagation(); });
-
-      /* ══════════════════════════════════════════
-         SUPABASE 연결 확인
+         Supabase 연결 확인 + 검색 기록 초기 로드
       ══════════════════════════════════════════ */
       async function initDB() {
         try {
           var res = await db.from('search_history').select('id').limit(1);
           if (res.error) throw res.error;
-          dbStatusText.textContent     = 'DB 연결됨';
-          supabaseBadge.style.opacity  = '1';
-          showToast('✅ Supabase 연결 성공 — 일본 서버 경유 검색 기록 저장 중', 3500);
-        } catch(e) {
+          // 연결 성공
+          dbStatusText.textContent = 'Supabase 연결됨';
+          dbIndicator.title        = '검색 기록 보기 (클릭)';
+          supabaseBadge.style.opacity = '1';
+          showToast('✅ Supabase 연결 성공 — 검색 기록이 클라우드에 저장됩니다', 3500);
+        } catch (e) {
           dbStatusText.textContent = 'DB 오류';
           dbIndicator.classList.add('err');
-          console.error('Supabase 오류:', e.message);
+          console.error('Supabase 연결 오류:', e.message);
         }
       }
+
       initDB();
 
       /* ══════════════════════════════════════════
-         검색 기록 저장
+         검색 기록 저장 (Supabase)
       ══════════════════════════════════════════ */
       async function saveSearchHistory(query) {
         try {
-          await db.from('search_history').insert({ query: query, session_id: SESSION_ID });
-        } catch(e) { console.warn('기록 저장 실패:', e.message); }
+          await db.from('search_history').insert({
+            query:      query,
+            session_id: SESSION_ID,
+          });
+        } catch (e) {
+          console.warn('검색 기록 저장 실패:', e.message);
+        }
       }
 
       /* ══════════════════════════════════════════
-         검색 기록 로드 / 렌더
+         검색 기록 로드 (Supabase)
       ══════════════════════════════════════════ */
       async function loadSearchHistory() {
         try {
@@ -1035,107 +746,111 @@
             .eq('session_id', SESSION_ID)
             .order('searched_at', { ascending: false })
             .limit(30);
+
           if (res.error) throw res.error;
           renderHistory(res.data || []);
-        } catch(e) {
+        } catch (e) {
           historyList.innerHTML = '<p class="text-red-400 text-xs text-center py-4">기록 불러오기 실패</p>';
         }
       }
 
       function renderHistory(rows) {
         historyList.innerHTML = '';
-        if (!rows.length) { historyEmpty.classList.remove('hidden'); return; }
+        if (!rows.length) {
+          historyEmpty.classList.remove('hidden');
+          return;
+        }
         historyEmpty.classList.add('hidden');
-        rows.forEach(function(row){
+        rows.forEach(function (row) {
           var div = document.createElement('div');
           div.className = 'history-item';
           var d = new Date(row.searched_at);
-          var ts = d.toLocaleString('ko-KR', { timeZone: 'Asia/Tokyo', month:'numeric', day:'numeric', hour:'2-digit', minute:'2-digit' });
+          var timeStr = d.toLocaleDateString('ko-KR', { month:'numeric', day:'numeric' }) + ' ' +
+                        d.toLocaleTimeString('ko-KR', { hour:'2-digit', minute:'2-digit' });
           div.innerHTML =
             '<i class="fa-solid fa-clock-rotate-left text-purple-600 text-xs flex-shrink-0"></i>' +
             '<span class="truncate flex-1">' + escapeHTML(row.query) + '</span>' +
-            '<span class="text-purple-600 text-xs flex-shrink-0 mr-2">' + ts + '</span>' +
+            '<span class="text-purple-600 text-xs flex-shrink-0 mr-2">' + timeStr + '</span>' +
             '<button class="hi-del" data-id="' + row.id + '">삭제</button>';
-          div.addEventListener('click', function(e){
+
+          // 클릭 → 검색어 채우기
+          div.addEventListener('click', function (e) {
             if (e.target.classList.contains('hi-del')) return;
             input.value = row.query;
             clearBtn.classList.remove('hidden');
             closeHistory();
             input.focus();
           });
-          div.querySelector('.hi-del').addEventListener('click', async function(e){
+
+          // 삭제 버튼
+          div.querySelector('.hi-del').addEventListener('click', async function (e) {
             e.stopPropagation();
             await db.from('search_history').delete().eq('id', row.id);
             loadSearchHistory();
           });
+
           historyList.appendChild(div);
         });
       }
 
-      clearAllHistory.addEventListener('click', async function(){
+      /* ── 전체 기록 삭제 ── */
+      clearAllHistory.addEventListener('click', async function () {
         await db.from('search_history').delete().eq('session_id', SESSION_ID);
         showToast('🗑️ 검색 기록 전체 삭제됨');
         loadSearchHistory();
       });
 
-      dbIndicator.addEventListener('click', function(e){
+      /* ── DB indicator 클릭 → 기록 패널 ── */
+      dbIndicator.addEventListener('click', function (e) {
         e.stopPropagation();
         historyOpen = !historyOpen;
         historyPanel.classList.toggle('open', historyOpen);
         if (historyOpen) loadSearchHistory();
       });
-      function closeHistory(){ historyOpen = false; historyPanel.classList.remove('open'); }
+
+      function closeHistory() {
+        historyOpen = false;
+        historyPanel.classList.remove('open');
+      }
 
       /* ══════════════════════════════════════════
          프라이버시 모드 토글
       ══════════════════════════════════════════ */
-      privacyModeBtn.addEventListener('click', function(e){
+      privacyModeBtn.addEventListener('click', function (e) {
         e.stopPropagation();
         privacyModeOn = !privacyModeOn;
         privacyModeBtn.classList.toggle('on', privacyModeOn);
         privacyOverlay.classList.toggle('active', privacyModeOn);
         pmLabel.textContent = privacyModeOn ? '프라이버시 ON' : '프라이버시 모드';
-        safeBadge.textContent  = privacyModeOn ? 'safe=off' : 'safe=active';
-        updateGeoUrlBar();
-        showToast(privacyModeOn ? '🔐 프라이버시 모드 ON — safe=off 적용됨' : '🔓 프라이버시 모드 OFF');
+        showToast(privacyModeOn ? '🔐 프라이버시 모드 활성화 — safe=off' : '🔓 프라이버시 모드 해제');
       });
 
       /* ══════════════════════════════════════════
          프록시 모드 토글
       ══════════════════════════════════════════ */
-      proxyToggle.addEventListener('click', function(e){
+      proxyToggle.addEventListener('click', function (e) {
         e.stopPropagation();
         PROXY_CONFIG.enabled = !PROXY_CONFIG.enabled;
-        updateProxyUI();
-        showToast(PROXY_CONFIG.enabled ? '🔐 InvisiProxy ON — 트래픽 경유 활성화' : '🔓 InvisiProxy OFF');
+        updateProxyToggleUI();
+        showToast(PROXY_CONFIG.enabled ? '🔐 프록시 모드 ON' : '🔓 프록시 모드 OFF');
       });
 
-      function updateProxyUI() {
+      function updateProxyToggleUI() {
         if (PROXY_CONFIG.enabled) {
-          proxyToggle.innerHTML   = '🔓 프록시 모드 비활성화';
+          proxyToggle.innerHTML = '🔓 프록시 모드 비활성화';
           proxyToggle.style.background = 'linear-gradient(90deg,#dc2626,#ef4444)';
           proxyToggle.style.color = '#fef2f2';
-          jpProxyBadge.innerHTML  = '<i class="fa-solid fa-lock" style="font-size:8px"></i> InvisiProxy ON';
-          jpProxyBadge.style.background = 'rgba(34,197,94,0.18)';
         } else {
-          proxyToggle.innerHTML   = '🔐 프록시 모드 활성화';
+          proxyToggle.innerHTML = '🔐 프록시 모드 활성화';
           proxyToggle.style.background = 'linear-gradient(90deg,#f59e0b,#fbbf24)';
           proxyToggle.style.color = '#78350f';
-          jpProxyBadge.innerHTML  = '<i class="fa-solid fa-lock-open" style="font-size:8px"></i> 비활성화';
-          jpProxyBadge.style.background = '';
         }
       }
 
-      /* ── 프록시 URL 변환 ── */
-      function proxyifyUrl(url) {
-        if (!PROXY_CONFIG.enabled) return url;
-        return PROXY_CONFIG.proxyUrl + '?url=' + encodeURIComponent(url);
-      }
-
       /* ══════════════════════════════════════════
-         로고+검색바 ON/OFF
+         로고 + 검색바 ON/OFF (레이아웃 고정)
       ══════════════════════════════════════════ */
-      toggleBtn.addEventListener('click', function(){
+      toggleBtn.addEventListener('click', function () {
         isHidden = !isHidden;
         mainContent.classList.toggle('is-hidden', isHidden);
         toggleBtn.innerHTML = isHidden ? '🔄' : '👁️';
@@ -1144,20 +859,36 @@
       /* ══════════════════════════════════════════
          Apps popup
       ══════════════════════════════════════════ */
-      appsBtn.addEventListener('click', function(e){
+      appsBtn.addEventListener('click', function (e) {
         e.stopPropagation();
         appsPopup.classList.toggle('open');
       });
-      document.addEventListener('click', function(){
+      document.addEventListener('click', function () {
         appsPopup.classList.remove('open');
-        if (!japanPanelOpen) japanPanel.classList.remove('open');
         closeHistory();
       });
-      appsPopup.addEventListener('click', function(e){ e.stopPropagation(); });
-      historyPanel.addEventListener('click', function(e){ e.stopPropagation(); });
+      appsPopup.addEventListener('click', function (e) { e.stopPropagation(); });
+      historyPanel.addEventListener('click', function (e) { e.stopPropagation(); });
 
       /* ══════════════════════════════════════════
-         검색 실행 (Japan URL 파라미터 완전 적용)
+         Voice / Lens refs
+      ══════════════════════════════════════════ */
+      var voiceModal    = document.getElementById('voice-modal');
+      var voiceStartBtn = document.getElementById('voice-start-btn');
+      var voiceCloseBtn = document.getElementById('voice-close-btn');
+      var voiceStatus   = document.getElementById('voice-status');
+      var voiceInterim  = document.getElementById('voice-interim');
+      var voiceBtn      = document.getElementById('voice-btn');
+      var lensBtn       = document.getElementById('lens-btn');
+
+      /* ── 프록시 URL 변환 ── */
+      function proxyifyUrl(url) {
+        if (!PROXY_CONFIG.enabled) return url;
+        return PROXY_CONFIG.proxyUrl + '?url=' + encodeURIComponent(url);
+      }
+
+      /* ══════════════════════════════════════════
+         검색 실행 + 기록 저장
       ══════════════════════════════════════════ */
       function openSearch(query, lucky) {
         query = (query || '').trim();
@@ -1168,27 +899,31 @@
 
         if (isURL) {
           var url = /^https?:\/\//i.test(query) ? query : 'https://' + query;
-          window.open(proxyifyUrl(url), '_blank');
+          url = proxyifyUrl(url);
+          window.open(url, '_blank');
           saveSearchHistory(query);
           return;
         }
 
-        /* Japan 완전 적용 검색 URL */
-        var searchUrl = buildSearchUrl(query, lucky);
-        window.open(proxyifyUrl(searchUrl), '_blank');
+        var base      = 'https://www.google.co.jp/search';
+        var safeParam = privacyModeOn ? 'safe=off' : 'safe=active';
+        var params    = 'gl=jp&hl=ko&' + safeParam + '&nfpr=1&filter=0&pws=0';
+        var suffix    = lucky ? '&btnI=1' : '';
+        var searchUrl = base + '?q=' + encodeURIComponent(query) + '&' + params + suffix;
+        searchUrl     = proxyifyUrl(searchUrl);
+        window.open(searchUrl, '_blank');
         saveSearchHistory(query);
-        showToast('🇯🇵 일본 서버 경유 검색: ' + query.slice(0,20) + (query.length>20?'…':''));
       }
 
-      searchBtn.addEventListener('click', function(){ openSearch(input.value, false); });
-      luckyBtn.addEventListener('click',  function(){ openSearch(input.value, true);  });
-      input.addEventListener('keydown', function(e){
+      searchBtn.addEventListener('click', function () { openSearch(input.value, false); });
+      luckyBtn.addEventListener('click',  function () { openSearch(input.value, true);  });
+      input.addEventListener('keydown', function (e) {
         if (e.key === 'Enter')  { openSearch(input.value, false); hideSuggestions(); }
         if (e.key === 'Escape') { hideSuggestions(); closeHistory(); }
       });
 
-      /* ── Google Lens (일본 Lens) ── */
-      document.getElementById('lens-btn').addEventListener('click', function(){
+      /* ── Google Lens ── */
+      lensBtn.addEventListener('click', function () {
         window.open(proxyifyUrl('https://lens.google.com'), '_blank');
       });
 
@@ -1197,103 +932,119 @@
       ══════════════════════════════════════════ */
       var SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
       var recognition = null;
-      var voiceModal    = document.getElementById('voice-modal');
-      var voiceStartBtn = document.getElementById('voice-start-btn');
-      var voiceCloseBtn = document.getElementById('voice-close-btn');
-      var voiceStatus   = document.getElementById('voice-status');
-      var voiceInterim  = document.getElementById('voice-interim');
-      var voiceBtn      = document.getElementById('voice-btn');
 
       if (SpeechRecognition) {
         recognition = new SpeechRecognition();
         recognition.lang = 'ko-KR';
         recognition.interimResults = true;
         recognition.maxAlternatives = 1;
-        recognition.onstart  = function(){ voiceStatus.textContent = '듣고 있습니다…'; voiceStartBtn.classList.add('listening'); };
-        recognition.onresult = function(e){
-          var t = '';
-          for (var i = e.resultIndex; i < e.results.length; i++) t += e.results[i][0].transcript;
-          voiceInterim.textContent = t;
-          if (e.results[e.results.length-1].isFinal){
-            input.value = t; clearBtn.classList.remove('hidden');
-            closeVoiceModal(); openSearch(t, false);
+
+        recognition.onstart = function () {
+          voiceStatus.textContent = '듣고 있습니다…';
+          voiceStartBtn.classList.add('listening');
+        };
+        recognition.onresult = function (e) {
+          var transcript = '';
+          for (var i = e.resultIndex; i < e.results.length; i++) {
+            transcript += e.results[i][0].transcript;
+          }
+          voiceInterim.textContent = transcript;
+          if (e.results[e.results.length - 1].isFinal) {
+            input.value = transcript;
+            clearBtn.classList.remove('hidden');
+            closeVoiceModal();
+            openSearch(transcript, false);
           }
         };
-        recognition.onerror = function(e){
-          voiceStatus.textContent = '오류: ' + (e.error==='not-allowed'?'마이크 권한 필요':e.error);
+        recognition.onerror = function (e) {
+          voiceStatus.textContent = '오류: ' + (e.error === 'not-allowed' ? '마이크 권한을 허용해주세요' : e.error);
           voiceStartBtn.classList.remove('listening');
         };
-        recognition.onend = function(){ voiceStartBtn.classList.remove('listening'); };
+        recognition.onend = function () {
+          voiceStartBtn.classList.remove('listening');
+          if (voiceModal.classList.contains('open')) {
+            voiceStatus.textContent = '다시 누르면 재시도합니다';
+          }
+        };
       } else {
-        voiceBtn.title         = '이 브라우저는 음성 인식을 지원하지 않습니다';
-        voiceBtn.style.opacity = '0.4';
-        voiceBtn.style.cursor  = 'not-allowed';
+        voiceBtn.title          = '이 브라우저는 음성 인식을 지원하지 않습니다';
+        voiceBtn.style.opacity  = '0.4';
+        voiceBtn.style.cursor   = 'not-allowed';
       }
 
-      voiceBtn.addEventListener('click', function(){ if (!recognition) return; openVoiceModal(); });
-      voiceStartBtn.addEventListener('click', function(){
+      voiceBtn.addEventListener('click', function () {
+        if (!recognition) return;
+        openVoiceModal();
+      });
+      voiceStartBtn.addEventListener('click', function () {
         if (!recognition) return;
         voiceInterim.textContent = '';
         voiceStatus.textContent  = '듣고 있습니다…';
         try { recognition.start(); } catch(e) {}
       });
       voiceCloseBtn.addEventListener('click', closeVoiceModal);
-      voiceModal.addEventListener('click', function(e){ if(e.target===voiceModal) closeVoiceModal(); });
-      document.addEventListener('keydown', function(e){
-        if (e.key==='Escape' && voiceModal.classList.contains('open')) closeVoiceModal();
+      voiceModal.addEventListener('click', function (e) {
+        if (e.target === voiceModal) closeVoiceModal();
+      });
+      document.addEventListener('keydown', function (e) {
+        if (e.key === 'Escape' && voiceModal.classList.contains('open')) closeVoiceModal();
       });
 
-      function openVoiceModal(){
+      function openVoiceModal() {
         voiceInterim.textContent = '';
         voiceStatus.textContent  = '마이크 버튼을 누르세요';
         voiceModal.classList.add('open');
       }
-      function closeVoiceModal(){
+      function closeVoiceModal() {
         if (recognition) { try { recognition.stop(); } catch(e) {} }
         voiceModal.classList.remove('open');
         voiceStartBtn.classList.remove('listening');
       }
 
       /* ══════════════════════════════════════════
-         자동완성 (JSONP — Google JP)
+         Clear button + Autocomplete
       ══════════════════════════════════════════ */
-      input.addEventListener('input', function(){
+      input.addEventListener('input', function () {
         clearBtn.classList.toggle('hidden', !input.value);
-        if (input.value.length >= 2) fetchSuggestions(input.value);
-        else hideSuggestions();
+        if (input.value.length >= 2) {
+          fetchSuggestions(input.value);
+        } else {
+          hideSuggestions();
+        }
       });
-      clearBtn.addEventListener('click', function(){
-        input.value = ''; clearBtn.classList.add('hidden');
-        hideSuggestions(); input.focus();
+      clearBtn.addEventListener('click', function () {
+        input.value = '';
+        clearBtn.classList.add('hidden');
+        hideSuggestions();
+        input.focus();
       });
 
+      /* ── JSONP 자동완성 ── */
       var suggestTimer  = null;
       var suggestSerial = 0;
 
       function fetchSuggestions(query) {
         clearTimeout(suggestTimer);
-        suggestTimer = setTimeout(function(){
+        suggestTimer = setTimeout(function () {
           var serial   = ++suggestSerial;
           var cbName   = '__fdSuggest_' + serial;
           var scriptEl = document.createElement('script');
           scriptEl.id  = 'suggest-script-' + serial;
 
-          window[cbName] = function(data){
+          window[cbName] = function (data) {
             var el = document.getElementById('suggest-script-' + serial);
             if (el) el.remove();
             delete window[cbName];
             if (serial !== suggestSerial) return;
             renderSuggestions(Array.isArray(data[1]) ? data[1] : []);
           };
-          scriptEl.onerror = function(){
+          scriptEl.onerror = function () {
             var el = document.getElementById('suggest-script-' + serial);
             if (el) el.remove();
             delete window[cbName];
           };
-          /* gl=jp&hl=ko — 일본 지역 자동완성 */
           scriptEl.src =
-            JP_GEO.suggestBase +
-            '?client=chrome&ds=&gl=jp&hl=ko&q=' +
+            'https://suggestqueries.google.com/complete/search?client=chrome&q=' +
             encodeURIComponent(query) + '&callback=' + cbName;
           document.body.appendChild(scriptEl);
         }, 220);
@@ -1302,13 +1053,13 @@
       function renderSuggestions(items) {
         if (!items.length) { hideSuggestions(); return; }
         suggestions.innerHTML = '';
-        items.slice(0,6).forEach(function(text){
+        items.slice(0, 6).forEach(function (text) {
           var li = document.createElement('li');
-          li.setAttribute('role','option');
+          li.setAttribute('role', 'option');
           li.innerHTML =
             '<i class="fa-solid fa-magnifying-glass text-purple-500"></i>' +
             '<span class="flex-1 truncate">' + escapeHTML(text) + '</span>';
-          li.addEventListener('mousedown', function(e){
+          li.addEventListener('mousedown', function (e) {
             e.preventDefault();
             input.value = text;
             clearBtn.classList.remove('hidden');
@@ -1320,30 +1071,34 @@
         suggestions.classList.remove('hidden');
       }
 
-      function hideSuggestions(){ suggestions.classList.add('hidden'); suggestions.innerHTML=''; }
-
-      document.addEventListener('click', function(e){
-        if (!input.contains(e.target) && !suggestions.contains(e.target)) hideSuggestions();
-      });
-
-      function escapeHTML(str){
-        return str.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+      function hideSuggestions() {
+        suggestions.classList.add('hidden');
+        suggestions.innerHTML = '';
       }
 
-      /* ── 초기 Geo URL Bar ── */
-      updateGeoUrlBar();
+      document.addEventListener('click', function (e) {
+        if (!input.contains(e.target) && !suggestions.contains(e.target)) {
+          hideSuggestions();
+        }
+      });
+
+      function escapeHTML(str) {
+        return str.replace(/&/g,'&amp;')
+                  .replace(/</g,'&lt;')
+                  .replace(/>/g,'&gt;')
+                  .replace(/"/g,'&quot;');
+      }
 
       /* ── Auto focus ── */
       input.focus();
-
-    }); /* end DOMContentLoaded */
+    });
   </script>
 
   <!-- OnSpace preview load signal -->
   <script>
-    window.onload = function(){
+    window.onload = function () {
       var d = document.createElement('div');
-      d.id  = 'appLoadFinished';
+      d.id = 'appLoadFinished';
       document.body.appendChild(d);
     };
   </script>
