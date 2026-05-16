@@ -95,16 +95,8 @@
       transform: scale(1.12);
     }
 
-    /* ── Hidden state — visibility 방식으로 공간 유지, 나머지 UI 고정 ── */
-    #main-content.is-hidden {
-      visibility: hidden;
-      opacity: 0;
-      pointer-events: none;
-      transition: opacity 0.25s;
-    }
-    #main-content {
-      transition: opacity 0.25s;
-    }
+    /* ── Hidden state ── */
+    #main-content.is-hidden { display: none !important; }
 
     /* ── Japan WiFi badge ── */
     .japan-wifi {
