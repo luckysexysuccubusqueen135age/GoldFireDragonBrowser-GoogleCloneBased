@@ -3,10 +3,10 @@
 <head>
   <meta charset="UTF-8"/>
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>FireDragon Browser with InvisiProxy</title>
+  <title>FireDragon Browser</title>
 
   <!-- SEO / Social -->
-  <meta name="description" content="빠르고 안전한 프리미엄 브라우저 — FireDragon + InvisiProxy"/>
+  <meta name="description" content="빠르고 안전한 프리미엄 브라우저 — FireDragon"/>
   <meta property="og:title" content="FireDragon Browser"/>
   <meta property="og:description" content="빠르고 안전한 프리미엄 브라우저"/>
   <meta property="og:url" content="https://www.onspace.ai"/>
@@ -95,7 +95,7 @@
       transform: scale(1.12);
     }
 
-    /* ── Hidden state ── */
+    /* ── Hidden state — visibility 방식으로 공간 유지, 나머지 UI 고정 ── */
     #main-content.is-hidden {
       visibility: hidden;
       opacity: 0;
@@ -176,113 +176,9 @@
       0%,100% { transform: scale(1); }
       50%      { transform: scale(1.1); }
     }
-
-    /* ── Privacy Mode Overlay ── */
-    #privacy-overlay {
-      display: none;
-      position: fixed;
-      inset: 0;
-      z-index: 5;
-      pointer-events: none;
-      align-items: center;
-      justify-content: center;
-      flex-direction: column;
-      gap: 12px;
-      background: radial-gradient(
-        ellipse at center,
-        rgba(88,28,235,0.18) 0%,
-        rgba(0,0,0,0) 70%
-      );
-    }
-    #privacy-overlay.active { display: flex; }
-    .privacy-shield-icon {
-      font-size: clamp(80px,15vw,160px);
-      color: rgba(167,139,250,0.12);
-      text-shadow: 0 0 60px rgba(139,92,246,0.35), 0 0 120px rgba(139,92,246,0.18);
-      animation: shield-pulse 3s ease-in-out infinite;
-      user-select: none;
-    }
-    .privacy-label {
-      font-size: clamp(11px,2vw,16px);
-      font-weight: 900;
-      letter-spacing: 0.25em;
-      color: rgba(167,139,250,0.28);
-      text-transform: uppercase;
-      user-select: none;
-    }
-    @keyframes shield-pulse {
-      0%,100% { transform: scale(1);   opacity: 0.7; }
-      50%      { transform: scale(1.06); opacity: 1;   }
-    }
-
-    /* ── Privacy Mode Toggle Button ── */
-    .privacy-mode-btn {
-      display: flex;
-      align-items: center;
-      gap: 7px;
-      padding: 6px 14px;
-      border-radius: 9999px;
-      font-size: 12px;
-      font-weight: 800;
-      letter-spacing: 0.03em;
-      border: 2px solid rgba(139,92,246,0.5);
-      background: rgba(12,4,28,0.85);
-      color: #a78bfa;
-      cursor: pointer;
-      white-space: nowrap;
-      flex-shrink: 0;
-      transition: all 0.28s;
-      backdrop-filter: blur(10px);
-    }
-    .privacy-mode-btn:hover {
-      border-color: #a78bfa;
-      background: rgba(88,28,235,0.25);
-      color: #ede9fe;
-      box-shadow: 0 0 18px rgba(139,92,246,0.45);
-    }
-    .privacy-mode-btn.on {
-      background: linear-gradient(135deg,#4c1d95,#6d28d9);
-      border-color: #a78bfa;
-      color: #ede9fe;
-      box-shadow: 0 0 22px rgba(139,92,246,0.6);
-    }
-    .privacy-mode-btn .pm-dot {
-      width: 8px; height: 8px;
-      border-radius: 50%;
-      background: #6b7280;
-      transition: background 0.28s, box-shadow 0.28s;
-      flex-shrink: 0;
-    }
-    .privacy-mode-btn.on .pm-dot {
-      background: #a78bfa;
-      box-shadow: 0 0 8px #a78bfa;
-    }
-
-    /* ── Proxy Mode Toggle ── */
-    .proxy-toggle-badge {
-      background: linear-gradient(90deg,#f59e0b,#fbbf24);
-      color: #78350f;
-      padding: 6px 16px;
-      border-radius: 9999px;
-      font-size: 12px;
-      font-weight: 900;
-      box-shadow: 0 0 16px #f59e0b88;
-      pointer-events: auto;
-      white-space: nowrap;
-      flex-shrink: 0;
-      cursor: pointer;
-      transition: all 0.3s;
-    }
-    .proxy-toggle-badge:hover {
-      background: linear-gradient(90deg,#dc2626,#ef4444);
-      color: #fef2f2;
-      box-shadow: 0 0 20px #dc262688;
-    }
-
     /* ── Responsive ── */
     @media (max-width: 640px) {
       .japan-wifi { font-size: 10px; padding: 3px 10px; }
-      .proxy-toggle-badge { font-size: 10px; padding: 4px 12px; }
     }
   </style>
 </head>
@@ -304,30 +200,12 @@
     </div>
   </div>
 
-  <!-- ════════════ PRIVACY MODE OVERLAY ════════════ -->
-  <div id="privacy-overlay" aria-hidden="true">
-    <i class="fa-solid fa-shield-halved privacy-shield-icon"></i>
-    <span class="privacy-label">🔐 프록시 활성화</span>
-  </div>
-
   <!-- ════════════ TOP NAV ════════════ -->
   <header class="flex justify-between items-center px-4 py-3 gap-2 z-50 flex-wrap"
           style="background: linear-gradient(to bottom, rgba(0,0,0,0.88), transparent);">
 
     <!-- Japan WiFi Badge (left side) -->
     <div class="japan-wifi">🇯🇵 Japan WiFi IP Connected • Proxy Active</div>
-
-    <!-- Privacy Mode Toggle -->
-    <button id="privacy-mode-btn" class="privacy-mode-btn" title="프라이버시 모드 토글">
-      <span class="pm-dot"></span>
-      <i class="fa-solid fa-shield-halved"></i>
-      <span id="pm-label">프라이버시 모드</span>
-    </button>
-
-    <!-- Proxy Mode Badge -->
-    <button id="proxy-mode-toggle" class="proxy-toggle-badge" title="InvisiProxy 모드 토글">
-      🔐 프록시 모드 활성화
-    </button>
 
     <div class="flex items-center gap-2 flex-wrap justify-end">
 
@@ -386,7 +264,7 @@
       <h1 class="text-4xl md:text-5xl font-black tracking-widest mt-5 text-white drop-shadow-lg">
         FireDragon
       </h1>
-      <p class="text-purple-300 text-sm mt-1">빠르고 안전한 프리미엄 브라우저 + InvisiProxy</p>
+      <p class="text-purple-300 text-sm mt-1">빠르고 안전한 프리미엄 브라우저</p>
     </div>
 
     <!-- Search Bar + Suggestions -->
@@ -483,19 +361,11 @@
       <a href="#" class="hover:text-purple-300 transition">서비스 약관</a>
       <a href="#" class="hover:text-purple-300 transition">설정</a>
     </nav>
-    <span>🇯🇵 일본 • FireDragon 135.0 + InvisiProxy 🔐</span>
+    <span>🇯🇵 일본 • FireDragon 135.0</span>
   </footer>
 
   <!-- ════════════ SCRIPTS ════════════ -->
   <script>
-    // InvisiProxy Configuration
-    const PROXY_CONFIG = {
-      enabled: false,
-      proxyUrl: '/proxy',
-      proxyApiUrl: '/api/proxy',
-      supportedModes: ['ultraviolet', 'rammerhead', 'bare', 'scramjet']
-    };
-
     document.addEventListener('DOMContentLoaded', function () {
 
       /* ── DOM refs ── */
@@ -508,42 +378,8 @@
       var appsBtn     = document.getElementById('apps-btn');
       var appsPopup   = document.getElementById('apps-popup');
       var suggestions = document.getElementById('suggestions');
-      var proxyToggle      = document.getElementById('proxy-mode-toggle');
-      var privacyModeBtn   = document.getElementById('privacy-mode-btn');
-      var privacyOverlay   = document.getElementById('privacy-overlay');
-      var pmLabel          = document.getElementById('pm-label');
-      var privacyModeOn    = false;
 
       var isHidden = false;
-
-      /* ── 프라이버시 모드 토글 ── */
-      privacyModeBtn.addEventListener('click', function (e) {
-        e.stopPropagation();
-        privacyModeOn = !privacyModeOn;
-        privacyModeBtn.classList.toggle('on', privacyModeOn);
-        privacyOverlay.classList.toggle('active', privacyModeOn);
-        pmLabel.textContent = privacyModeOn ? '프라이버시 ON' : '프라이버시 모드';
-      });
-
-      /* ── 프록시 모드 토글 ── */
-      proxyToggle.addEventListener('click', function (e) {
-        e.stopPropagation();
-        PROXY_CONFIG.enabled = !PROXY_CONFIG.enabled;
-        updateProxyToggleUI();
-        console.log('Proxy Mode:', PROXY_CONFIG.enabled ? '활성화됨' : '비활성화됨');
-      });
-
-      function updateProxyToggleUI() {
-        if (PROXY_CONFIG.enabled) {
-          proxyToggle.innerHTML = '🔓 프록시 모드 비활성화';
-          proxyToggle.style.background = 'linear-gradient(90deg,#dc2626,#ef4444)';
-          proxyToggle.style.color = '#fef2f2';
-        } else {
-          proxyToggle.innerHTML = '🔐 프록시 모드 활성화';
-          proxyToggle.style.background = 'linear-gradient(90deg,#f59e0b,#fbbf24)';
-          proxyToggle.style.color = '#78350f';
-        }
-      }
 
       /* ── 로고 + 검색바 ON/OFF ── */
       toggleBtn.addEventListener('click', function () {
@@ -570,14 +406,6 @@
       var voiceBtn      = document.getElementById('voice-btn');
       var lensBtn       = document.getElementById('lens-btn');
 
-      /* ── 프록시를 통한 URL 변환 ── */
-      function proxyifyUrl(url) {
-        if (!PROXY_CONFIG.enabled) return url;
-        // InvisiProxy 형식으로 URL 인코딩
-        // 예: /service/ultraviolet?url=encoded_url
-        return PROXY_CONFIG.proxyUrl + '?url=' + encodeURIComponent(url);
-      }
-
       /* ── 검색 실행 ── */
       function openSearch(query, lucky) {
         query = (query || '').trim();
@@ -587,18 +415,14 @@
                     /^[a-zA-Z0-9-]+\.[a-zA-Z]{2,}(\/.*)?$/.test(query);
         if (isURL) {
           var url = /^https?:\/\//i.test(query) ? query : 'https://' + query;
-          url = proxyifyUrl(url);
           window.open(url, '_blank');
           return;
         }
 
-        var base      = 'https://www.google.co.jp/search';
-        var safeParam = privacyModeOn ? 'safe=off' : 'safe=active';
-        var params    = 'gl=jp&hl=ko&' + safeParam + '&nfpr=1&filter=0&pws=0';
-        var suffix    = lucky ? '&btnI=1' : '';
-        var searchUrl = base + '?q=' + encodeURIComponent(query) + '&' + params + suffix;
-        searchUrl = proxyifyUrl(searchUrl);
-        window.open(searchUrl, '_blank');
+        var base   = 'https://www.google.co.jp/search';
+        var params = 'gl=jp&hl=ko&safe=off&nfpr=1&filter=0&pws=0';
+        var suffix = lucky ? '&btnI=1' : '';
+        window.open(base + '?q=' + encodeURIComponent(query) + '&' + params + suffix, '_blank');
       }
 
       searchBtn.addEventListener('click', function () { openSearch(input.value, false); });
@@ -610,9 +434,7 @@
 
       /* ── Google Lens (이미지 검색) ── */
       lensBtn.addEventListener('click', function () {
-        var lensUrl = 'https://lens.google.com';
-        lensUrl = proxyifyUrl(lensUrl);
-        window.open(lensUrl, '_blank');
+        window.open('https://lens.google.com', '_blank');
       });
 
       /* ── 음성 검색 (Web Speech API) ── */
@@ -653,6 +475,7 @@
           }
         };
       } else {
+        /* 미지원 브라우저 */
         voiceBtn.title = '이 브라우저는 음성 인식을 지원하지 않습니다';
         voiceBtn.style.opacity = '0.4';
         voiceBtn.style.cursor  = 'not-allowed';
@@ -705,9 +528,9 @@
         input.focus();
       });
 
-      /* ── Autocomplete suggestions (JSONP) ── */
+      /* ── Autocomplete suggestions (JSONP — client=chrome supports callback) ── */
       var suggestTimer  = null;
-      var suggestSerial = 0;
+      var suggestSerial = 0; /* prevent stale responses */
 
       function fetchSuggestions(query) {
         clearTimeout(suggestTimer);
@@ -718,9 +541,11 @@
           scriptEl.id   = 'suggest-script-' + serial;
 
           window[cbName] = function (data) {
+            /* remove script tag */
             var el = document.getElementById('suggest-script-' + serial);
             if (el) el.remove();
             delete window[cbName];
+            /* ignore if a newer request is already in flight */
             if (serial !== suggestSerial) return;
             renderSuggestions(Array.isArray(data[1]) ? data[1] : []);
           };
@@ -791,6 +616,5 @@
   </script>
 <script>window.onload=function(){var d=document.createElement("div");d.id="appLoadFinished";document.body.appendChild(d);};</script>
 </body>
-
 
 </html>
