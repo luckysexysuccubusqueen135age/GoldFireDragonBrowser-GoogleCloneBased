@@ -25,8 +25,6 @@
   <script src="https://cdn.tailwindcss.com"></script>
   <!-- Font Awesome -->
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"/>
-  <!-- Supabase JS -->
-  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
 
   <style>
     *, *::before, *::after { box-sizing: border-box; }
@@ -77,18 +75,6 @@
       transition: background 0.15s;
     }
     #suggestions li:hover { background: rgba(192,132,252,0.15); }
-    #suggestions li .del-btn {
-      margin-left: auto;
-      font-size: 11px;
-      color: #7c3aed;
-      padding: 2px 6px;
-      border-radius: 4px;
-      border: 1px solid rgba(124,58,237,0.4);
-      background: transparent;
-      cursor: pointer;
-      transition: all 0.15s;
-    }
-    #suggestions li .del-btn:hover { background: rgba(124,58,237,0.3); color: #e9d5ff; }
 
     /* ── Toggle button ── */
     #toggle-main-btn {
@@ -109,7 +95,7 @@
       transform: scale(1.12);
     }
 
-    /* ── Hidden state (visibility only — keeps layout) ── */
+    /* ── Hidden state ── */
     #main-content.is-hidden {
       visibility: hidden;
       opacity: 0;
@@ -293,111 +279,6 @@
       box-shadow: 0 0 20px #dc262688;
     }
 
-    /* ── DB Status Toast ── */
-    #db-toast {
-      position: fixed;
-      bottom: 72px;
-      left: 50%;
-      transform: translateX(-50%) translateY(20px);
-      background: rgba(12,4,28,0.97);
-      border: 1px solid rgba(192,132,252,0.45);
-      color: #d8b4fe;
-      padding: 10px 22px;
-      border-radius: 9999px;
-      font-size: 13px;
-      font-weight: 700;
-      z-index: 800;
-      backdrop-filter: blur(16px);
-      opacity: 0;
-      transition: opacity 0.35s, transform 0.35s;
-      pointer-events: none;
-      white-space: nowrap;
-    }
-    #db-toast.show {
-      opacity: 1;
-      transform: translateX(-50%) translateY(0);
-    }
-
-    /* ── History Panel ── */
-    #history-panel {
-      display: none;
-      position: fixed;
-      top: 60px;
-      left: 50%;
-      transform: translateX(-50%);
-      width: min(500px, calc(100vw - 32px));
-      background: rgba(12,4,28,0.97);
-      border: 1px solid rgba(192,132,252,0.4);
-      border-radius: 20px;
-      padding: 18px;
-      z-index: 700;
-      backdrop-filter: blur(24px);
-      box-shadow: 0 8px 48px rgba(0,0,0,0.7);
-      max-height: 420px;
-      overflow-y: auto;
-    }
-    #history-panel.open { display: block; }
-    #history-panel::-webkit-scrollbar { width: 5px; }
-    #history-panel::-webkit-scrollbar-track { background: transparent; }
-    #history-panel::-webkit-scrollbar-thumb { background: rgba(192,132,252,0.4); border-radius: 99px; }
-    .history-item {
-      display: flex;
-      align-items: center;
-      gap: 10px;
-      padding: 9px 10px;
-      border-radius: 10px;
-      color: #d8b4fe;
-      font-size: 13px;
-      cursor: pointer;
-      transition: background 0.15s;
-    }
-    .history-item:hover { background: rgba(192,132,252,0.12); }
-    .history-item .hi-del {
-      margin-left: auto;
-      font-size: 10px;
-      color: #7c3aed;
-      padding: 2px 7px;
-      border-radius: 4px;
-      border: 1px solid rgba(124,58,237,0.4);
-      background: transparent;
-      cursor: pointer;
-      transition: all 0.15s;
-      flex-shrink: 0;
-    }
-    .history-item .hi-del:hover { background: rgba(124,58,237,0.3); color: #e9d5ff; }
-
-    /* ── DB Indicator (헤더 내) ── */
-    #db-indicator {
-      display: flex;
-      align-items: center;
-      gap: 5px;
-      font-size: 11px;
-      font-weight: 700;
-      color: #86efac;
-      padding: 4px 10px;
-      border-radius: 9999px;
-      background: rgba(34,197,94,0.12);
-      border: 1px solid rgba(34,197,94,0.35);
-      white-space: nowrap;
-      flex-shrink: 0;
-      cursor: pointer;
-      transition: background 0.2s;
-    }
-    #db-indicator:hover { background: rgba(34,197,94,0.22); }
-    #db-indicator.err { color: #fca5a5; background: rgba(239,68,68,0.12); border-color: rgba(239,68,68,0.35); }
-    #db-dot {
-      width: 7px; height: 7px;
-      border-radius: 50%;
-      background: #22c55e;
-      box-shadow: 0 0 6px #22c55e;
-      animation: blink-dot 2s ease-in-out infinite;
-    }
-    #db-indicator.err #db-dot { background: #ef4444; box-shadow: 0 0 6px #ef4444; animation: none; }
-    @keyframes blink-dot {
-      0%,100% { opacity: 1; }
-      50%      { opacity: 0.35; }
-    }
-
     /* ── Responsive ── */
     @media (max-width: 640px) {
       .japan-wifi { font-size: 10px; padding: 3px 10px; }
@@ -429,36 +310,12 @@
     <span class="privacy-label">🔐 프록시 활성화</span>
   </div>
 
-  <!-- DB Toast -->
-  <div id="db-toast"></div>
-
-  <!-- Search History Panel -->
-  <div id="history-panel" role="dialog" aria-label="검색 기록">
-    <div class="flex items-center justify-between mb-3">
-      <span class="text-purple-300 text-sm font-bold tracking-wide flex items-center gap-2">
-        <i class="fa-solid fa-database text-xs"></i> 검색 기록 (Supabase)
-      </span>
-      <button id="clear-all-history"
-              class="text-xs text-red-400 hover:text-red-300 border border-red-500/40 px-3 py-1 rounded-full transition hover:bg-red-500/10">
-        전체 삭제
-      </button>
-    </div>
-    <div id="history-list"></div>
-    <p id="history-empty" class="text-purple-500 text-xs text-center py-6 hidden">저장된 검색 기록이 없습니다.</p>
-  </div>
-
   <!-- ════════════ TOP NAV ════════════ -->
   <header class="flex justify-between items-center px-4 py-3 gap-2 z-50 flex-wrap"
           style="background: linear-gradient(to bottom, rgba(0,0,0,0.88), transparent);">
 
     <!-- Japan WiFi Badge (left side) -->
     <div class="japan-wifi">🇯🇵 Japan WiFi IP Connected • Proxy Active</div>
-
-    <!-- DB Status Indicator -->
-    <div id="db-indicator" title="검색 기록 보기 / Supabase 연결 상태">
-      <span id="db-dot"></span>
-      <span id="db-status-text">DB 연결 중…</span>
-    </div>
 
     <!-- Privacy Mode Toggle -->
     <button id="privacy-mode-btn" class="privacy-mode-btn" title="프라이버시 모드 토글">
@@ -530,11 +387,6 @@
         FireDragon
       </h1>
       <p class="text-purple-300 text-sm mt-1">빠르고 안전한 프리미엄 브라우저 + InvisiProxy</p>
-      <!-- DB connected badge under brand -->
-      <div id="supabase-badge" class="inline-flex items-center gap-2 mt-3 px-4 py-1 rounded-full text-xs font-bold
-                                       border border-green-500/40 bg-green-500/10 text-green-400 opacity-0 transition-opacity duration-700">
-        <i class="fa-solid fa-database"></i> Supabase 연결됨 · 검색 기록 저장 중
-      </div>
     </div>
 
     <!-- Search Bar + Suggestions -->
@@ -631,208 +483,54 @@
       <a href="#" class="hover:text-purple-300 transition">서비스 약관</a>
       <a href="#" class="hover:text-purple-300 transition">설정</a>
     </nav>
-    <span>🇯🇵 일본 • FireDragon 135.0 + InvisiProxy 🔐 • Supabase ☁️</span>
+    <span>🇯🇵 일본 • FireDragon 135.0 + InvisiProxy 🔐</span>
   </footer>
 
   <!-- ════════════ SCRIPTS ════════════ -->
   <script>
-    /* ══════════════════════════════════════════
-       Supabase 클라이언트 초기화
-       OnSpace Cloud (Supabase 호환) — 무료 플랜
-    ══════════════════════════════════════════ */
-    var SUPABASE_URL  = 'https://etdqussyhabojkojetdq.backend.onspace.ai';
-    var SUPABASE_ANON = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJyZWYiOiJldGRxdXNzeWhhYm9qa29qZXRkcSIsInJvbGUiOiJhbm9uIiwiaWF0IjoxNzc4NDA4MTUzLCJleHAiOjIwOTM3NjgxNTMsImlzcyI6Im9uc3BhY2UifQ.2xmXVdK-VxNm1clNIEdTZYkB5mZJtRXUMIlvGydodwo';
-
-    var db = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON);
-
-    /* ── 세션 ID (탭 단위 고유 식별자) ── */
-    var SESSION_ID = sessionStorage.getItem('fd_session');
-    if (!SESSION_ID) {
-      SESSION_ID = 'fd_' + Date.now() + '_' + Math.random().toString(36).slice(2, 9);
-      sessionStorage.setItem('fd_session', SESSION_ID);
-    }
-
-    /* ── InvisiProxy Configuration ── */
-    var PROXY_CONFIG = {
+    // InvisiProxy Configuration
+    const PROXY_CONFIG = {
       enabled: false,
       proxyUrl: '/proxy',
+      proxyApiUrl: '/api/proxy',
+      supportedModes: ['ultraviolet', 'rammerhead', 'bare', 'scramjet']
     };
 
     document.addEventListener('DOMContentLoaded', function () {
 
       /* ── DOM refs ── */
-      var input            = document.getElementById('search-input');
-      var clearBtn         = document.getElementById('clear-btn');
-      var searchBtn        = document.getElementById('search-btn');
-      var luckyBtn         = document.getElementById('lucky-btn');
-      var toggleBtn        = document.getElementById('toggle-main-btn');
-      var mainContent      = document.getElementById('main-content');
-      var appsBtn          = document.getElementById('apps-btn');
-      var appsPopup        = document.getElementById('apps-popup');
-      var suggestions      = document.getElementById('suggestions');
+      var input       = document.getElementById('search-input');
+      var clearBtn    = document.getElementById('clear-btn');
+      var searchBtn   = document.getElementById('search-btn');
+      var luckyBtn    = document.getElementById('lucky-btn');
+      var toggleBtn   = document.getElementById('toggle-main-btn');
+      var mainContent = document.getElementById('main-content');
+      var appsBtn     = document.getElementById('apps-btn');
+      var appsPopup   = document.getElementById('apps-popup');
+      var suggestions = document.getElementById('suggestions');
       var proxyToggle      = document.getElementById('proxy-mode-toggle');
       var privacyModeBtn   = document.getElementById('privacy-mode-btn');
       var privacyOverlay   = document.getElementById('privacy-overlay');
       var pmLabel          = document.getElementById('pm-label');
-      var dbIndicator      = document.getElementById('db-indicator');
-      var dbStatusText     = document.getElementById('db-status-text');
-      var dbDot            = document.getElementById('db-dot');
-      var dbToast          = document.getElementById('db-toast');
-      var historyPanel     = document.getElementById('history-panel');
-      var historyList      = document.getElementById('history-list');
-      var historyEmpty     = document.getElementById('history-empty');
-      var clearAllHistory  = document.getElementById('clear-all-history');
-      var supabaseBadge    = document.getElementById('supabase-badge');
+      var privacyModeOn    = false;
 
-      var privacyModeOn = false;
-      var isHidden      = false;
-      var historyOpen   = false;
+      var isHidden = false;
 
-      /* ══════════════════════════════════════════
-         Toast 헬퍼
-      ══════════════════════════════════════════ */
-      function showToast(msg, duration) {
-        dbToast.textContent = msg;
-        dbToast.classList.add('show');
-        clearTimeout(showToast._t);
-        showToast._t = setTimeout(function () {
-          dbToast.classList.remove('show');
-        }, duration || 2800);
-      }
-
-      /* ══════════════════════════════════════════
-         Supabase 연결 확인 + 검색 기록 초기 로드
-      ══════════════════════════════════════════ */
-      async function initDB() {
-        try {
-          var res = await db.from('search_history').select('id').limit(1);
-          if (res.error) throw res.error;
-          // 연결 성공
-          dbStatusText.textContent = 'Supabase 연결됨';
-          dbIndicator.title        = '검색 기록 보기 (클릭)';
-          supabaseBadge.style.opacity = '1';
-          showToast('✅ Supabase 연결 성공 — 검색 기록이 클라우드에 저장됩니다', 3500);
-        } catch (e) {
-          dbStatusText.textContent = 'DB 오류';
-          dbIndicator.classList.add('err');
-          console.error('Supabase 연결 오류:', e.message);
-        }
-      }
-
-      initDB();
-
-      /* ══════════════════════════════════════════
-         검색 기록 저장 (Supabase)
-      ══════════════════════════════════════════ */
-      async function saveSearchHistory(query) {
-        try {
-          await db.from('search_history').insert({
-            query:      query,
-            session_id: SESSION_ID,
-          });
-        } catch (e) {
-          console.warn('검색 기록 저장 실패:', e.message);
-        }
-      }
-
-      /* ══════════════════════════════════════════
-         검색 기록 로드 (Supabase)
-      ══════════════════════════════════════════ */
-      async function loadSearchHistory() {
-        try {
-          var res = await db
-            .from('search_history')
-            .select('id,query,searched_at')
-            .eq('session_id', SESSION_ID)
-            .order('searched_at', { ascending: false })
-            .limit(30);
-
-          if (res.error) throw res.error;
-          renderHistory(res.data || []);
-        } catch (e) {
-          historyList.innerHTML = '<p class="text-red-400 text-xs text-center py-4">기록 불러오기 실패</p>';
-        }
-      }
-
-      function renderHistory(rows) {
-        historyList.innerHTML = '';
-        if (!rows.length) {
-          historyEmpty.classList.remove('hidden');
-          return;
-        }
-        historyEmpty.classList.add('hidden');
-        rows.forEach(function (row) {
-          var div = document.createElement('div');
-          div.className = 'history-item';
-          var d = new Date(row.searched_at);
-          var timeStr = d.toLocaleDateString('ko-KR', { month:'numeric', day:'numeric' }) + ' ' +
-                        d.toLocaleTimeString('ko-KR', { hour:'2-digit', minute:'2-digit' });
-          div.innerHTML =
-            '<i class="fa-solid fa-clock-rotate-left text-purple-600 text-xs flex-shrink-0"></i>' +
-            '<span class="truncate flex-1">' + escapeHTML(row.query) + '</span>' +
-            '<span class="text-purple-600 text-xs flex-shrink-0 mr-2">' + timeStr + '</span>' +
-            '<button class="hi-del" data-id="' + row.id + '">삭제</button>';
-
-          // 클릭 → 검색어 채우기
-          div.addEventListener('click', function (e) {
-            if (e.target.classList.contains('hi-del')) return;
-            input.value = row.query;
-            clearBtn.classList.remove('hidden');
-            closeHistory();
-            input.focus();
-          });
-
-          // 삭제 버튼
-          div.querySelector('.hi-del').addEventListener('click', async function (e) {
-            e.stopPropagation();
-            await db.from('search_history').delete().eq('id', row.id);
-            loadSearchHistory();
-          });
-
-          historyList.appendChild(div);
-        });
-      }
-
-      /* ── 전체 기록 삭제 ── */
-      clearAllHistory.addEventListener('click', async function () {
-        await db.from('search_history').delete().eq('session_id', SESSION_ID);
-        showToast('🗑️ 검색 기록 전체 삭제됨');
-        loadSearchHistory();
-      });
-
-      /* ── DB indicator 클릭 → 기록 패널 ── */
-      dbIndicator.addEventListener('click', function (e) {
-        e.stopPropagation();
-        historyOpen = !historyOpen;
-        historyPanel.classList.toggle('open', historyOpen);
-        if (historyOpen) loadSearchHistory();
-      });
-
-      function closeHistory() {
-        historyOpen = false;
-        historyPanel.classList.remove('open');
-      }
-
-      /* ══════════════════════════════════════════
-         프라이버시 모드 토글
-      ══════════════════════════════════════════ */
+      /* ── 프라이버시 모드 토글 ── */
       privacyModeBtn.addEventListener('click', function (e) {
         e.stopPropagation();
         privacyModeOn = !privacyModeOn;
         privacyModeBtn.classList.toggle('on', privacyModeOn);
         privacyOverlay.classList.toggle('active', privacyModeOn);
         pmLabel.textContent = privacyModeOn ? '프라이버시 ON' : '프라이버시 모드';
-        showToast(privacyModeOn ? '🔐 프라이버시 모드 활성화 — safe=off' : '🔓 프라이버시 모드 해제');
       });
 
-      /* ══════════════════════════════════════════
-         프록시 모드 토글
-      ══════════════════════════════════════════ */
+      /* ── 프록시 모드 토글 ── */
       proxyToggle.addEventListener('click', function (e) {
         e.stopPropagation();
         PROXY_CONFIG.enabled = !PROXY_CONFIG.enabled;
         updateProxyToggleUI();
-        showToast(PROXY_CONFIG.enabled ? '🔐 프록시 모드 ON' : '🔓 프록시 모드 OFF');
+        console.log('Proxy Mode:', PROXY_CONFIG.enabled ? '활성화됨' : '비활성화됨');
       });
 
       function updateProxyToggleUI() {
@@ -847,32 +545,23 @@
         }
       }
 
-      /* ══════════════════════════════════════════
-         로고 + 검색바 ON/OFF (레이아웃 고정)
-      ══════════════════════════════════════════ */
+      /* ── 로고 + 검색바 ON/OFF ── */
       toggleBtn.addEventListener('click', function () {
         isHidden = !isHidden;
         mainContent.classList.toggle('is-hidden', isHidden);
         toggleBtn.innerHTML = isHidden ? '🔄' : '👁️';
       });
 
-      /* ══════════════════════════════════════════
-         Apps popup
-      ══════════════════════════════════════════ */
+      /* ── Apps popup ── */
       appsBtn.addEventListener('click', function (e) {
         e.stopPropagation();
         appsPopup.classList.toggle('open');
       });
       document.addEventListener('click', function () {
         appsPopup.classList.remove('open');
-        closeHistory();
       });
       appsPopup.addEventListener('click', function (e) { e.stopPropagation(); });
-      historyPanel.addEventListener('click', function (e) { e.stopPropagation(); });
 
-      /* ══════════════════════════════════════════
-         Voice / Lens refs
-      ══════════════════════════════════════════ */
       var voiceModal    = document.getElementById('voice-modal');
       var voiceStartBtn = document.getElementById('voice-start-btn');
       var voiceCloseBtn = document.getElementById('voice-close-btn');
@@ -881,27 +570,25 @@
       var voiceBtn      = document.getElementById('voice-btn');
       var lensBtn       = document.getElementById('lens-btn');
 
-      /* ── 프록시 URL 변환 ── */
+      /* ── 프록시를 통한 URL 변환 ── */
       function proxyifyUrl(url) {
         if (!PROXY_CONFIG.enabled) return url;
+        // InvisiProxy 형식으로 URL 인코딩
+        // 예: /service/ultraviolet?url=encoded_url
         return PROXY_CONFIG.proxyUrl + '?url=' + encodeURIComponent(url);
       }
 
-      /* ══════════════════════════════════════════
-         검색 실행 + 기록 저장
-      ══════════════════════════════════════════ */
+      /* ── 검색 실행 ── */
       function openSearch(query, lucky) {
         query = (query || '').trim();
         if (!query) { input.focus(); return; }
 
         var isURL = /^https?:\/\//i.test(query) ||
                     /^[a-zA-Z0-9-]+\.[a-zA-Z]{2,}(\/.*)?$/.test(query);
-
         if (isURL) {
           var url = /^https?:\/\//i.test(query) ? query : 'https://' + query;
           url = proxyifyUrl(url);
           window.open(url, '_blank');
-          saveSearchHistory(query);
           return;
         }
 
@@ -910,26 +597,25 @@
         var params    = 'gl=jp&hl=ko&' + safeParam + '&nfpr=1&filter=0&pws=0';
         var suffix    = lucky ? '&btnI=1' : '';
         var searchUrl = base + '?q=' + encodeURIComponent(query) + '&' + params + suffix;
-        searchUrl     = proxyifyUrl(searchUrl);
+        searchUrl = proxyifyUrl(searchUrl);
         window.open(searchUrl, '_blank');
-        saveSearchHistory(query);
       }
 
       searchBtn.addEventListener('click', function () { openSearch(input.value, false); });
       luckyBtn.addEventListener('click',  function () { openSearch(input.value, true);  });
       input.addEventListener('keydown', function (e) {
-        if (e.key === 'Enter')  { openSearch(input.value, false); hideSuggestions(); }
-        if (e.key === 'Escape') { hideSuggestions(); closeHistory(); }
+        if (e.key === 'Enter') { openSearch(input.value, false); hideSuggestions(); }
+        if (e.key === 'Escape') { hideSuggestions(); }
       });
 
-      /* ── Google Lens ── */
+      /* ── Google Lens (이미지 검색) ── */
       lensBtn.addEventListener('click', function () {
-        window.open(proxyifyUrl('https://lens.google.com'), '_blank');
+        var lensUrl = 'https://lens.google.com';
+        lensUrl = proxyifyUrl(lensUrl);
+        window.open(lensUrl, '_blank');
       });
 
-      /* ══════════════════════════════════════════
-         음성 검색 (Web Speech API)
-      ══════════════════════════════════════════ */
+      /* ── 음성 검색 (Web Speech API) ── */
       var SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
       var recognition = null;
 
@@ -967,21 +653,23 @@
           }
         };
       } else {
-        voiceBtn.title          = '이 브라우저는 음성 인식을 지원하지 않습니다';
-        voiceBtn.style.opacity  = '0.4';
-        voiceBtn.style.cursor   = 'not-allowed';
+        voiceBtn.title = '이 브라우저는 음성 인식을 지원하지 않습니다';
+        voiceBtn.style.opacity = '0.4';
+        voiceBtn.style.cursor  = 'not-allowed';
       }
 
       voiceBtn.addEventListener('click', function () {
         if (!recognition) return;
         openVoiceModal();
       });
+
       voiceStartBtn.addEventListener('click', function () {
         if (!recognition) return;
         voiceInterim.textContent = '';
         voiceStatus.textContent  = '듣고 있습니다…';
-        try { recognition.start(); } catch(e) {}
+        try { recognition.start(); } catch(e) {/* 이미 실행 중 */}
       });
+
       voiceCloseBtn.addEventListener('click', closeVoiceModal);
       voiceModal.addEventListener('click', function (e) {
         if (e.target === voiceModal) closeVoiceModal();
@@ -1001,9 +689,7 @@
         voiceStartBtn.classList.remove('listening');
       }
 
-      /* ══════════════════════════════════════════
-         Clear button + Autocomplete
-      ══════════════════════════════════════════ */
+      /* ── Clear button ── */
       input.addEventListener('input', function () {
         clearBtn.classList.toggle('hidden', !input.value);
         if (input.value.length >= 2) {
@@ -1019,17 +705,17 @@
         input.focus();
       });
 
-      /* ── JSONP 자동완성 ── */
+      /* ── Autocomplete suggestions (JSONP) ── */
       var suggestTimer  = null;
       var suggestSerial = 0;
 
       function fetchSuggestions(query) {
         clearTimeout(suggestTimer);
         suggestTimer = setTimeout(function () {
-          var serial   = ++suggestSerial;
-          var cbName   = '__fdSuggest_' + serial;
-          var scriptEl = document.createElement('script');
-          scriptEl.id  = 'suggest-script-' + serial;
+          var serial    = ++suggestSerial;
+          var cbName    = '__fdSuggest_' + serial;
+          var scriptEl  = document.createElement('script');
+          scriptEl.id   = 'suggest-script-' + serial;
 
           window[cbName] = function (data) {
             var el = document.getElementById('suggest-script-' + serial);
@@ -1038,14 +724,17 @@
             if (serial !== suggestSerial) return;
             renderSuggestions(Array.isArray(data[1]) ? data[1] : []);
           };
+
           scriptEl.onerror = function () {
             var el = document.getElementById('suggest-script-' + serial);
             if (el) el.remove();
             delete window[cbName];
           };
+
           scriptEl.src =
             'https://suggestqueries.google.com/complete/search?client=chrome&q=' +
             encodeURIComponent(query) + '&callback=' + cbName;
+
           document.body.appendChild(scriptEl);
         }, 220);
       }
@@ -1056,9 +745,8 @@
         items.slice(0, 6).forEach(function (text) {
           var li = document.createElement('li');
           li.setAttribute('role', 'option');
-          li.innerHTML =
-            '<i class="fa-solid fa-magnifying-glass text-purple-500"></i>' +
-            '<span class="flex-1 truncate">' + escapeHTML(text) + '</span>';
+          li.innerHTML = '<i class="fa-solid fa-magnifying-glass text-purple-500"></i><span>' +
+                         escapeHTML(text) + '</span>';
           li.addEventListener('mousedown', function (e) {
             e.preventDefault();
             input.value = text;
@@ -1076,12 +764,6 @@
         suggestions.innerHTML = '';
       }
 
-      document.addEventListener('click', function (e) {
-        if (!input.contains(e.target) && !suggestions.contains(e.target)) {
-          hideSuggestions();
-        }
-      });
-
       function escapeHTML(str) {
         return str.replace(/&/g,'&amp;')
                   .replace(/</g,'&lt;')
@@ -1089,12 +771,17 @@
                   .replace(/"/g,'&quot;');
       }
 
+      document.addEventListener('click', function (e) {
+        if (!input.contains(e.target) && !suggestions.contains(e.target)) {
+          hideSuggestions();
+        }
+      });
+
       /* ── Auto focus ── */
       input.focus();
     });
   </script>
-
-  <!-- OnSpace preview load signal -->
+  <!-- App load signal for OnSpace preview -->
   <script>
     window.onload = function () {
       var d = document.createElement('div');
@@ -1104,5 +791,6 @@
   </script>
 <script>window.onload=function(){var d=document.createElement("div");d.id="appLoadFinished";document.body.appendChild(d);};</script>
 </body>
+
 
 </html>
