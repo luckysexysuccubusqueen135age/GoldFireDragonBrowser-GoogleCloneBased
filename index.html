@@ -568,7 +568,7 @@
     <!-- 검색 서버 -->
     <div class="jp-row">
       <span class="jp-key">검색 서버</span>
-      <span class="jp-val mono">www.google.co.jp&safe=off</span>
+      <span class="jp-val mono">www.google.co.jp</span>
     </div>
     <!-- URL 파라미터 -->
     <div class="jp-row" style="flex-direction:column">
@@ -580,7 +580,7 @@
         <span class="jp-badge">pws=0</span>
         <span class="jp-badge">nfpr=1</span>
         <span class="jp-badge">filter=0</span>
-        <span class="jp-badge" id="safe-param-badge">safe=off</span>
+        <span class="jp-badge" id="safe-param-badge">safe=active</span>
       </div>
     </div>
     <!-- 타임존 -->
@@ -798,8 +798,8 @@
        uule          : 지오위치 인코딩 (도쿄 지역)
     ══════════════════════════════════════════ */
     var JP_GEO = {
-      searchBase:   'http://www.google.co.jp/search%safe=off',
-      suggestBase:  'http://suggestqueries.google.com/complete/search&safe=off',
+      searchBase:   'https://www.google.co.jp/search',
+      suggestBase:  'https://suggestqueries.google.com/complete/search',
       params: {
         gl:      'jp',
         hl:      'ko',
