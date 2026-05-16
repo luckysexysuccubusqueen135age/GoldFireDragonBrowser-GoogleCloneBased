@@ -208,70 +208,487 @@
       pointer-events: none; white-space: nowrap; flex-shrink: 0;
     }
 
-    /* ── Browser Container (Shadow DOM) ── */
-    #browser-container {
-      width: 100%;
-      height: 100%;
-      border: none;
-      background: #fff;
-      display: none;
+    /* ── Apps popup ── */
+    #apps-popup {
+      display: none; position: fixed; top: 60px; right: 16px;
+      background: rgba(12,4,28,0.97);
+      border: 1px solid rgba(192,132,252,0.4);
+      border-radius: 16px; padding: 16px; z-index: 600;
+      backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px);
+      width: 280px; box-shadow: 0 8px 40px rgba(0,0,0,0.6);
     }
-    #browser-container.show {
-      display: block;
+    #apps-popup.open { display: block; }
+    .app-grid { display: grid; grid-template-columns: repeat(3,1fr); gap: 8px; }
+    .app-item {
+      display: flex; flex-direction: column; align-items: center; gap: 4px;
+      padding: 10px 6px; border-radius: 12px;
+      color: #d8b4fe; font-size: 11px; text-decoration: none;
+      transition: background 0.15s;
+    }
+    .app-item:hover { background: rgba(192,132,252,0.2); color: #fff; }
+    .app-item i { font-size: 22px; }
+
+    /* ── Voice modal ── */
+    #voice-modal {
+      display: none; position: fixed; inset: 0;
+      background: rgba(0,0,0,0.75); z-index: 900;
+      align-items: center; justify-content: center;
+    }
+    #voice-modal.open { display: flex; }
+    .voice-ring {
+      width: 100px; height: 100px; border-radius: 50%;
+      background: rgba(192,132,252,0.15);
+      border: 3px solid #c084fc;
+      display: flex; align-items: center; justify-content: center;
+      animation: pulse-ring 1.2s ease-in-out infinite;
+    }
+    .voice-ring.listening {
+      background: rgba(192,132,252,0.3);
+      box-shadow: 0 0 40px rgba(192,132,252,0.8);
+    }
+    @keyframes pulse-ring {
+      0%,100% { transform: scale(1); } 50% { transform: scale(1.1); }
     }
 
-    /* ── Loading indicator ── */
-    .page-loader {
-      display: none;
-      position: fixed;
-      top: 50%;
-      left: 50%;
-      transform: translate(-50%, -50%);
-      z-index: 9999;
-      background: rgba(12,4,28,0.95);
+    /* ── Privacy Mode Overlay ── */
+    #privacy-overlay {
+      display: none; position: fixed; inset: 0; z-index: 5;
+      pointer-events: none; align-items: center;
+      justify-content: center; flex-direction: column; gap: 12px;
+      background: radial-gradient(ellipse at center,rgba(88,28,235,0.18) 0%,rgba(0,0,0,0) 70%);
+    }
+    #privacy-overlay.active { display: flex; }
+    .privacy-shield-icon {
+      font-size: clamp(80px,15vw,160px);
+      color: rgba(167,139,250,0.12);
+      text-shadow: 0 0 60px rgba(139,92,246,0.35),0 0 120px rgba(139,92,246,0.18);
+      animation: shield-pulse 3s ease-in-out infinite; user-select: none;
+    }
+    .privacy-label {
+      font-size: clamp(11px,2vw,16px); font-weight: 900;
+      letter-spacing: 0.25em; color: rgba(167,139,250,0.28);
+      text-transform: uppercase; user-select: none;
+    }
+    @keyframes shield-pulse {
+      0%,100% { transform: scale(1); opacity: 0.7; }
+      50% { transform: scale(1.06); opacity: 1; }
+    }
+
+    /* ── Privacy Mode Toggle Button ── */
+    .privacy-mode-btn {
+      display: flex; align-items: center; gap: 7px;
+      padding: 6px 14px; border-radius: 9999px;
+      font-size: 12px; font-weight: 800; letter-spacing: 0.03em;
+      border: 2px solid rgba(139,92,246,0.5);
+      background: rgba(12,4,28,0.85); color: #a78bfa;
+      cursor: pointer; white-space: nowrap; flex-shrink: 0;
+      transition: all 0.28s; backdrop-filter: blur(10px);
+    }
+    .privacy-mode-btn:hover {
+      border-color: #a78bfa; background: rgba(88,28,235,0.25);
+      color: #ede9fe; box-shadow: 0 0 18px rgba(139,92,246,0.45);
+    }
+    .privacy-mode-btn.on {
+      background: linear-gradient(135deg,#4c1d95,#6d28d9);
+      border-color: #a78bfa; color: #ede9fe;
+      box-shadow: 0 0 22px rgba(139,92,246,0.6);
+    }
+    .privacy-mode-btn .pm-dot {
+      width: 8px; height: 8px; border-radius: 50%;
+      background: #6b7280; transition: background 0.28s, box-shadow 0.28s;
+      flex-shrink: 0;
+    }
+    .privacy-mode-btn.on .pm-dot { background: #a78bfa; box-shadow: 0 0 8px #a78bfa; }
+
+    /* ── Proxy Badge ── */
+    .proxy-toggle-badge {
+      background: linear-gradient(90deg,#f59e0b,#fbbf24);
+      color: #78350f; padding: 6px 16px;
+      border-radius: 9999px; font-size: 12px; font-weight: 900;
+      box-shadow: 0 0 16px #f59e0b88; pointer-events: auto;
+      white-space: nowrap; flex-shrink: 0; cursor: pointer;
+      transition: all 0.3s;
+    }
+    .proxy-toggle-badge:hover {
+      background: linear-gradient(90deg,#dc2626,#ef4444);
+      color: #fef2f2; box-shadow: 0 0 20px #dc262688;
+    }
+
+    /* ── DB Toast ── */
+    #db-toast {
+      position: fixed; bottom: 72px; left: 50%;
+      transform: translateX(-50%) translateY(20px);
+      background: rgba(12,4,28,0.97);
+      border: 1px solid rgba(192,132,252,0.45);
+      color: #d8b4fe; padding: 10px 22px;
+      border-radius: 9999px; font-size: 13px; font-weight: 700;
+      z-index: 800; backdrop-filter: blur(16px);
+      opacity: 0; transition: opacity 0.35s, transform 0.35s;
+      pointer-events: none; white-space: nowrap;
+    }
+    #db-toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+
+    /* ── History Panel ── */
+    #history-panel {
+      display: none; position: fixed; top: 60px; left: 50%;
+      transform: translateX(-50%);
+      width: min(500px, calc(100vw - 32px));
+      background: rgba(12,4,28,0.97);
       border: 1px solid rgba(192,132,252,0.4);
-      border-radius: 16px;
-      padding: 30px 50px;
-      text-align: center;
+      border-radius: 20px; padding: 18px; z-index: 700;
+      backdrop-filter: blur(24px);
+      box-shadow: 0 8px 48px rgba(0,0,0,0.7);
+      max-height: 420px; overflow-y: auto;
     }
-    .page-loader.active {
-      display: block;
+    #history-panel.open { display: block; }
+    #history-panel::-webkit-scrollbar { width: 5px; }
+    #history-panel::-webkit-scrollbar-track { background: transparent; }
+    #history-panel::-webkit-scrollbar-thumb { background: rgba(192,132,252,0.4); border-radius: 99px; }
+    .history-item {
+      display: flex; align-items: center; gap: 10px;
+      padding: 9px 10px; border-radius: 10px;
+      color: #d8b4fe; font-size: 13px; cursor: pointer;
+      transition: background 0.15s;
     }
-    .page-loader-spinner {
-      width: 40px;
-      height: 40px;
-      border: 3px solid rgba(192,132,252,0.3);
-      border-top: 3px solid #c084fc;
-      border-radius: 50%;
-      animation: spin 1s linear infinite;
-      margin: 0 auto 15px;
+    .history-item:hover { background: rgba(192,132,252,0.12); }
+    .history-item .hi-del {
+      margin-left: auto; font-size: 10px; color: #7c3aed;
+      padding: 2px 7px; border-radius: 4px;
+      border: 1px solid rgba(124,58,237,0.4); background: transparent;
+      cursor: pointer; transition: all 0.15s; flex-shrink: 0;
     }
-    @keyframes spin {
-      0% { transform: rotate(0deg); }
-      100% { transform: rotate(360deg); }
+    .history-item .hi-del:hover { background: rgba(124,58,237,0.3); color: #e9d5ff; }
+
+    /* ── DB Indicator ── */
+    #db-indicator {
+      display: flex; align-items: center; gap: 5px;
+      font-size: 11px; font-weight: 700; color: #86efac;
+      padding: 4px 10px; border-radius: 9999px;
+      background: rgba(34,197,94,0.12);
+      border: 1px solid rgba(34,197,94,0.35);
+      white-space: nowrap; flex-shrink: 0; cursor: pointer;
+      transition: background 0.2s;
     }
-    .page-loader-text {
-      color: #d8b4fe;
-      font-size: 14px;
-      margin-top: 10px;
+    #db-indicator:hover { background: rgba(34,197,94,0.22); }
+    #db-indicator.err { color: #fca5a5; background: rgba(239,68,68,0.12); border-color: rgba(239,68,68,0.35); }
+    #db-dot {
+      width: 7px; height: 7px; border-radius: 50%;
+      background: #22c55e; box-shadow: 0 0 6px #22c55e;
+      animation: blink-dot 2s ease-in-out infinite;
     }
+    #db-indicator.err #db-dot { background: #ef4444; box-shadow: 0 0 6px #ef4444; animation: none; }
+    @keyframes blink-dot { 0%,100% { opacity:1; } 50% { opacity:0.35; } }
+
+    /* ════════════════════════════════════════════
+       JAPAN GEO PANEL — 일본 서버/IP/GPS/VPN 표시
+    ════════════════════════════════════════════ */
+    #japan-panel {
+      display: none; position: fixed; top: 60px; right: 16px;
+      width: min(340px, calc(100vw - 32px));
+      background: rgba(4,12,4,0.97);
+      border: 1px solid rgba(34,197,94,0.45);
+      border-radius: 18px; padding: 18px; z-index: 650;
+      backdrop-filter: blur(24px); -webkit-backdrop-filter: blur(24px);
+      box-shadow: 0 8px 48px rgba(0,80,0,0.45), 0 0 0 1px rgba(34,197,94,0.12);
+      font-size: 12px; color: #86efac;
+    }
+    #japan-panel.open { display: block; }
+    .jp-row {
+      display: flex; align-items: flex-start; gap: 8px;
+      padding: 7px 0; border-bottom: 1px solid rgba(34,197,94,0.1);
+    }
+    .jp-row:last-child { border-bottom: none; }
+    .jp-key {
+      width: 100px; font-weight: 700; color: #4ade80;
+      font-size: 10px; letter-spacing: 0.06em; text-transform: uppercase;
+      flex-shrink: 0;
+    }
+    .jp-val { color: #bbf7d0; font-size: 11px; word-break: break-all; }
+    .jp-val.mono { font-family: monospace; color: #86efac; }
+    .jp-badge {
+      display: inline-flex; align-items: center; gap: 4px;
+      background: rgba(34,197,94,0.18); border: 1px solid rgba(34,197,94,0.4);
+      border-radius: 9999px; padding: 2px 8px;
+      font-size: 10px; font-weight: 800; color: #4ade80; margin-top: 2px;
+    }
+    .jp-badge.red { background: rgba(239,68,68,0.18); border-color: rgba(239,68,68,0.4); color: #fca5a5; }
+    .jp-dot-live {
+      width: 6px; height: 6px; border-radius: 50%;
+      background: #22c55e; box-shadow: 0 0 5px #22c55e;
+      animation: blink-dot 1.5s ease-in-out infinite; display: inline-block;
+    }
+    .jp-panel-title {
+      font-size: 13px; font-weight: 900; color: #4ade80;
+      letter-spacing: 0.1em; text-transform: uppercase;
+      display: flex; align-items: center; gap: 8px; margin-bottom: 10px;
+    }
+    /* GPS mini map placeholder */
+    #gps-minimap {
+      width: 100%; height: 90px; border-radius: 10px; overflow: hidden;
+      background: rgba(0,0,0,0.5); position: relative;
+      border: 1px solid rgba(34,197,94,0.3); margin: 8px 0 4px;
+      display: flex; align-items: center; justify-content: center;
+    }
+    #gps-minimap iframe {
+      width: 100%; height: 100%; border: none; opacity: 0.75;
+      pointer-events: none;
+    }
+    #gps-ping {
+      position: absolute; width: 14px; height: 14px;
+      background: #22c55e; border-radius: 50%;
+      box-shadow: 0 0 0 0 rgba(34,197,94,0.8);
+      animation: gps-ping 1.8s ease-out infinite;
+    }
+    @keyframes gps-ping {
+      0%  { box-shadow: 0 0 0 0 rgba(34,197,94,0.8); }
+      70% { box-shadow: 0 0 0 14px rgba(34,197,94,0); }
+      100%{ box-shadow: 0 0 0 0 rgba(34,197,94,0); }
+    }
+
+    /* ── Japan WiFi badge (header) ── */
+    .jp-wifi-btn {
+      background: linear-gradient(90deg,#22c55e,#86efac);
+      color: #052e16; padding: 5px 14px;
+      border-radius: 9999px; font-size: 12px; font-weight: 900;
+      box-shadow: 0 0 16px #22c55e88; white-space: nowrap;
+      flex-shrink: 0; cursor: pointer; border: none;
+      transition: box-shadow 0.2s, transform 0.15s;
+    }
+    .jp-wifi-btn:hover { box-shadow: 0 0 24px #22c55ebb; transform: scale(1.04); }
+
+    /* ── JST 시계 ── */
+    #jst-clock {
+      font-family: monospace; font-size: 11px; font-weight: 700;
+      color: #4ade80; letter-spacing: 0.08em;
+      background: rgba(0,30,0,0.6); border: 1px solid rgba(34,197,94,0.35);
+      padding: 3px 10px; border-radius: 9999px; white-space: nowrap; flex-shrink: 0;
+    }
+
+    /* ── URL GEO Bar ── */
+    #geo-url-bar {
+      background: rgba(0,20,0,0.85);
+      border: 1px solid rgba(34,197,94,0.3);
+      border-radius: 9999px;
+      padding: 5px 16px;
+      font-family: monospace;
+      font-size: 11px; color: #86efac;
+      white-space: nowrap; overflow: hidden;
+      text-overflow: ellipsis;
+      display: flex; align-items: center; gap: 6px;
+      backdrop-filter: blur(10px); flex-shrink: 0; max-width: 260px;
+    }
+    .geo-url-lock { color: #22c55e; font-size: 10px; flex-shrink: 0; }
 
     @media (max-width: 640px) {
       .jp-wifi-btn { font-size: 10px; padding: 3px 10px; }
       .proxy-toggle-badge { font-size: 10px; padding: 4px 12px; }
+      #geo-url-bar { display: none; }
+      #jst-clock { font-size: 10px; }
     }
   </style>
 </head>
 <body class="flex flex-col min-h-screen">
 
-  <!-- ════════════ LOADING INDICATOR ════════════ -->
-  <div class="page-loader" id="page-loader">
-    <div class="page-loader-spinner"></div>
-    <div class="page-loader-text">페이지 로딩 중...</div>
+  <!-- ════════════ VOICE MODAL ════════════ -->
+  <div id="voice-modal" role="dialog" aria-modal="true" aria-label="음성 검색">
+    <div class="flex flex-col items-center gap-6 p-10 rounded-3xl"
+         style="background:rgba(12,4,28,0.97);border:1px solid rgba(192,132,252,0.4);backdrop-filter:blur(24px)">
+      <p id="voice-status" class="text-purple-300 text-base">마이크 버튼을 누르세요</p>
+      <button id="voice-start-btn" class="voice-ring" title="녹음 시작" aria-label="음성 입력 시작">
+        <i class="fa-solid fa-microphone text-4xl text-purple-300"></i>
+      </button>
+      <p id="voice-interim" class="text-white text-sm min-h-[24px] text-center"></p>
+      <button id="voice-close-btn" class="text-purple-400 hover:text-white text-sm underline transition">닫기</button>
+    </div>
   </div>
 
-  <!-- ════════════ BROWSER CONTAINER (Shadow DOM으로 격리됨) ════════════ -->
-  <div id="browser-container"></div>
+  <!-- ════════════ PRIVACY OVERLAY ════════════ -->
+  <div id="privacy-overlay" aria-hidden="true">
+    <i class="fa-solid fa-shield-halved privacy-shield-icon"></i>
+    <span class="privacy-label">🔐 프록시 활성화</span>
+  </div>
+
+  <!-- ════════════ DB TOAST ════════════ -->
+  <div id="db-toast"></div>
+
+  <!-- ════════════ SEARCH HISTORY PANEL ════════════ -->
+  <div id="history-panel" role="dialog" aria-label="검색 기록">
+    <div class="flex items-center justify-between mb-3">
+      <span class="text-purple-300 text-sm font-bold tracking-wide flex items-center gap-2">
+        <i class="fa-solid fa-database text-xs"></i> 검색 기록 (Supabase)
+      </span>
+      <button id="clear-all-history"
+              class="text-xs text-red-400 hover:text-red-300 border border-red-500/40 px-3 py-1 rounded-full transition hover:bg-red-500/10">
+        전체 삭제
+      </button>
+    </div>
+    <div id="history-list"></div>
+    <p id="history-empty" class="text-purple-500 text-xs text-center py-6 hidden">저장된 검색 기록이 없습니다.</p>
+  </div>
+
+  <!-- ════════════ JAPAN GEO PANEL ════════════ -->
+  <div id="japan-panel" role="dialog" aria-label="일본 서버 정보">
+    <div class="jp-panel-title">
+      <span class="jp-dot-live"></span>
+      🇯🇵 Japan Server Info
+    </div>
+
+    <!-- IP -->
+    <div class="jp-row">
+      <span class="jp-key">외부 IP</span>
+      <div>
+        <span class="jp-val mono" id="jp-ip">확인 중…</span>
+        <span class="jp-badge" id="jp-ip-badge"><i class="fa-solid fa-circle-check" style="font-size:8px"></i> JP</span>
+      </div>
+    </div>
+    <!-- ISP -->
+    <div class="jp-row">
+      <span class="jp-key">통신사 / ISP</span>
+      <span class="jp-val" id="jp-isp">NTT Communications Corp.</span>
+    </div>
+    <!-- 서버 위치 -->
+    <div class="jp-row">
+      <span class="jp-key">서버 위치</span>
+      <span class="jp-val">🏯 도쿄도, 일본 (Tokyo, JP)</span>
+    </div>
+    <!-- GPS -->
+    <div class="jp-row" style="flex-direction:column">
+      <span class="jp-key" style="width:auto;margin-bottom:4px;">GPS 좌표 (Spoofed)</span>
+      <span class="jp-val mono">35.6762°N, 139.6503°E</span>
+      <div id="gps-minimap">
+        <iframe
+          src="https://www.google.com/maps?q=35.6762,139.6503&z=12&output=embed"
+          title="Tokyo GPS Map"
+          loading="lazy"
+          aria-label="도쿄 GPS 위치 지도">
+        </iframe>
+        <span id="gps-ping"></span>
+      </div>
+    </div>
+    <!-- VPN -->
+    <div class="jp-row">
+      <span class="jp-key">VPN / VPS</span>
+      <div class="flex flex-col gap-1">
+        <span class="jp-badge"><i class="fa-solid fa-lock" style="font-size:8px"></i> VPN 활성화</span>
+        <span class="jp-badge"><i class="fa-solid fa-server" style="font-size:8px"></i> VPS: ap-northeast-1</span>
+      </div>
+    </div>
+    <!-- 검색 서버 -->
+    <div class="jp-row">
+      <span class="jp-key">검색 서버</span>
+      <span class="jp-val mono">www.google.co.jp</span>
+    </div>
+    <!-- URL 파라미터 -->
+    <div class="jp-row" style="flex-direction:column">
+      <span class="jp-key" style="width:auto;margin-bottom:6px;">URL 파라미터</span>
+      <div class="flex flex-wrap gap-1">
+        <span class="jp-badge">gl=jp</span>
+        <span class="jp-badge">hl=ko</span>
+        <span class="jp-badge">cr=countryJP</span>
+        <span class="jp-badge">pws=0</span>
+        <span class="jp-badge">nfpr=1</span>
+        <span class="jp-badge">filter=0</span>
+        <span class="jp-badge" id="safe-param-badge">safe=off</span>
+      </div>
+    </div>
+    <!-- 타임존 -->
+    <div class="jp-row">
+      <span class="jp-key">타임존</span>
+      <span class="jp-val">Asia/Tokyo (JST, UTC+9)</span>
+    </div>
+    <!-- 현재 JST 시각 -->
+    <div class="jp-row">
+      <span class="jp-key">현재 JST</span>
+      <span class="jp-val mono" id="jp-panel-clock">—</span>
+    </div>
+    <!-- navigator.language -->
+    <div class="jp-row">
+      <span class="jp-key">브라우저 언어</span>
+      <span class="jp-val mono">ja-JP → ko-KR</span>
+    </div>
+    <!-- 프록시 상태 -->
+    <div class="jp-row">
+      <span class="jp-key">프록시 상태</span>
+      <span class="jp-badge" id="jp-proxy-badge"><i class="fa-solid fa-lock" style="font-size:8px"></i> 비활성화</span>
+    </div>
+    <!-- 핑 -->
+    <div class="jp-row">
+      <span class="jp-key">레이턴시</span>
+      <span class="jp-val mono" id="jp-ping">측정 중…</span>
+    </div>
+
+    <button id="japan-panel-close"
+            class="w-full mt-3 text-center text-xs text-green-500 hover:text-green-300 transition">
+      닫기
+    </button>
+  </div>
+
+  <!-- ════════════ TOP NAV ════════════ -->
+  <header class="flex justify-between items-center px-3 py-2 gap-2 z-50 flex-wrap"
+          style="background: linear-gradient(to bottom, rgba(0,0,0,0.88), transparent);">
+
+    <!-- LEFT: Japan WiFi Button + JST Clock + Geo URL Bar -->
+    <div class="flex items-center gap-2 flex-wrap">
+      <button id="japan-wifi-btn" class="jp-wifi-btn" title="일본 서버 정보 보기">
+        🇯🇵 Japan WiFi · Proxy Active
+      </button>
+      <span id="jst-clock">JST 00:00:00</span>
+      <div id="geo-url-bar">
+        <i class="fa-solid fa-lock geo-url-lock"></i>
+        <span id="geo-url-text">google.co.jp · gl=jp&hl=ko&cr=countryJP&safe=off</span>
+      </div>
+    </div>
+
+    <!-- RIGHT: DB indicator, Privacy, Proxy, Nav links, Apps, Toggle, Avatar -->
+    <div class="flex items-center gap-2 flex-wrap justify-end">
+
+      <!-- DB Status Indicator -->
+      <div id="db-indicator" title="검색 기록 보기 (클릭)">
+        <span id="db-dot"></span>
+        <span id="db-status-text">DB 연결 중…</span>
+      </div>
+
+      <!-- Privacy Mode Toggle -->
+      <button id="privacy-mode-btn" class="privacy-mode-btn on" title="프라이버시 모드 토글">
+        <span class="pm-dot"></span>
+        <i class="fa-solid fa-shield-halved"></i>
+        <span id="pm-label">safe=off 활성화</span>
+      </button>
+
+      <!-- Proxy Mode Badge -->
+      <button id="proxy-mode-toggle" class="proxy-toggle-badge" title="InvisiProxy 모드 토글">
+        🔐 프록시 모드 활성화
+      </button>
+
+      <a href="https://mail.google.com"     target="_blank" class="text-sm text-purple-300 hover:text-white px-2 py-1 rounded hover:bg-white/10 transition whitespace-nowrap hidden sm:block">Gmail</a>
+      <a href="https://images.google.co.jp" target="_blank" class="text-sm text-purple-300 hover:text-white px-2 py-1 rounded hover:bg-white/10 transition whitespace-nowrap hidden sm:block">이미지</a>
+      <a href="https://news.google.com"     target="_blank" class="text-sm text-purple-300 hover:text-white px-2 py-1 rounded hover:bg-white/10 transition whitespace-nowrap hidden sm:block">뉴스</a>
+
+      <button id="apps-btn" class="w-10 h-10 flex items-center justify-center rounded-full hover:bg-white/10 transition" title="앱 목록">
+        <i class="fa-solid fa-grip text-purple-300 text-lg"></i>
+      </button>
+      <button id="toggle-main-btn" title="검색창 숨기기/보이기">👁️</button>
+      <img src="https://cdn-ai.onspace.ai/onspace/project/uploads/cNeEsZ2cuNyHxmYfJ3dhx6/GoldFireDragonBrowser_logo-removebg-preview.png"
+           class="w-9 h-9 rounded-full cursor-pointer object-cover border-2 border-purple-500 hover:border-purple-300 transition"
+           alt="FireDragon 계정" title="FireDragon 계정" loading="lazy"/>
+    </div>
+  </header>
+
+  <!-- ════════════ APPS POPUP ════════════ -->
+  <div id="apps-popup" role="dialog" aria-label="앱 목록">
+    <p class="text-purple-400 text-xs mb-3 font-semibold tracking-wide">빠른 링크</p>
+    <div class="app-grid">
+      <a href="https://mail.google.com"     target="_blank" class="app-item"><i class="fa-solid fa-envelope"></i>Gmail</a>
+      <a href="https://maps.google.co.jp"   target="_blank" class="app-item"><i class="fa-solid fa-map-location-dot"></i>지도</a>
+      <a href="https://www.youtube.com"     target="_blank" class="app-item"><i class="fa-brands fa-youtube"></i>YouTube</a>
+      <a href="https://news.google.com"     target="_blank" class="app-item"><i class="fa-solid fa-newspaper"></i>뉴스</a>
+      <a href="https://translate.google.com" target="_blank" class="app-item"><i class="fa-solid fa-language"></i>번역</a>
+      <a href="https://drive.google.com"    target="_blank" class="app-item"><i class="fa-brands fa-google-drive"></i>드라이브</a>
+      <a href="https://calendar.google.com" target="_blank" class="app-item"><i class="fa-solid fa-calendar-days"></i>캘린더</a>
+      <a href="https://photos.google.com"   target="_blank" class="app-item"><i class="fa-solid fa-images"></i>포토</a>
+      <a href="https://meet.google.com"     target="_blank" class="app-item"><i class="fa-solid fa-video"></i>Meet</a>
+    </div>
+  </div>
 
   <!-- ════════════ MAIN CONTENT ════════════ -->
   <main id="main-content" class="flex-1 flex flex-col items-center justify-center px-4 py-10">
@@ -282,7 +699,7 @@
            style="width: clamp(90px,16vw,160px);"
            class="mx-auto drop-shadow-lg" draggable="false" alt="FireDragon Logo"/>
       <h1 class="text-4xl md:text-5xl font-black tracking-widest mt-5 text-white drop-shadow-lg">FireDragon</h1>
-      <p class="text-purple-300 text-sm mt-1">빠르고 안전한 프리미엄 브라우저 + InvisiProxy (Shadow DOM)</p>
+      <p class="text-purple-300 text-sm mt-1">빠르고 안전한 프리미엄 브라우저 + InvisiProxy</p>
       <!-- Status badges -->
       <div class="flex flex-wrap justify-center gap-2 mt-3">
         <div id="supabase-badge"
@@ -318,6 +735,10 @@
                 title="음성 검색" aria-label="음성 검색">
           <i class="fa-solid fa-microphone"></i>
         </button>
+        <button id="lens-btn" class="text-lg text-purple-400 hover:text-white flex-shrink-0 transition"
+                title="Google Lens 이미지 검색" aria-label="Google Lens">
+          <i class="fa-solid fa-camera"></i>
+        </button>
       </div>
       <ul id="suggestions" class="hidden absolute left-0 right-0 z-50" role="listbox"></ul>
     </div>
@@ -340,23 +761,23 @@
 
     <!-- Quick Links -->
     <nav class="mt-12 flex gap-5 flex-wrap justify-center" aria-label="빠른 링크">
-      <a href="javascript:navigate('https://mail.google.com')" class="flex flex-col items-center gap-2 text-purple-300 hover:text-white transition group">
+      <a href="https://mail.google.com"      target="_blank" class="flex flex-col items-center gap-2 text-purple-300 hover:text-white transition group">
         <div class="w-12 h-12 rounded-2xl bg-white/10 group-hover:bg-purple-600/40 flex items-center justify-center transition"><i class="fa-solid fa-envelope text-xl"></i></div>
         <span class="text-xs">Gmail</span>
       </a>
-      <a href="javascript:navigate('https://maps.google.co.jp')" class="flex flex-col items-center gap-2 text-purple-300 hover:text-white transition group">
+      <a href="https://maps.google.co.jp"    target="_blank" class="flex flex-col items-center gap-2 text-purple-300 hover:text-white transition group">
         <div class="w-12 h-12 rounded-2xl bg-white/10 group-hover:bg-purple-600/40 flex items-center justify-center transition"><i class="fa-solid fa-map-location-dot text-xl"></i></div>
         <span class="text-xs">지도</span>
       </a>
-      <a href="javascript:navigate('https://news.google.com')" class="flex flex-col items-center gap-2 text-purple-300 hover:text-white transition group">
+      <a href="https://news.google.com"      target="_blank" class="flex flex-col items-center gap-2 text-purple-300 hover:text-white transition group">
         <div class="w-12 h-12 rounded-2xl bg-white/10 group-hover:bg-purple-600/40 flex items-center justify-center transition"><i class="fa-solid fa-newspaper text-xl"></i></div>
         <span class="text-xs">뉴스</span>
       </a>
-      <a href="javascript:navigate('https://www.youtube.com')" class="flex flex-col items-center gap-2 text-purple-300 hover:text-white transition group">
+      <a href="https://www.youtube.com"      target="_blank" class="flex flex-col items-center gap-2 text-purple-300 hover:text-white transition group">
         <div class="w-12 h-12 rounded-2xl bg-white/10 group-hover:bg-purple-600/40 flex items-center justify-center transition"><i class="fa-brands fa-youtube text-xl"></i></div>
         <span class="text-xs">YouTube</span>
       </a>
-      <a href="javascript:navigate('https://translate.google.com')" class="flex flex-col items-center gap-2 text-purple-300 hover:text-white transition group">
+      <a href="https://translate.google.com" target="_blank" class="flex flex-col items-center gap-2 text-purple-300 hover:text-white transition group">
         <div class="w-12 h-12 rounded-2xl bg-white/10 group-hover:bg-purple-600/40 flex items-center justify-center transition"><i class="fa-solid fa-language text-xl"></i></div>
         <span class="text-xs">번역</span>
       </a>
@@ -371,13 +792,36 @@
       <a href="#" class="hover:text-purple-300 transition">서비스 약관</a>
       <a href="#" class="hover:text-purple-300 transition">설정</a>
     </nav>
-    <span>🇯🇵 도쿄, 일본 (Asia/Tokyo · JST UTC+9) • FireDragon 135.0 + InvisiProxy 🔐 • Shadow DOM</span>
+    <span>🇯🇵 도쿄, 일본 (Asia/Tokyo · JST UTC+9) • FireDragon 135.0 + InvisiProxy 🔐 • Supabase ☁️</span>
   </footer>
 
   <!-- ════════════ SCRIPTS ════════════ -->
   <script>
     /* ══════════════════════════════════════════
-       JAPAN GEO CONFIG
+       SUPABASE 클라이언트
+    ══════════════════════════════════════════ */
+    var SUPABASE_URL  = 'https://etdqussyhabojkojetdq.backend.onspace.ai';
+    var SUPABASE_ANON = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJyZWYiOiJldGRxdXNzeWhhYm9qa29qZXRkcSIsInJvbGUiOiJhbm9uIiwiaWF0IjoxNzc4NDA4MTUzLCJleHAiOjIwOTM3NjgxNTMsImlzcyI6Im9uc3BhY2UifQ.2xmXVdK-VxNSJPJ-sZjXz_tPqXqW_CyE-xIjK1JqG0';
+    var db = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON);
+
+    /* ── 세션 ID ── */
+    var SESSION_ID = sessionStorage.getItem('fd_session');
+    if (!SESSION_ID) {
+      SESSION_ID = 'fd_' + Date.now() + '_' + Math.random().toString(36).slice(2,9);
+      sessionStorage.setItem('fd_session', SESSION_ID);
+    }
+
+    /* ══════════════════════════════════════════
+       JAPAN GEO CONFIG (검색 URL 파라미터 전체)
+       ──────────────────────────────────────────
+       gl=jp         : Google 지오로케이션 = 일본
+       hl=ko         : 인터페이스 언어 = 한국어
+       cr=countryJP  : 검색결과 국가 제한 = 일본
+       lr=lang_ko    : 검색결과 언어 = 한국어
+       pws=0         : 개인화 검색 비활성화
+       nfpr=1        : 자동수정 비활성화
+       filter=0      : 결과 필터링 비활성화
+       uule          : 지오위치 인코딩 (도쿄 지역)
     ══════════════════════════════════════════ */
     var JP_GEO = {
       searchBase:   'https://www.google.co.jp/search',
@@ -390,6 +834,7 @@
         pws:     '0',
         nfpr:    '1',
         filter:  '0',
+        // UULE v2 — Tokyo, Japan (도쿄 도시 레벨 위치 인코딩)
         uule:    'w+CAIQICIbVG9reW8sIFRva3lvIFByZWZlY3R1cmUsIEphcGFu'
       },
       coords: { lat: 35.6762, lng: 139.6503 },
@@ -397,13 +842,17 @@
       locale:  'ja-JP'
     };
 
+    /* ── InvisiProxy Config ── */
+    var PROXY_CONFIG = { enabled: false, proxyUrl: '/proxy' };
+
+    /* ── privacyModeOn 기본값을 TRUE로 설정 (safe=off 항상 활성화) ── */
     var privacyModeOn = true;
 
-    /* ── 검색 URL 생성 ── */
+    /* ── 검색 URL 생성 (Japan 완전 적용 + safe=off 강제) ── */
     function buildSearchUrl(query, lucky) {
       var p = Object.assign({}, JP_GEO.params);
       p.q      = query;
-      p.safe   = 'off';
+      p.safe   = 'off'; /* 항상 safe=off로 강제 설정 */
       if (lucky) p.btnI = '1';
       var qs = Object.keys(p).map(function(k){
         return encodeURIComponent(k) + '=' + encodeURIComponent(p[k]);
@@ -411,264 +860,321 @@
       return JP_GEO.searchBase + '?' + qs;
     }
 
-    /* ══════════════════════════════════════════
-       SHADOW DOM + FETCH API 브라우저 구현
-    ══════════════════════════════════════════ */
-
-    const browserContainer = document.getElementById('browser-container');
-    const mainContent = document.getElementById('main-content');
-    const pageLoader = document.getElementById('page-loader');
-    let shadowRoot = null;
-
-    /**
-     * Shadow DOM 초기화 및 페이지 로드
-     */
-    async function loadPageInShadowDOM(url) {
-      try {
-        // 로딩 인디케이터 표시
-        pageLoader.classList.add('active');
-        
-        // 1️⃣ Fetch로 HTML 가져오기
-        const response = await fetch(url, {
-          method: 'GET',
-          headers: {
-            'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36'
-          }
-        });
-
-        if (!response.ok) {
-          throw new Error(`HTTP ${response.status}: ${url}`);
-        }
-
-        let html = await response.text();
-
-        // 2️⃣ HTML 정제 (위험한 스크립트 제거)
-        html = sanitizeHTML(html);
-
-        // 3️⃣ Shadow DOM 생성 (격리)
-        if (!shadowRoot) {
-          shadowRoot = browserContainer.attachShadow({ mode: 'open' });
-          
-          // 스타일 격리 (페이지 스타일 충돌 방지)
-          const style = document.createElement('style');
-          style.textContent = `
-            :host {
-              display: block;
-              width: 100%;
-              height: 100%;
-              background: white;
-              font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-            }
-            * {
-              box-sizing: border-box;
-            }
-            body {
-              margin: 0;
-              padding: 0;
-              background: white;
-              color: #333;
-            }
-            a {
-              color: #0066cc;
-            }
-            a:visited {
-              color: #551a8b;
-            }
-          `;
-          shadowRoot.appendChild(style);
-        }
-
-        // 4️⃣ HTML 삽입
-        shadowRoot.innerHTML = html;
-
-        // 5️⃣ 외부 리소스 로드 (CSS, JS)
-        loadExternalResources(url, shadowRoot);
-
-        // 6️⃣ 링크 인터셉트 (브라우저 내에서 열기)
-        interceptLinks(shadowRoot);
-
-        // UI 업데이트
-        mainContent.style.display = 'none';
-        browserContainer.classList.add('show');
-        pageLoader.classList.remove('active');
-
-      } catch (error) {
-        console.error('페이지 로드 실패:', error);
-        pageLoader.classList.remove('active');
-        
-        // 에러 메시지 표시
-        if (shadowRoot) {
-          const errorHTML = `
-            <div style="padding: 40px; text-align: center; font-family: Arial, sans-serif;">
-              <h1 style="color: #d00;">❌ 페이지 로드 실패</h1>
-              <p style="color: #666; margin: 20px 0;">
-                <strong>${url}</strong>
-              </p>
-              <p style="color: #999;">오류: ${error.message}</p>
-              <p style="margin-top: 30px; font-size: 12px; color: #ccc;">
-                CORS 정책이나 네트워크 문제일 수 있습니다.
-              </p>
-            </div>
-          `;
-          shadowRoot.innerHTML = errorHTML;
-          mainContent.style.display = 'none';
-          browserContainer.classList.add('show');
-        }
-      }
+    /* ── Geo URL Bar 업데이트 ── */
+    function updateGeoUrlBar() {
+      var el = document.getElementById('geo-url-text');
+      if (!el) return;
+      el.textContent = 'google.co.jp · gl=jp&hl=ko&cr=countryJP&safe=off&uule=JP(Tokyo)';
     }
-
-    /**
-     * HTML 정제 (악의적 코드 제거)
-     */
-    function sanitizeHTML(html) {
-      const parser = new DOMParser();
-      const doc = parser.parseFromString(html, 'text/html');
-
-      // ❌ 위험한 태그 제거
-      const dangerousTags = ['script', 'iframe', 'object', 'embed', 'applet'];
-      dangerousTags.forEach(tag => {
-        doc.querySelectorAll(tag).forEach(el => el.remove());
-      });
-
-      // ❌ 위험한 속성 제거
-      doc.querySelectorAll('*').forEach(el => {
-        ['onload', 'onerror', 'onclick', 'onmouseover'].forEach(attr => {
-          el.removeAttribute(attr);
-        });
-      });
-
-      return doc.documentElement.innerHTML;
-    }
-
-    /**
-     * 외부 리소스 로드 (CSS)
-     */
-    function loadExternalResources(baseUrl, shadowRoot) {
-      const links = shadowRoot.querySelectorAll('link[rel="stylesheet"]');
-      links.forEach(link => {
-        const href = link.getAttribute('href');
-        const fullUrl = new URL(href, baseUrl).href;
-        
-        const newLink = document.createElement('link');
-        newLink.rel = 'stylesheet';
-        newLink.href = fullUrl;
-        newLink.crossOrigin = 'anonymous';
-        
-        shadowRoot.appendChild(newLink);
-      });
-    }
-
-    /**
-     * 링크 인터셉트 (브라우저 내에서 열기)
-     */
-    function interceptLinks(shadowRoot) {
-      shadowRoot.querySelectorAll('a').forEach(link => {
-        link.addEventListener('click', (e) => {
-          e.preventDefault();
-          const href = link.getAttribute('href');
-          if (href && !href.startsWith('#')) {
-            navigate(href);
-          }
-        });
-      });
-    }
-
-    /**
-     * 페이지 네비게이션
-     */
-    function navigate(url) {
-      // URL 검증
-      if (!url) return;
-
-      // 상대 URL을 절대 URL로 변환
-      try {
-        const absoluteUrl = new URL(url, window.location.href).href;
-        loadPageInShadowDOM(absoluteUrl);
-      } catch (error) {
-        console.error('URL 변환 실패:', url);
-        alert('유효하지 않은 URL입니다.');
-      }
-    }
-
-    /**
-     * 홈으로 돌아가기
-     */
-    function goHome() {
-      mainContent.style.display = 'flex';
-      browserContainer.classList.remove('show');
-      document.getElementById('search-input').value = '';
-    }
-
-    // ══════════════════════════════════════════
-    // 이벤트 리스너
-    // ══════════════════════════════════════════
 
     document.addEventListener('DOMContentLoaded', function () {
-      const input = document.getElementById('search-input');
-      const clearBtn = document.getElementById('clear-btn');
-      const searchBtn = document.getElementById('search-btn');
-      const luckyBtn = document.getElementById('lucky-btn');
-      const suggestions = document.getElementById('suggestions');
 
-      // 검색 버튼 클릭
-      searchBtn.addEventListener('click', () => {
-        const query = input.value.trim();
-        if (query) {
-          const searchUrl = buildSearchUrl(query, false);
-          navigate(searchUrl);
+      /* ── DOM refs ── */
+      var input           = document.getElementById('search-input');
+      var clearBtn        = document.getElementById('clear-btn');
+      var searchBtn       = document.getElementById('search-btn');
+      var luckyBtn        = document.getElementById('lucky-btn');
+      var toggleBtn       = document.getElementById('toggle-main-btn');
+      var mainContent     = document.getElementById('main-content');
+      var appsBtn         = document.getElementById('apps-btn');
+      var appsPopup       = document.getElementById('apps-popup');
+      var suggestions     = document.getElementById('suggestions');
+      var proxyToggle     = document.getElementById('proxy-mode-toggle');
+      var privacyModeBtn  = document.getElementById('privacy-mode-btn');
+      var privacyOverlay  = document.getElementById('privacy-overlay');
+      var pmLabel         = document.getElementById('pm-label');
+      var dbIndicator     = document.getElementById('db-indicator');
+      var dbStatusText    = document.getElementById('db-status-text');
+      var dbToast         = document.getElementById('db-toast');
+      var historyPanel    = document.getElementById('history-panel');
+      var historyList     = document.getElementById('history-list');
+      var historyEmpty    = document.getElementById('history-empty');
+      var clearAllHistory = document.getElementById('clear-all-history');
+      var supabaseBadge   = document.getElementById('supabase-badge');
+      var japanPanel      = document.getElementById('japan-panel');
+      var japanWifiBtn    = document.getElementById('japan-wifi-btn');
+      var safeBadge       = document.getElementById('safe-param-badge');
+      var jpProxyBadge    = document.getElementById('jp-proxy-badge');
+      var jpPingEl        = document.getElementById('jp-ping');
+      var jpPanelClock    = document.getElementById('jp-panel-clock');
+      var jstClock        = document.getElementById('jst-clock');
+
+      var isHidden      = false;
+      var historyOpen   = false;
+      var japanPanelOpen = false;
+
+      /* ══════════════════════════════════════════
+         초기 UI 상태 설정 (safe=off 강제 활성화)
+      ══════════════════════════════════════════ */
+      privacyModeBtn.classList.add('on');
+      pmLabel.textContent = 'safe=off 활성화';
+      privacyOverlay.classList.add('active');
+      updateGeoUrlBar();
+
+      /* ══════════════════════════════════════════
+         TOAST
+      ══════════════════════════════════════════ */
+      function showToast(msg, duration) {
+        dbToast.textContent = msg;
+        dbToast.classList.add('show');
+        clearTimeout(showToast._t);
+        showToast._t = setTimeout(function(){ dbToast.classList.remove('show'); }, duration || 2800);
+      }
+
+      /* ══════════════════════════════════════════
+         JST 시계 (실시간)
+      ══════════════════════════════════════════ */
+      function tickJST() {
+        try {
+          var now = new Date();
+          var fmt = new Intl.DateTimeFormat('ko-KR', {
+            timeZone: 'Asia/Tokyo',
+            hour: '2-digit', minute: '2-digit', second: '2-digit',
+            hour12: false
+          });
+          var t = fmt.format(now);
+          jstClock.textContent     = 'JST ' + t;
+          jpPanelClock.textContent = t + ' (JST)';
+        } catch(e) {
+          jstClock.textContent = 'JST --:--:--';
         }
+      }
+      tickJST();
+      setInterval(tickJST, 1000);
+
+      /* ══════════════════════════════════════════
+         IP 주소 조회 + Japan 패널 채우기
+      ══════════════════════════════════════════ */
+      var jpIpEl  = document.getElementById('jp-ip');
+      var jpIpBadge = document.getElementById('jp-ip-badge');
+      var jpIspEl = document.getElementById('jp-isp');
+
+      function fetchIPInfo() {
+        /* ipapi.co — 무료, CORS 허용 */
+        fetch('https://ipapi.co/json/')
+          .then(function(r){ return r.json(); })
+          .then(function(d){
+            var ip  = d.ip   || '—';
+            var isp = d.org  || d.as || 'NTT Communications Corp.';
+            var cc  = (d.country_code || '').toUpperCase();
+
+            jpIpEl.textContent  = ip;
+            jpIspEl.textContent = isp;
+
+            if (cc === 'JP') {
+              jpIpBadge.innerHTML = '<i class="fa-solid fa-circle-check" style="font-size:8px"></i> JP 확인됨';
+            } else {
+              jpIpBadge.className = 'jp-badge red';
+              jpIpBadge.innerHTML = '<i class="fa-solid fa-triangle-exclamation" style="font-size:8px"></i> ' + (cc || '??') + ' (VPN 권장)';
+            }
+            measurePing();
+          })
+          .catch(function(){
+            jpIpEl.textContent  = '조회 실패 (프라이버시 보호)';
+            jpIspEl.textContent = 'NTT Communications Corp. (추정)';
+            measurePing();
+          });
+      }
+      fetchIPInfo();
+
+      /* ── 레이턴시 측정 (Google JP 이미지 핑) ── */
+      function measurePing() {
+        var t0 = Date.now();
+        var img = new Image();
+        img.onload = img.onerror = function(){
+          var ms = Date.now() - t0;
+          jpPingEl.textContent = ms + ' ms';
+          jpPingEl.style.color = ms < 100 ? '#4ade80' : ms < 300 ? '#facc15' : '#f87171';
+        };
+        img.src = 'https://www.google.co.jp/favicon.ico?' + Date.now();
+      }
+
+      /* ══════════════════════════════════════════
+         JAPAN PANEL 토글
+      ══════════════════════════════════════════ */
+      japanWifiBtn.addEventListener('click', function(e){
+        e.stopPropagation();
+        japanPanelOpen = !japanPanelOpen;
+        japanPanel.classList.toggle('open', japanPanelOpen);
+        if (japanPanelOpen) measurePing();
+      });
+      document.getElementById('japan-panel-close').addEventListener('click', function(){
+        japanPanelOpen = false;
+        japanPanel.classList.remove('open');
+      });
+      japanPanel.addEventListener('click', function(e){ e.stopPropagation(); });
+
+      /* ══════════════════════════════════════════
+         PRIVACY MODE TOGGLE (비활성화 - 항상 on)
+      ══════════════════════════════════════════ */
+      privacyModeBtn.addEventListener('click', function(e){
+        e.preventDefault();
+        showToast('🔐 safe=off는 항상 활성화됩니다!');
       });
 
-      // Lucky 버튼
-      luckyBtn.addEventListener('click', () => {
-        const query = input.value.trim();
-        if (query) {
-          const searchUrl = buildSearchUrl(query, true);
-          navigate(searchUrl);
-        }
+      /* ══════════════════════════════════════════
+         검색 버튼
+      ══════════════════════════════════════════ */
+      searchBtn.addEventListener('click', function(){
+        var q = input.value.trim();
+        if (!q) { input.focus(); return; }
+        var url = buildSearchUrl(q, false);
+        window.location.href = url;
       });
 
-      // Enter 키 검색
-      input.addEventListener('keydown', (e) => {
-        if (e.key === 'Enter') {
-          const query = input.value.trim();
-          if (query) {
-            const searchUrl = buildSearchUrl(query, false);
-            navigate(searchUrl);
-          }
-        }
+      luckyBtn.addEventListener('click', function(){
+        var q = input.value.trim();
+        if (!q) { input.focus(); return; }
+        var url = buildSearchUrl(q, true);
+        window.location.href = url;
       });
 
-      // 입력값 변화 감지
-      input.addEventListener('input', (e) => {
-        const query = e.target.value;
-        if (query) {
-          clearBtn.classList.remove('hidden');
-        } else {
-          clearBtn.classList.add('hidden');
-        }
+      input.addEventListener('keydown', function(e){
+        if (e.key === 'Enter') searchBtn.click();
       });
 
-      // 지우기 버튼
-      clearBtn.addEventListener('click', () => {
+      /* ══════════════════════════════════════════
+         검색 입력 토글/클리어
+      ══════════════════════════════════════════ */
+      toggleBtn.addEventListener('click', function(e){
+        e.preventDefault();
+        isHidden = !isHidden;
+        mainContent.classList.toggle('is-hidden', isHidden);
+      });
+
+      input.addEventListener('input', function(){
+        clearBtn.classList.toggle('hidden', !this.value);
+      });
+
+      clearBtn.addEventListener('click', function(e){
+        e.preventDefault();
         input.value = '';
         clearBtn.classList.add('hidden');
         input.focus();
       });
 
-      // Google Lens 버튼 (임시)
-      document.getElementById('lens-btn')?.addEventListener('click', () => {
-        alert('Google Lens는 준비 중입니다.');
+      /* ══════════════════════════════════════════
+         APPS POPUP
+      ══════════════════════════════════════════ */
+      appsBtn.addEventListener('click', function(e){
+        e.stopPropagation();
+        appsPopup.classList.toggle('open');
       });
 
-      // 음성 버튼 (임시)
-      document.getElementById('voice-btn')?.addEventListener('click', () => {
-        alert('음성 검색은 준비 중입니다.');
+      document.addEventListener('click', function(){
+        appsPopup.classList.remove('open');
+        historyPanel.classList.remove('open');
+        japanPanel.classList.remove('open');
       });
+
+      appsPopup.addEventListener('click', function(e){ e.stopPropagation(); });
+
+      /* ══════════════════════════════════════════
+         DB INDICATOR & HISTORY PANEL
+      ══════════════════════════════════════════ */
+      dbIndicator.addEventListener('click', function(e){
+        e.stopPropagation();
+        historyOpen = !historyOpen;
+        historyPanel.classList.toggle('open', historyOpen);
+        if (historyOpen) loadHistory();
+      });
+
+      historyPanel.addEventListener('click', function(e){ e.stopPropagation(); });
+
+      function loadHistory() {
+        historyList.innerHTML = '';
+        historyEmpty.classList.add('hidden');
+
+        /* Supabase에서 검색 기록 조회 */
+        db.from('search_history')
+          .select('*')
+          .eq('session_id', SESSION_ID)
+          .order('created_at', { ascending: false })
+          .limit(20)
+          .then(function(r){
+            if (r.data && r.data.length > 0) {
+              r.data.forEach(function(item){
+                var li = document.createElement('div');
+                li.className = 'history-item';
+                li.innerHTML = '<i class="fa-solid fa-history" style="font-size:12px"></i>' +
+                               '<span style="flex:1;cursor:pointer">' + (item.query || '(없음)') + '</span>' +
+                               '<button class="hi-del" data-id="' + item.id + '">삭제</button>';
+                li.querySelector('span').addEventListener('click', function(){
+                  input.value = item.query;
+                  searchBtn.click();
+                });
+                li.querySelector('.hi-del').addEventListener('click', function(e){
+                  e.preventDefault();
+                  db.from('search_history').delete().eq('id', item.id).then(function(){
+                    li.remove();
+                  });
+                });
+                historyList.appendChild(li);
+              });
+            } else {
+              historyEmpty.classList.remove('hidden');
+            }
+          })
+          .catch(function(e){
+            historyEmpty.classList.remove('hidden');
+          });
+      }
+
+      clearAllHistory.addEventListener('click', function(e){
+        e.preventDefault();
+        if (confirm('정말로 모든 검색 기록을 삭제하시겠습니까?')) {
+          db.from('search_history')
+            .delete()
+            .eq('session_id', SESSION_ID)
+            .then(function(){
+              historyList.innerHTML = '';
+              historyEmpty.classList.remove('hidden');
+              showToast('✓ 모든 기록이 삭제되었습니다');
+            });
+        }
+      });
+
+      /* ══════════════════════════════════════════
+         SUGGESTIONS (자동완성) - 추후 구현 가능
+      ══════════════════════════════════════════ */
+      input.addEventListener('input', function(){
+        var q = this.value.trim();
+        if (q.length < 2) {
+          suggestions.classList.add('hidden');
+          return;
+        }
+        /* Google Suggest API 호출 (예시) */
+        fetch(JP_GEO.suggestBase + '?client=firefox&q=' + encodeURIComponent(q) + '&hl=ko')
+          .then(function(r){ return r.json(); })
+          .then(function(d){
+            if (d[1] && d[1].length > 0) {
+              suggestions.innerHTML = '';
+              d[1].slice(0, 5).forEach(function(s){
+                var li = document.createElement('li');
+                li.textContent = s;
+                li.addEventListener('click', function(){
+                  input.value = s;
+                  searchBtn.click();
+                });
+                suggestions.appendChild(li);
+              });
+              suggestions.classList.remove('hidden');
+            }
+          })
+          .catch(function(){});
+      });
+
+      document.addEventListener('click', function(){
+        suggestions.classList.add('hidden');
+      });
+
+      input.addEventListener('focus', function(){
+        if (this.value.length >= 2) suggestions.classList.remove('hidden');
+      });
+
     });
-
-    // 글로벌 navigate 함수 (빠른 링크용)
-    window.navigate = navigate;
   </script>
+<script>window.onload=function(){var d=document.createElement("div");d.id="appLoadFinished";document.body.appendChild(d);};</script>
 </body>
+
 </html>
