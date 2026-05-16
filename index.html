@@ -177,6 +177,87 @@
       50%      { transform: scale(1.1); }
     }
 
+    /* ── Privacy Mode Overlay ── */
+    #privacy-overlay {
+      display: none;
+      position: fixed;
+      inset: 0;
+      z-index: 5;
+      pointer-events: none;
+      align-items: center;
+      justify-content: center;
+      flex-direction: column;
+      gap: 12px;
+      background: radial-gradient(
+        ellipse at center,
+        rgba(88,28,235,0.18) 0%,
+        rgba(0,0,0,0) 70%
+      );
+    }
+    #privacy-overlay.active { display: flex; }
+    .privacy-shield-icon {
+      font-size: clamp(80px,15vw,160px);
+      color: rgba(167,139,250,0.12);
+      text-shadow: 0 0 60px rgba(139,92,246,0.35), 0 0 120px rgba(139,92,246,0.18);
+      animation: shield-pulse 3s ease-in-out infinite;
+      user-select: none;
+    }
+    .privacy-label {
+      font-size: clamp(11px,2vw,16px);
+      font-weight: 900;
+      letter-spacing: 0.25em;
+      color: rgba(167,139,250,0.28);
+      text-transform: uppercase;
+      user-select: none;
+    }
+    @keyframes shield-pulse {
+      0%,100% { transform: scale(1);   opacity: 0.7; }
+      50%      { transform: scale(1.06); opacity: 1;   }
+    }
+
+    /* ── Privacy Mode Toggle Button ── */
+    .privacy-mode-btn {
+      display: flex;
+      align-items: center;
+      gap: 7px;
+      padding: 6px 14px;
+      border-radius: 9999px;
+      font-size: 12px;
+      font-weight: 800;
+      letter-spacing: 0.03em;
+      border: 2px solid rgba(139,92,246,0.5);
+      background: rgba(12,4,28,0.85);
+      color: #a78bfa;
+      cursor: pointer;
+      white-space: nowrap;
+      flex-shrink: 0;
+      transition: all 0.28s;
+      backdrop-filter: blur(10px);
+    }
+    .privacy-mode-btn:hover {
+      border-color: #a78bfa;
+      background: rgba(88,28,235,0.25);
+      color: #ede9fe;
+      box-shadow: 0 0 18px rgba(139,92,246,0.45);
+    }
+    .privacy-mode-btn.on {
+      background: linear-gradient(135deg,#4c1d95,#6d28d9);
+      border-color: #a78bfa;
+      color: #ede9fe;
+      box-shadow: 0 0 22px rgba(139,92,246,0.6);
+    }
+    .privacy-mode-btn .pm-dot {
+      width: 8px; height: 8px;
+      border-radius: 50%;
+      background: #6b7280;
+      transition: background 0.28s, box-shadow 0.28s;
+      flex-shrink: 0;
+    }
+    .privacy-mode-btn.on .pm-dot {
+      background: #a78bfa;
+      box-shadow: 0 0 8px #a78bfa;
+    }
+
     /* ── Proxy Mode Toggle ── */
     .proxy-toggle-badge {
       background: linear-gradient(90deg,#f59e0b,#fbbf24);
@@ -223,12 +304,25 @@
     </div>
   </div>
 
+  <!-- ════════════ PRIVACY MODE OVERLAY ════════════ -->
+  <div id="privacy-overlay" aria-hidden="true">
+    <i class="fa-solid fa-shield-halved privacy-shield-icon"></i>
+    <span class="privacy-label">🔐 프록시 활성화</span>
+  </div>
+
   <!-- ════════════ TOP NAV ════════════ -->
   <header class="flex justify-between items-center px-4 py-3 gap-2 z-50 flex-wrap"
           style="background: linear-gradient(to bottom, rgba(0,0,0,0.88), transparent);">
 
     <!-- Japan WiFi Badge (left side) -->
     <div class="japan-wifi">🇯🇵 Japan WiFi IP Connected • Proxy Active</div>
+
+    <!-- Privacy Mode Toggle -->
+    <button id="privacy-mode-btn" class="privacy-mode-btn" title="프라이버시 모드 토글">
+      <span class="pm-dot"></span>
+      <i class="fa-solid fa-shield-halved"></i>
+      <span id="pm-label">프라이버시 모드</span>
+    </button>
 
     <!-- Proxy Mode Badge -->
     <button id="proxy-mode-toggle" class="proxy-toggle-badge" title="InvisiProxy 모드 토글">
@@ -414,9 +508,22 @@
       var appsBtn     = document.getElementById('apps-btn');
       var appsPopup   = document.getElementById('apps-popup');
       var suggestions = document.getElementById('suggestions');
-      var proxyToggle = document.getElementById('proxy-mode-toggle');
+      var proxyToggle      = document.getElementById('proxy-mode-toggle');
+      var privacyModeBtn   = document.getElementById('privacy-mode-btn');
+      var privacyOverlay   = document.getElementById('privacy-overlay');
+      var pmLabel          = document.getElementById('pm-label');
+      var privacyModeOn    = false;
 
       var isHidden = false;
+
+      /* ── 프라이버시 모드 토글 ── */
+      privacyModeBtn.addEventListener('click', function (e) {
+        e.stopPropagation();
+        privacyModeOn = !privacyModeOn;
+        privacyModeBtn.classList.toggle('on', privacyModeOn);
+        privacyOverlay.classList.toggle('active', privacyModeOn);
+        pmLabel.textContent = privacyModeOn ? '프라이버시 ON' : '프라이버시 모드';
+      });
 
       /* ── 프록시 모드 토글 ── */
       proxyToggle.addEventListener('click', function (e) {
@@ -485,9 +592,10 @@
           return;
         }
 
-        var base   = 'https://www.google.co.jp/search';
-        var params = 'gl=jp&hl=ko&safe=off&nfpr=1&filter=0&pws=0';
-        var suffix = lucky ? '&btnI=1' : '';
+        var base      = 'https://www.google.co.jp/search';
+        var safeParam = privacyModeOn ? 'safe=off' : 'safe=active';
+        var params    = 'gl=jp&hl=ko&' + safeParam + '&nfpr=1&filter=0&pws=0';
+        var suffix    = lucky ? '&btnI=1' : '';
         var searchUrl = base + '?q=' + encodeURIComponent(query) + '&' + params + suffix;
         searchUrl = proxyifyUrl(searchUrl);
         window.open(searchUrl, '_blank');
@@ -682,9 +790,7 @@
     };
   </script>
 <script>window.onload=function(){var d=document.createElement("div");d.id="appLoadFinished";document.body.appendChild(d);};</script>
-<script>window.onload=function(){var d=document.createElement("div");d.id="appLoadFinished";document.body.appendChild(d);};</script>
 </body>
-
 
 
 </html>
