@@ -15,7 +15,7 @@ concurrency:
 
 jobs:
   build_site:
-    runs-on: windows x86_64
+    runs-on:local= windows x86_64 / web= github repo + githubpage
     steps:
       - name: Checkout Code
         uses: actions/checkout@v4
