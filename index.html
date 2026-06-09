@@ -24,20 +24,8 @@
     <script src="https://cdn.tailwindcss.com"></script>
    <link rel="stylesheet" href="import '../fonts/gamefont.css'; // 내 프로젝트 구조에 맞게 gamefont.css 경로를 링크하세요.">
 
-   <!-- 폰트 등록 및 웹사이트 전체 글자 적용 -->
-    <style>
-        @font-face {
-            font-family: 'a큐티허니';
-            src: url("https://jsdelivr.net") format("woff"),
-                 url("https://jsdelivr.net") format("truetype");
-            font-weight: normal;
-            font-style: normal;
-        }
-
-        /* fonts/gamefont.css 또는 메인 스타일시트 상단 */
-
-@font-face {
-    font-family: 'CutieHoney';
+    @font-face {
+    font-family: 'aCutieHoney';
     src: url('./a큐티허니.woff') format('woff'),
          url('./a큐티허니.ttf') format('truetype');
     font-weight: normal;
@@ -45,16 +33,14 @@
     font-display: swap;
 }
 
-/* 웹페이지 내의 모든 텍스트 요소를 하이재킹하여 큐티허니 폰트로 강제 변경 */
+/* 브라우저 레이아웃 전체 및 모든 하위 요소를 하이재킹하여 큐티허니 폰트로 강제 변경 */
 * {
-    font-family: 'CutieHoney', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif !important;
+    font-family: 'aCutieHoney', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif !important;
 }
 
-/* 인풋창, 버튼, 주소창 시뮬레이터 텍스트까지 전부 강제 지정 */
-input, button, select, textarea, span, div, p, a, h1, h2, h3, iframe {
-    font-family: 'CutieHoney' !important;
-}
-
+/* 입력 폼, 인앱 버튼, 주소창 입력칸 시뮬레이터 텍스트까지 누락 없이 강제 타깃 지정 */
+input, button, select, textarea, span, div, p, a, h1, h2, h3, iframe, body, html {
+    font-family: 'aCutieHoney' !important;
    
   <!-- SEO / Social -->
   <meta name="description" content="빠르고 안전한 프리미엄 브라우저 — FireDragon">
