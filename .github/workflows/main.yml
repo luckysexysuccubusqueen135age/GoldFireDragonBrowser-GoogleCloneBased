@@ -18,7 +18,7 @@ jobs:
   build-and-deploy:
     environment:
       name: github-pages
-      url: https://luckysexysuccubusqueen135age.github.io/GoldFireDragonBrowser-GoogleCloneBased/
+      url: https://github.io
     runs-on: ubuntu-latest
 
     steps:
@@ -28,12 +28,11 @@ jobs:
       with:
         persist-credentials: true
 
-    # 2. Node.js 구동 환경 세팅
+    # 2. Node.js 구동 환경 세팅 (에러 원인이었던 cache 옵션을 제거하여 락파일 없이도 통과하게 만듭니다)
     - name: Set up Node.js Environment
       uses: actions/setup-node@v4
       with:
         node-version: '20'
-        cache: 'npm'
 
     # 3. 코르도바 안드로이드 빌드를 위한 JDK 17 환경 구축
     - name: Set up JDK 17 for Cordova Android Build
@@ -100,7 +99,7 @@ jobs:
           # 코르도바 안드로이드 플랫폼 추가
           cordova platform add android --optional || true
           
-          # [지시 조건 반영] 필수 인앱 브라우저 및 웹뷰 플러그인 명시적 추가
+          # 필수 인앱 브라우저 및 웹뷰 플러그인 명시적 추가
           echo "📦 Cordova 플러그인 주입 시작..."
           cordova plugin add cordova-plugin-inappbrowser --save || true
           cordova plugin add cordova-plugin-inappwebview --save || true
