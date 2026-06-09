@@ -12,14 +12,14 @@ permissions:
 
 concurrency:
   group: "pages"
-  # 배포가 밀려 무한 대기 후 취소되는 현상을 전면 방지하기 위해 이전 빌드를 강제 취소하고 새 작업을 즉시 밀어 넣습니다.
+  # 배포 대기 버그 전면 차단
   cancel-in-progress: true 
 
 jobs:
   build-and-deploy:
     environment:
       name: github-pages
-      # [주소 완벽 고정] 질문자님이 명시한 정확한 GitHub Pages 주소 링크
+      # [주소 고정] 질문자님이 명시한 정확한 GitHub Pages 주소 링크
       url: https://github.io
     runs-on: ubuntu-latest
 
@@ -58,8 +58,8 @@ jobs:
         sudo apt-get update
         sudo apt-get install -y openvpn
 
-    # 6. [경로 완벽 고정] 질문자님이 명시한 정확한 VPN 설정 파일 경로 내부에서 무작위 선택 후 구동
-    # 미국 IP로 세는 현상을 막기 위해 라우팅 하이재킹 플래그(--redirect-gateway def1)를 강제로 탑재했습니다.
+    # 6. [경로 고정] 지정하신 정확한 VPN 설정 파일 경로 내부에서 무작위 선택 후 구동
+    # 미국 IP 누수를 완벽 차단하기 위한 하이재킹 플래그 및 인터페이스 초기화 옵션 적용
     - name: Connect to Random OpenVPN JP Config
       run: |
         CONFIG_DIR="OpenVpn/Server/Japan/Configs"
@@ -70,20 +70,38 @@ jobs:
         
         echo "선택되어 실행되는 OpenVPN JP 설정 파일: $SELECTED_OVPN"
         
-        # --redirect-gateway def1 플래그로 깃허브 가상서버의 기존 미국 라우팅 주소를 지우고 일본 VPN망으로 트래픽을 강제 고정합니다.
+        # 가상 어댑터 노이즈를 지우고 라우팅을 강제 병합하여 데몬 구동합니다.
         sudo openvpn \
           --config "$SELECTED_OVPN" \
+          --dev tun \
           --redirect-gateway def1 \
           --dhcp-option DNS 8.8.8.8 \
           --daemon vpn_instance
-        
-        # 일본 무료 서버 노드가 터널을 확실하게 뚫고 기본 게이트웨이로 잡힐 때까지 15초간 대기합니다.
-        sleep 15
 
-    # 7. 일본 VPN망 연결 상태 확인 (IP 정보 출력하여 국가 코드가 JP로 변했는지 최종 확인)
-    # --redirect-gateway 옵션 덕분에 미국이 아닌 진짜 일본 IP 주소가 터미널 로그에 기록됩니다.
-    - name: Verify Japanese Network Tunneling
-      run: curl https://ipinfo.io
+    # 7. [핵심 교정] 가상 컴퓨터의 공인 IP 국가 코드가 진짜 일본(JP)으로 변할 때까지 무한 체킹 루프 가동
+    # 미국(US)으로 탈출하는 현상이 발견되면 최대 12회(총 60초) 동안 지속적으로 갱신을 기다리며 추적합니다.
+    - name: Wait and Verify Japanese Network Tunneling
+      run: |
+        echo "🌐 일본 VPN망 터널링 최종 유효성 검사 시작..."
+        for i in {1..12}; do
+          echo "⏱️ 네트워크 국가 추적 확인 중... (시도 $i/12)"
+          
+          # ipinfo.io에서 현재 국가 코드 2자리 추출 (예: US, JP)
+          CURRENT_COUNTRY=$(curl -s https://ipinfo.io | jq -r '.country' || echo "UNKNOWN")
+          echo "📍 현재 할당된 가상 IP 국가: $CURRENT_COUNTRY"
+          
+          if [ "$CURRENT_COUNTRY" = "JP" ]; then
+            echo "🚀 [성공] 네트워크망이 진짜 일본(JP)으로 정상 우회 조치되었습니다!"
+            curl -s https://ipinfo.io
+            exit 0
+          fi
+          
+          echo "⚠️ 현재 아직 미국(US) 또는 연결 대기 중입니다. 5초 후 재조회합니다."
+          sleep 5
+        done
+        
+        echo "❌ [실패] 일본 VPN 연결 노드가 터널링 확보에 최종 실패했습니다. (다음 푸시 때 다른 파일 자동 매칭 유도)"
+        exit 1
 
     # 8. Webpack 번들링 및 Express/Supabase/OneSpace AI 빌드 스크립트 실행
     - name: Build Web Application
@@ -122,7 +140,7 @@ jobs:
     - name: Commit and Push Updated Files to Repository
       run: |
         git config --global user.name "github-actions[bot]"
-        git config --global user.email "github-actions[bot]@users.noreply.github.com"
+        git config --global user.email "github-actions[bot]@://github.com"
         
         # 변경(수정/업데이트)된 파일만 스테이징에 반영
         git add -u
