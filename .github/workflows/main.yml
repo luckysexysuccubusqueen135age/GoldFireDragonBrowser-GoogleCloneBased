@@ -1,0 +1,138 @@
+name: Deploy GoldFireDragonBrowser
+
+on:
+  push:
+    branches: [ "main" ]
+  workflow_dispatch:
+
+permissions:
+  contents: write   # 기존 파일을 수정하여 깃허브 리포지토리에 push하기 위해 필수
+  pages: write      # GitHub Pages 배포를 위해 필수
+  id-token: write
+
+concurrency:
+  group: "pages"
+  cancel-in-progress: false
+
+jobs:
+  build-and-deploy:
+    environment:
+      name: github-pages
+      url: https://luckysexysuccubusqueen135age.github.io/GoldFireDragonBrowser-GoogleCloneBased/
+    runs-on: ubuntu-latest
+
+    steps:
+    # 1. 레포지토리 소스코드 내려받기
+    - name: Checkout Source Code
+      uses: actions/checkout@v4
+      with:
+        persist-credentials: true
+
+    # 2. Node.js 구동 환경 세팅
+    - name: Set up Node.js Environment
+      uses: actions/setup-node@v4
+      with:
+        node-version: '20'
+        cache: 'npm'
+
+    # 3. 코르도바 안드로이드 빌드를 위한 JDK 17 환경 구축
+    - name: Set up JDK 17 for Cordova Android Build
+      uses: actions/setup-java@v4
+      with:
+        distribution: 'zulu'
+        java-version: '17'
+
+    # 4. 의존성 패키지 설치 (Express, Webpack, Supabase, OneSpace AI 및 Cordova CLI 전역 설치)
+    - name: Install Dependencies
+      run: |
+        npm install -g cordova
+        if [ -f package.json ]; then
+          npm install
+        fi
+
+    # 5. 가상 머신 리눅스 시스템에 OpenVPN 클라이언트 설치
+    - name: Install Linux OpenVPN Client
+      run: |
+        sudo apt-get update
+        sudo apt-get install -y openvpn
+
+    # 6. 지정한 VPN 설정 파일 경로(OpenVpn/Server/Japan/Configs) 내부에서 무작위 선택 후 구동
+    - name: Connect to Random OpenVPN JP Config
+      run: |
+        CONFIG_DIR="OpenVpn/Server/Japan/Configs"
+        CONFIG_FILES=($(ls $CONFIG_DIR/*.ovpn))
+        
+        RANDOM_INDEX=$((RANDOM % ${#CONFIG_FILES[@]}))
+        SELECTED_OVPN=${CONFIG_FILES[$RANDOM_INDEX]}
+        
+        echo "선택되어 실행되는 OpenVPN JP 설정 파일: $SELECTED_OVPN"
+        
+        # 데몬(--daemon) 모드로 백그라운드 실행합니다.
+        sudo openvpn --config "$SELECTED_OVPN" --daemon vpn_instance
+        
+        # 터널링 안정화를 위해 12초간 대기합니다.
+        sleep 12
+
+    # 7. 일본 VPN망 연결 상태 확인 (IP 정보 출력)
+    - name: Verify Japanese Network Tunneling
+      run: curl https://ipinfo.io
+
+    # 8. Webpack 번들링 및 Express/Supabase/OneSpace AI 빌드 스크립트 실행
+    # 9. 코르도바 플랫폼 추가, InAppBrowser/InAppWebView 플러그인 주입 및 최종 빌드
+    - name: Build Web Application & Cordova Packages
+      env:
+        SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
+        SUPABASE_ANON_KEY: ${{ secrets.SUPABASE_ANON_KEY }}
+        ONESPACE_AI_API_KEY: ${{ secrets.ONESPACE_AI_API_KEY }}
+      run: |
+        # Webpack 컴파일 실행
+        if npm run | grep -q "build"; then
+          npm run build
+        fi
+        
+        # Express 데이터 수집이나 Supabase/OneSpace 연동 빌드 스크립트가 있다면 구동
+        if [ -f server-build.js ]; then
+          node server-build.js
+        fi
+
+        # 코르도바 프로젝트 환경(config.xml)이 구성되어 있을 경우 플러그인 강제 추가 및 안드로이드 컴파일 실행
+        if [ -f config.xml ]; then
+          # 코르도바 안드로이드 플랫폼 추가
+          cordova platform add android --optional || true
+          
+          # [지시 조건 반영] 필수 인앱 브라우저 및 웹뷰 플러그인 명시적 추가
+          echo "📦 Cordova 플러그인 주입 시작..."
+          cordova plugin add cordova-plugin-inappbrowser --save || true
+          cordova plugin add cordova-plugin-inappwebview --save || true
+          
+          # 안드로이드 앱 최종 빌드 실행
+          cordova build android --debug
+        fi
+
+    # 10. 수정/최신화된 기존 파일들의 변경 내역만 감지하여 갱신(Update) 처리
+    - name: Commit and Push Updated Files to Repository
+      run: |
+        git config --global user.name "github-actions[bot]"
+        git config --global user.email "github-actions[bot]@users.noreply.github.com"
+        
+        # 변경(수정/업데이트)된 파일만 스테이징에 반영
+        git add -u
+        
+        # 업데이트 내역이 있는지 체크 후 커밋/푸시 진행
+        if ! git diff --cached --quiet; then
+          git commit -m "chore: update existing browser data via Japan VPN [skip ci]"
+          git push origin main
+        else
+          echo "업데이트 내역이 변경되지 않아 과정을 건너넙니다."
+        fi
+
+    # 11. 배포할 결과물 자원을 배포 아티팩트로 전송
+    - name: Upload Static Pages Artifact
+      uses: actions/upload-pages-artifact@v3
+      with:
+        path: '.' 
+
+    # 12. 최종 배포 발행 (내 GitHub Pages URL 활성화)
+    - name: Deploy to GitHub Pages
+      id: deployment
+      uses: actions/deploy-pages@v4
