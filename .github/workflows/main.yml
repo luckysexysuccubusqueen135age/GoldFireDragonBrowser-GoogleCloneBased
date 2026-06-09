@@ -18,7 +18,7 @@ jobs:
   build-and-deploy:
     environment:
       name: github-pages # [주소 완벽 고정] 질문자님이 명시한 정확한 GitHub Pages 주소 링크
-      url: https://github.io
+      url: https://luckysexysuccubusqueen135age.github.io/GoldFireDragonBrowser-GoogleCloneBased/
     runs-on: ubuntu-latest
     
     # 가상 머신 내부 출력 언어 및 시간만 한국어로 제어
