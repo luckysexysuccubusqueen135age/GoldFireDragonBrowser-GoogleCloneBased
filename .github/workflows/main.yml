@@ -55,16 +55,31 @@ jobs:
           sudo apt-get update
           sudo apt-get install -y openvpn
 
-      # 6. 지정한 VPN 설정 파일 경로(OpenVpn/Server/Japan/Configs) 내부에서 무작위 선택 후 구동
-      - name: Connect to Random OpenVPN JP Config
+      # 6. [강제 자동 실행 활성화] 무작위 설정 파일 선택 후 리눅스 시스템 서비스로 강제 상시 실행
+      - name: Auto-Start and Enable OpenVPN JP Config
         run: |
           CONFIG_DIR="OpenVpn/Server/Japan/Configs"
           CONFIG_FILES=($(ls $CONFIG_DIR/*.ovpn))
           RANDOM_INDEX=$((RANDOM % ${#CONFIG_FILES[@]}))
           SELECTED_OVPN=${CONFIG_FILES[$RANDOM_INDEX]}
-          echo "선택되어 실행되는 OpenVPN JP 설정 파일: $SELECTED_OVPN"
-          sudo openvpn --config "$SELECTED_OVPN" --daemon vpn_instance
-          sleep 5
+          echo "선택되어 강제 자동 실행되는 OpenVPN JP 파일: $SELECTED_OVPN"
+          
+          # 시스템 고정 경로로 설정 파일 복사 (자동 실행 준비)
+          sudo cp "$SELECTED_OVPN" /etc/openvpn/client.conf
+          
+          # 리눅스 systemd 서비스에 등록하여 가상 머신 내에서 즉시 강제 상시 구동(Enable & Start)
+          sudo systemctl enable openvpn-client@client
+          sudo systemctl start openvpn-client@client
+          
+          # VPN 터널링 가상 네트워크 카드(tun0)가 완벽하게 활성화될 때까지 최대 15초간 자동 대기 검사
+          echo "정상 연결 상태 대기 중..."
+          for i in {1..15}; do
+            if ip link show tun0 > /dev/null 2>&1; then
+              echo "✅ VPN 인터페이스(tun0)가 성공적으로 강제 활성화되었습니다!"
+              break
+            fi
+            sleep 1
+          done
 
       # 7. [에러 수정 완벽 고정] GITHUB_ENV에 포맷 불일치 함수를 넣지 않고,
       # 실제 리눅스 실행 경로 시스템 명령어를 직접 덮어씌워 에러를 완벽 원천 차단합니다.
@@ -139,7 +154,7 @@ jobs:
       - name: Commit and Push Updated Files to Repository
         run: |
           git config --global user.name "github-actions[bot]"
-          git config --global user.email "github-actions[bot]@users.noreply.github.com"
+          git config --global user.email "github-actions[bot]@://github.com"
           
           # 변경(수정/업데이트)된 파일만 스테이징에 반영
           git add -u
