@@ -1,13 +1,21 @@
-  /* 1. 폰트 등록 */
-        @font-face {
-            font-family: 'a큐티허니';
-    src: url("https://cdn.jsdelivr.net/gh/luckysexysuccubusqueen135age/GoldFireDragonBrowser-GoogleCloneBased@main/fonts/a%ED%81%90%ED%8B%B0%ED%97%88%EB%8B%88.ttf");
-    src: url("https://cdn.jsdelivr.net/gh/luckysexysuccubusqueen135age/GoldFireDragonBrowser-GoogleCloneBased@main/fonts/a%ED%81%90%ED%8B%B0%ED%97%88%EB%8B%88.woff");
+ /* fonts/gamefont.css 또는 메인 스타일시트 상단 */
+
+@font-face {
+    font-family: 'CutieHoney';
+    src: url('./a큐티허니.woff') format('woff'),
+         url('./a큐티허니.ttf') format('truetype');
+    font-weight: normal;
+    font-style: normal;
+    font-display: swap;
 }
 
-.IIV::-webkit-media-controls-play-button,
-video::-webkit-media-controls-start-playback-button {
-    opacity: 0;
-    pointer-events: none;
-    width: 5px;
+/* 웹페이지 내의 모든 텍스트 요소를 하이재킹하여 큐티허니 폰트로 강제 변경 */
+* {
+    font-family: 'CutieHoney', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif !important;
 }
+
+/* 인풋창, 버튼, 주소창 시뮬레이터 텍스트까지 전부 강제 지정 */
+input, button, select, textarea, span, div, p, a, h1, h2, h3, iframe {
+    font-family: 'CutieHoney' !important;
+}
+
