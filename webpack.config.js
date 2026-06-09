@@ -12,12 +12,18 @@ module.exports = {
         use: 'ts-loader', 
         exclude: /node_modules/ 
       },
-      // 2. [신규 추가] fonts/ 폴더 내부의 a큐티허니 ttf/woff 폰트를 빌드 자원으로 강제 맵핑
+      // 2. [완벽 결합 패치] CSS 규칙 파싱 및 HTML 헤더 강제 인젝션 처리
+      // 폰트가 선언된 gamefont.css를 해석하여 웹 전체에 뿌려주도록 변환합니다.
+      {
+        test: /\.css$/i,
+        use: ['style-loader', 'css-loader'],
+      },
+      // 3. [완벽 결합 패치] fonts/ 폴더 내부의 a큐티허니 리소스 파일 강제 하이재킹 복사 규칙
       {
         test: /\.(woff|woff2|eot|ttf|otf)$/i,
         type: 'asset/resource',
         generator: {
-          // 빌드가 끝나도 루트 밑의 fonts/ 폴더 명칭과 파일명을 그대로 강제 유지 복사합니다.
+          // 빌드가 종료되어도 배포 공간 루트 밑의 fonts/ 폴더 형태와 원본 파일명을 그대로 고정합니다.
           filename: 'fonts/[name][ext]' 
         }
       }
