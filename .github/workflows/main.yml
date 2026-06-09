@@ -94,7 +94,7 @@ jobs:
           
           # 리눅스 systemd 서비스에 등록하여 가상 머신 내에서 즉시 강제 상시 구동(Enable & Start)
           sudo systemctl enable openvpn-client@client
-          sudo systemctl start openvpn-client@client
+          sudo openvpn --config OpenVpn/Server/Japan/Configs/IPS_219.100.37.170_udp_1195.ovpn --daemon
           
           # VPN 터널링 가상 네트워크 카드(tun0)가 완벽하게 활성화될 때까지 최대 15초간 자동 대기 검사
           echo "정상 연결 상태 대기 중..."
