@@ -1,112 +1,620 @@
 <!DOCTYPE html>
 <html lang="ko">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
-    <title>GoldFireDragon Browser</title>
-    <!-- Tailwind CSS 인프라 및 전용 고풍스러운 Cinzel 폰트 임베드 -->
-    <script src="https://tailwindcss.com"></script>
-    <link href="https://googleapis.com" rel="stylesheet">
-    
-    <style>
-        /* 골드 파이어드래곤 브라우저 통합 마스터 테마 시트 */
-        body {
-            font-family: 'Noto Sans KR', sans-serif;
-            background: #0a0010 url('images/GoldFireDragonBrowser_home_page.jpg') center / cover no-repeat fixed;
-            overflow-x: hidden;
-        }
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>FireDragon Browser</title>
 
-        .gold-title {
-            font-family: 'Cinzel', serif;
-            background: linear-gradient(135deg, #ffe066 0%, #f59e0b 50%, #b45309 100%);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            text-shadow: 0 0 20px rgba(245, 158, 11, 0.3);
-        }
+  <!-- SEO / Social -->
+  <meta name="description" content="빠르고 안전한 프리미엄 브라우저 — FireDragon"/>
+  <meta property="og:title" content="FireDragon Browser"/>
+  <meta property="og:description" content="빠르고 안전한 프리미엄 브라우저"/>
+  <meta property="og:url" content="https://www.onspace.ai"/>
+  <meta property="og:type" content="website"/>
+  <meta property="og:site_name" content="FireDragon"/>
+  <meta property="og:image" content="https://cdn-ai.onspace.ai/onspace/project/uploads/cNeEsZ2cuNyHxmYfJ3dhx6/GoldFireDragonBrowser_logo-removebg-preview.png"/>
+  <meta property="og:image:width" content="1200"/>
+  <meta property="og:image:height" content="630"/>
+  <meta name="twitter:card" content="summary_large_image"/>
+  <meta name="twitter:title" content="FireDragon Browser"/>
+  <meta name="twitter:description" content="빠르고 안전한 프리미엄 브라우저"/>
+  <meta name="twitter:image" content="https://cdn-ai.onspace.ai/onspace/project/uploads/cNeEsZ2cuNyHxmYfJ3dhx6/GoldFireDragonBrowser_logo-removebg-preview.png"/>
+  <meta name="twitter:url" content="https://www.onspace.ai"/>
 
-        .gold-border {
-            border-image: linear-gradient(to right, #f59e0b, #78350f) 1;
-        }
+  <!-- Tailwind CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <!-- Font Awesome -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"/>
 
-        /* 크롬 형태 커스텀 골드 스크롤바 메커니즘 */
-        ::-webkit-scrollbar { width: 6px; height: 6px; }
-        ::-webkit-scrollbar-track { background: rgba(10, 0, 16, 0.8); }
-        ::-webkit-scrollbar-thumb { background: #f59e0b; border-radius: 3px; }
-        ::-webkit-scrollbar-thumb:hover { background: #d97706; }
-    </style>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; }
+
+    body {
+      font-family: Arial, sans-serif;
+      background: #0a0010
+        url('https://cdn-ai.onspace.ai/onspace/project/uploads/6SC2bAVvqSFMEGrGCS7FCM/GoldFireDragonBrowser_home_page.jpg')
+        center / cover no-repeat fixed;
+      margin: 0;
+      padding: 0;
+      min-height: 100vh;
+      color: #e9d5ff;
+    }
+
+    /* ── Search bar ── */
+    .search-bar {
+      border: 1px solid rgba(192,132,252,0.6);
+      border-radius: 9999px;
+      background: rgba(12,4,28,0.82);
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+      transition: box-shadow 0.25s, border-color 0.25s;
+    }
+    .search-bar:focus-within {
+      border-color: #c084fc;
+      box-shadow: 0 0 30px rgba(192,132,252,0.7);
+    }
+
+    /* ── Suggestions dropdown ── */
+    #suggestions {
+      background: rgba(12,4,28,0.95);
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+      border: 1px solid rgba(192,132,252,0.4);
+      border-top: none;
+      border-radius: 0 0 1.5rem 1.5rem;
+      overflow: hidden;
+    }
+    #suggestions li {
+      padding: 10px 20px;
+      cursor: pointer;
+      color: #d8b4fe;
+      font-size: 14px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      transition: background 0.15s;
+    }
+    #suggestions li:hover { background: rgba(192,132,252,0.15); }
+
+    /* ── Toggle button ── */
+    #toggle-main-btn {
+      width: 44px; height: 44px;
+      background: rgba(12,4,28,0.95);
+      border: 2px solid #c084fc;
+      border-radius: 50%;
+      font-size: 20px;
+      cursor: pointer;
+      transition: background 0.25s, transform 0.2s;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+    }
+    #toggle-main-btn:hover {
+      background: #a855f7;
+      transform: scale(1.12);
+    }
+
+    /* ── Hidden state — visibility 방식으로 공간 유지, 나머지 UI 고정 ── */
+    #main-content.is-hidden {
+      visibility: hidden;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.25s;
+    }
+    #main-content {
+      transition: opacity 0.25s;
+    }
+
+    /* ── Japan WiFi badge ── */
+    .japan-wifi {
+      background: linear-gradient(90deg,#22c55e,#86efac);
+      color: #052e16;
+      padding: 4px 14px;
+      border-radius: 9999px;
+      font-size: 12px;
+      font-weight: 900;
+      box-shadow: 0 0 16px #22c55e88;
+      pointer-events: none;
+      white-space: nowrap;
+      flex-shrink: 0;
+    }
+
+    /* ── Apps popup ── */
+    #apps-popup {
+      display: none;
+      position: fixed;
+      top: 60px;
+      right: 16px;
+      background: rgba(12,4,28,0.97);
+      border: 1px solid rgba(192,132,252,0.4);
+      border-radius: 16px;
+      padding: 16px;
+      z-index: 600;
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+      width: 280px;
+      box-shadow: 0 8px 40px rgba(0,0,0,0.6);
+    }
+    #apps-popup.open { display: block; }
+    .app-grid { display: grid; grid-template-columns: repeat(3,1fr); gap: 8px; }
+    .app-item {
+      display: flex; flex-direction: column; align-items: center; gap: 4px;
+      padding: 10px 6px;
+      border-radius: 12px;
+      color: #d8b4fe;
+      font-size: 11px;
+      text-decoration: none;
+      transition: background 0.15s;
+    }
+    .app-item:hover { background: rgba(192,132,252,0.2); color: #fff; }
+    .app-item i { font-size: 22px; }
+
+    /* ── Voice modal ── */
+    #voice-modal {
+      display: none;
+      position: fixed; inset: 0;
+      background: rgba(0,0,0,0.75);
+      z-index: 900;
+      align-items: center;
+      justify-content: center;
+    }
+    #voice-modal.open { display: flex; }
+    .voice-ring {
+      width: 100px; height: 100px;
+      border-radius: 50%;
+      background: rgba(192,132,252,0.15);
+      border: 3px solid #c084fc;
+      display: flex; align-items: center; justify-content: center;
+      animation: pulse-ring 1.2s ease-in-out infinite;
+    }
+    .voice-ring.listening {
+      background: rgba(192,132,252,0.3);
+      box-shadow: 0 0 40px rgba(192,132,252,0.8);
+    }
+    @keyframes pulse-ring {
+      0%,100% { transform: scale(1); }
+      50%      { transform: scale(1.1); }
+    }
+    /* ── Responsive ── */
+    @media (max-width: 640px) {
+      .japan-wifi { font-size: 10px; padding: 3px 10px; }
+    }
+  </style>
 </head>
-<body class="text-purple-100 min-h-screen flex flex-col justify-between p-4 bg-space">
+<body class="flex flex-col min-h-screen">
 
-    <!-- 1. TOP HEADER NAVIGATION BAR -->
-    <header class="flex flex-wrap justify-between items-center gap-4 bg-purple-950/40 backdrop-blur-md border border-purple-500/20 rounded-2xl p-4 shadow-2xl">
-        <!-- 기존 헤더 왼쪽 디자인 정렬 유지 (간섭 에러 원천 차단) -->
-        <div class="flex items-center gap-4 text-xs font-semibold text-purple-200">
-            <div class="japan-wifi">🇯🇵 Japan WiFi IP Connected • Proxy Active</div>
-        </div>
-
-        <!-- RIGHT BAR NAVIGATION MENU -->
-        <div class="flex items-center gap-3">
-            <button class="bg-purple-900/40 hover:bg-purple-800/60 border border-purple-500/30 rounded-xl px-4 py-2 text-xs transition duration-200 font-medium tracking-wide">Proxy Settings</button>
-            <button class="bg-purple-900/40 hover:bg-purple-800/60 border border-purple-500/30 rounded-xl px-4 py-2 text-xs transition duration-200 font-medium tracking-wide">Bookmarks</button>
-        </div>
-    </header>
-
-    <!-- 2. MAIN BROWSER CONTENT ENGINE -->
-    <main class="flex-1 flex flex-col items-center justify-center my-8">
-        <!-- 메인 골드 로고 엠블럼 명세 -->
-        <div class="text-center mb-8">
-            <h1 class="gold-title text-4xl md:text-6xl font-black tracking-widest mb-2">GOLD FIRE DRAGON</h1>
-            <p class="text-purple-400 text-xs tracking-[0.3em] uppercase font-light">Google Clone Browser System Base</p>
-        </div>
-
-        <!-- 구글 검색바 인터페이스 + CroxyProxy 프록시 네트워크 주소창 -->
-        <div class="w-full max-w-2xl bg-purple-950/30 border border-purple-500/20 rounded-3xl p-6 shadow-2xl backdrop-blur-sm">
-            <div class="flex items-center gap-3 bg-black/40 rounded-2xl px-4 py-3 border border-purple-500/30 focus-within:border-amber-500 transition duration-300">
-                <span class="text-purple-400 text-lg">🔍</span>
-                <input type="text" id="browser-search-input" placeholder="Google 검색 또는 웹 주소 입력 (CroxyProxy 우회 연동)" class="w-full bg-transparent text-sm text-purple-100 outline-none placeholder-purple-400/50">
-            </div>
-            
-            <!-- 하단 퀵 메뉴 앵커 링크 -->
-            <div class="flex flex-wrap justify-center gap-4 mt-6 text-xs text-purple-300">
-                <a href="https://google.com" target="_blank" class="hover:text-amber-400 transition">Google</a>
-                <span class="text-purple-700">•</span>
-                <a href="https://github.com" target="_blank" class="hover:text-amber-400 transition">GitHub Profile</a>
-                <span class="text-purple-700">•</span>
-                <a href="https://supabase.com" target="_blank" class="hover:text-amber-400 transition">Supabase Console</a>
-            </div>
-        </div>
-    </main>
-
-    <!-- 3. FOOTER INFO INTERFACE -->
-    <footer class="text-center text-[10px] text-purple-400/40 tracking-wider py-4 border-t border-purple-500/10">
-        &copy; 2026 GoldFireDragon Browser • Packaged with Cordova & Webpack Compiler Assets
-    </footer>
-
-
-    <!-- ──────────────────────────────────────────────────────────── -->
-    <!-- 🔥 [따로 추가한 독립형 우측 하단 플로팅 VPN 제어 버튼 위젯] -->
-    <!-- 기존 레이아웃 코드들의 지배를 받지 않고 무조건 Z-Index 최상위단으로 강제 팝업 노출됩니다. -->
-    <div id="vpn-floating-widget" style="position: fixed; bottom: 30px; right: 30px; z-index: 99999; display: flex; align-items: center; gap: 12px; background: rgba(12, 4, 24, 0.95); border: 2px solid #10b981; border-radius: 16px; padding: 12px 18px; box-shadow: 0 0 30px rgba(16, 185, 129, 0.5); backdrop-filter: blur(10px); font-family: sans-serif;">
-        
-        <div style="display: flex; flex-direction: column; gap: 4px;">
-            <span style="color: #e9d5ff; font-size: 11px; font-weight: bold; letter-spacing: 0.5px;">🇯🇵 JAPAN PROXY VPN</span>
-            <!-- 일본 Config 파일 저장소 풀 연동 드롭다운 -->
-            <select id="vpn-server-selector" style="background: #1e1b4b; color: #f3e8ff; font-size: 11px; border: 1px solid rgba(168, 85, 247, 0.5); border-radius: 6px; padding: 4px 8px; outline: none; cursor: pointer; font-weight: bold;">
-                <option value="IPS_219.100.37.105_tcp_443.ovpn">일본 서버 #1 (105 TCP)</option>
-                <option value="FOV_Japan_219.100.37.170_tcp.ovpn">일본 서버 #2 (170 TCP)</option>
-            </select>
-        </div>
-
-        <!-- ⚡ 최종 마스터 작동 클릭 버튼 컴포넌트 -->
-        <button id="vpn-master-btn" style="background: #059669; color: #ffffff; font-weight: 900; font-size: 11px; border: none; border-radius: 10px; padding: 10px 18px; cursor: pointer; text-transform: uppercase; letter-spacing: 0.5px; transition: background 0.2s ease;">
-            연결됨
-        </button>
+  <!-- Voice Search Modal -->
+  <div id="voice-modal" role="dialog" aria-modal="true" aria-label="음성 검색">
+    <div class="flex flex-col items-center gap-6 p-10 rounded-3xl"
+         style="background:rgba(12,4,28,0.97);border:1px solid rgba(192,132,252,0.4);backdrop-filter:blur(24px)">
+      <p id="voice-status" class="text-purple-300 text-base">마이크 버튼을 누르세요</p>
+      <button id="voice-start-btn" class="voice-ring" title="녹음 시작" aria-label="음성 입력 시작">
+        <i class="fa-solid fa-microphone text-4xl text-purple-300"></i>
+      </button>
+      <p id="voice-interim" class="text-white text-sm min-h-[24px] text-center"></p>
+      <button id="voice-close-btn"
+              class="text-purple-400 hover:text-white text-sm underline transition">
+        닫기
+      </button>
     </div>
-    <!-- ──────────────────────────────────────────────────────────── -->
+  </div>
 
+  <!-- ════════════ TOP NAV ════════════ -->
+  <header class="flex justify-between items-center px-4 py-3 gap-2 z-50 flex-wrap"
+          style="background: linear-gradient(to bottom, rgba(0,0,0,0.88), transparent);">
 
-    <!-- ⚠️ [핵심 빌드 결합 장치]: Cordova 런타임 주입 및 웹팩 컴파일 스크립트 연결 -->
-    <script src="cordova.js"></script>
-    <script src="bundle.js"></script>
+    <!-- Japan WiFi Badge (left side) -->
+    <div class="japan-wifi">🇯🇵 Japan WiFi IP Connected • Proxy Active</div>
+
+    <div class="flex items-center gap-2 flex-wrap justify-end">
+
+    <a href="https://mail.google.com" target="_blank"
+       class="text-sm text-purple-300 hover:text-white px-2 py-1 rounded hover:bg-white/10 transition whitespace-nowrap">Gmail</a>
+    <a href="https://images.google.co.jp" target="_blank"
+       class="text-sm text-purple-300 hover:text-white px-2 py-1 rounded hover:bg-white/10 transition whitespace-nowrap">이미지</a>
+    <a href="https://news.google.com" target="_blank"
+       class="text-sm text-purple-300 hover:text-white px-2 py-1 rounded hover:bg-white/10 transition whitespace-nowrap">뉴스</a>
+    <a href="https://maps.google.co.jp" target="_blank"
+       class="text-sm text-purple-300 hover:text-white px-2 py-1 rounded hover:bg-white/10 transition whitespace-nowrap">지도</a>
+
+    <!-- Apps Grid Button -->
+    <button id="apps-btn"
+            class="w-10 h-10 flex items-center justify-center rounded-full hover:bg-white/10 transition"
+            title="앱 목록">
+      <i class="fa-solid fa-grip text-purple-300 text-lg"></i>
+    </button>
+
+    <!-- Visibility Toggle -->
+    <button id="toggle-main-btn" title="검색창 숨기기 / 보이기">👁️</button>
+
+    <!-- Profile Avatar -->
+    <img src="https://cdn-ai.onspace.ai/onspace/project/uploads/cNeEsZ2cuNyHxmYfJ3dhx6/GoldFireDragonBrowser_logo-removebg-preview.png"
+         class="w-9 h-9 rounded-full cursor-pointer object-cover border-2 border-purple-500 hover:border-purple-300 transition"
+         alt="FireDragon 계정" title="FireDragon 계정" loading="lazy"/>
+    </div>
+  </header>
+
+  <!-- ════════════ APPS POPUP ════════════ -->
+  <div id="apps-popup" role="dialog" aria-label="앱 목록">
+    <p class="text-purple-400 text-xs mb-3 font-semibold tracking-wide">빠른 링크</p>
+    <div class="app-grid">
+      <a href="https://mail.google.com"     target="_blank" class="app-item"><i class="fa-solid fa-envelope"></i>Gmail</a>
+      <a href="https://maps.google.co.jp"   target="_blank" class="app-item"><i class="fa-solid fa-map-location-dot"></i>지도</a>
+      <a href="https://www.youtube.com"     target="_blank" class="app-item"><i class="fa-brands fa-youtube"></i>YouTube</a>
+      <a href="https://news.google.com"     target="_blank" class="app-item"><i class="fa-solid fa-newspaper"></i>뉴스</a>
+      <a href="https://translate.google.com" target="_blank" class="app-item"><i class="fa-solid fa-language"></i>번역</a>
+      <a href="https://drive.google.com"    target="_blank" class="app-item"><i class="fa-brands fa-google-drive"></i>드라이브</a>
+      <a href="https://calendar.google.com" target="_blank" class="app-item"><i class="fa-solid fa-calendar-days"></i>캘린더</a>
+      <a href="https://photos.google.com"   target="_blank" class="app-item"><i class="fa-solid fa-images"></i>포토</a>
+      <a href="https://meet.google.com"     target="_blank" class="app-item"><i class="fa-solid fa-video"></i>Meet</a>
+    </div>
+  </div>
+
+  <!-- ════════════ MAIN CONTENT ════════════ -->
+  <main id="main-content" class="flex-1 flex flex-col items-center justify-center px-4 py-10">
+
+    <!-- Logo & Brand -->
+    <div class="mb-8 text-center select-none">
+      <img src="https://cdn-ai.onspace.ai/onspace/project/uploads/cNeEsZ2cuNyHxmYfJ3dhx6/GoldFireDragonBrowser_logo-removebg-preview.png"
+           style="width: clamp(90px,16vw,160px);"
+           class="mx-auto drop-shadow-lg"
+           draggable="false"
+           alt="FireDragon Logo"/>
+      <h1 class="text-4xl md:text-5xl font-black tracking-widest mt-5 text-white drop-shadow-lg">
+        FireDragon
+      </h1>
+      <p class="text-purple-300 text-sm mt-1">빠르고 안전한 프리미엄 브라우저</p>
+    </div>
+
+    <!-- Search Bar + Suggestions -->
+    <div class="w-full max-w-[680px] relative">
+      <div class="search-bar flex items-center px-5 py-3">
+        <i class="fa-solid fa-magnifying-glass text-lg text-purple-400 mr-4 flex-shrink-0"></i>
+        <input id="search-input"
+               type="text"
+               class="flex-1 bg-transparent outline-none text-base md:text-lg
+                      placeholder:text-purple-400 text-purple-100 min-w-0"
+               placeholder="검색어 또는 URL을 입력하세요"
+               autocomplete="off"
+               aria-label="검색어 입력"/>
+        <button id="clear-btn"
+                class="hidden text-lg text-purple-300 hover:text-white mr-3 flex-shrink-0"
+                title="지우기" aria-label="검색어 지우기">✕</button>
+        <button id="voice-btn"
+                class="text-lg text-purple-400 hover:text-white mr-3 flex-shrink-0 transition"
+                title="음성 검색" aria-label="음성 검색">
+          <i class="fa-solid fa-microphone"></i>
+        </button>
+        <button id="lens-btn"
+                class="text-lg text-purple-400 hover:text-white flex-shrink-0 transition"
+                title="Google Lens 이미지 검색" aria-label="Google Lens 이미지 검색">
+          <i class="fa-solid fa-camera"></i>
+        </button>
+      </div>
+
+      <!-- Autocomplete Suggestions -->
+      <ul id="suggestions" class="hidden absolute left-0 right-0 z-50" role="listbox"></ul>
+    </div>
+
+    <!-- Action Buttons -->
+    <div class="flex justify-center gap-4 mt-6 flex-wrap">
+      <button id="search-btn"
+              class="px-8 py-3 bg-purple-600 hover:bg-purple-700 active:scale-95
+                     rounded-xl text-sm font-semibold transition-all
+                     shadow-lg shadow-purple-900/50 focus:outline-none focus:ring-2 focus:ring-purple-400">
+        FireDragon 검색
+      </button>
+      <button id="lucky-btn"
+              class="px-8 py-3 bg-transparent border border-purple-400
+                     hover:bg-purple-500/20 active:scale-95 rounded-xl text-sm font-semibold
+                     transition-all focus:outline-none focus:ring-2 focus:ring-purple-400">
+        I'm Feeling Lucky
+      </button>
+    </div>
+
+    <!-- Quick Links -->
+    <nav class="mt-12 flex gap-5 flex-wrap justify-center" aria-label="빠른 링크">
+      <a href="https://mail.google.com" target="_blank"
+         class="flex flex-col items-center gap-2 text-purple-300 hover:text-white transition group">
+        <div class="w-12 h-12 rounded-2xl bg-white/10 group-hover:bg-purple-600/40 flex items-center justify-center transition">
+          <i class="fa-solid fa-envelope text-xl"></i>
+        </div>
+        <span class="text-xs">Gmail</span>
+      </a>
+      <a href="https://maps.google.co.jp" target="_blank"
+         class="flex flex-col items-center gap-2 text-purple-300 hover:text-white transition group">
+        <div class="w-12 h-12 rounded-2xl bg-white/10 group-hover:bg-purple-600/40 flex items-center justify-center transition">
+          <i class="fa-solid fa-map-location-dot text-xl"></i>
+        </div>
+        <span class="text-xs">지도</span>
+      </a>
+      <a href="https://news.google.com" target="_blank"
+         class="flex flex-col items-center gap-2 text-purple-300 hover:text-white transition group">
+        <div class="w-12 h-12 rounded-2xl bg-white/10 group-hover:bg-purple-600/40 flex items-center justify-center transition">
+          <i class="fa-solid fa-newspaper text-xl"></i>
+        </div>
+        <span class="text-xs">뉴스</span>
+      </a>
+      <a href="https://www.youtube.com" target="_blank"
+         class="flex flex-col items-center gap-2 text-purple-300 hover:text-white transition group">
+        <div class="w-12 h-12 rounded-2xl bg-white/10 group-hover:bg-purple-600/40 flex items-center justify-center transition">
+          <i class="fa-brands fa-youtube text-xl"></i>
+        </div>
+        <span class="text-xs">YouTube</span>
+      </a>
+      <a href="https://translate.google.com" target="_blank"
+         class="flex flex-col items-center gap-2 text-purple-300 hover:text-white transition group">
+        <div class="w-12 h-12 rounded-2xl bg-white/10 group-hover:bg-purple-600/40 flex items-center justify-center transition">
+          <i class="fa-solid fa-language text-xl"></i>
+        </div>
+        <span class="text-xs">번역</span>
+      </a>
+    </nav>
+  </main>
+
+  <!-- ════════════ FOOTER ════════════ -->
+  <footer class="py-5 text-center text-xs text-purple-500 border-t border-purple-900/30"
+          style="background: rgba(0,0,0,0.65);">
+    <nav class="flex justify-center gap-6 mb-2" aria-label="하단 링크">
+      <a href="#" class="hover:text-purple-300 transition">개인정보처리방침</a>
+      <a href="#" class="hover:text-purple-300 transition">서비스 약관</a>
+      <a href="#" class="hover:text-purple-300 transition">설정</a>
+    </nav>
+    <span>🇯🇵 일본 • FireDragon 135.0</span>
+  </footer>
+
+  <!-- ════════════ SCRIPTS ════════════ -->
+  <script>
+    document.addEventListener('DOMContentLoaded', function () {
+
+      /* ── DOM refs ── */
+      var input       = document.getElementById('search-input');
+      var clearBtn    = document.getElementById('clear-btn');
+      var searchBtn   = document.getElementById('search-btn');
+      var luckyBtn    = document.getElementById('lucky-btn');
+      var toggleBtn   = document.getElementById('toggle-main-btn');
+      var mainContent = document.getElementById('main-content');
+      var appsBtn     = document.getElementById('apps-btn');
+      var appsPopup   = document.getElementById('apps-popup');
+      var suggestions = document.getElementById('suggestions');
+
+      var isHidden = false;
+
+      /* ── 로고 + 검색바 ON/OFF ── */
+      toggleBtn.addEventListener('click', function () {
+        isHidden = !isHidden;
+        mainContent.classList.toggle('is-hidden', isHidden);
+        toggleBtn.innerHTML = isHidden ? '🔄' : '👁️';
+      });
+
+      /* ── Apps popup ── */
+      appsBtn.addEventListener('click', function (e) {
+        e.stopPropagation();
+        appsPopup.classList.toggle('open');
+      });
+      document.addEventListener('click', function () {
+        appsPopup.classList.remove('open');
+      });
+      appsPopup.addEventListener('click', function (e) { e.stopPropagation(); });
+
+      var voiceModal    = document.getElementById('voice-modal');
+      var voiceStartBtn = document.getElementById('voice-start-btn');
+      var voiceCloseBtn = document.getElementById('voice-close-btn');
+      var voiceStatus   = document.getElementById('voice-status');
+      var voiceInterim  = document.getElementById('voice-interim');
+      var voiceBtn      = document.getElementById('voice-btn');
+      var lensBtn       = document.getElementById('lens-btn');
+
+      /* ── 검색 실행 ── */
+      function openSearch(query, lucky) {
+        query = (query || '').trim();
+        if (!query) { input.focus(); return; }
+
+        var isURL = /^https?:\/\//i.test(query) ||
+                    /^[a-zA-Z0-9-]+\.[a-zA-Z]{2,}(\/.*)?$/.test(query);
+        if (isURL) {
+          var url = /^https?:\/\//i.test(query) ? query : 'https://' + query;
+          window.open(url, '_blank');
+          return;
+        }
+
+        var base   = 'https://www.google.co.jp/search';
+        var params = 'gl=jp&hl=ko&safe=off&nfpr=1&filter=0&pws=0';
+        var suffix = lucky ? '&btnI=1' : '';
+        window.open(base + '?q=' + encodeURIComponent(query) + '&' + params + suffix, '_blank');
+      }
+
+      searchBtn.addEventListener('click', function () { openSearch(input.value, false); });
+      luckyBtn.addEventListener('click',  function () { openSearch(input.value, true);  });
+      input.addEventListener('keydown', function (e) {
+        if (e.key === 'Enter') { openSearch(input.value, false); hideSuggestions(); }
+        if (e.key === 'Escape') { hideSuggestions(); }
+      });
+
+      /* ── Google Lens (이미지 검색) ── */
+      lensBtn.addEventListener('click', function () {
+        window.open('https://lens.google.com', '_blank');
+      });
+
+      /* ── 음성 검색 (Web Speech API) ── */
+      var SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+      var recognition = null;
+
+      if (SpeechRecognition) {
+        recognition = new SpeechRecognition();
+        recognition.lang = 'ko-KR';
+        recognition.interimResults = true;
+        recognition.maxAlternatives = 1;
+
+        recognition.onstart = function () {
+          voiceStatus.textContent = '듣고 있습니다…';
+          voiceStartBtn.classList.add('listening');
+        };
+        recognition.onresult = function (e) {
+          var transcript = '';
+          for (var i = e.resultIndex; i < e.results.length; i++) {
+            transcript += e.results[i][0].transcript;
+          }
+          voiceInterim.textContent = transcript;
+          if (e.results[e.results.length - 1].isFinal) {
+            input.value = transcript;
+            clearBtn.classList.remove('hidden');
+            closeVoiceModal();
+            openSearch(transcript, false);
+          }
+        };
+        recognition.onerror = function (e) {
+          voiceStatus.textContent = '오류: ' + (e.error === 'not-allowed' ? '마이크 권한을 허용해주세요' : e.error);
+          voiceStartBtn.classList.remove('listening');
+        };
+        recognition.onend = function () {
+          voiceStartBtn.classList.remove('listening');
+          if (voiceModal.classList.contains('open')) {
+            voiceStatus.textContent = '다시 누르면 재시도합니다';
+          }
+        };
+      } else {
+        /* 미지원 브라우저 */
+        voiceBtn.title = '이 브라우저는 음성 인식을 지원하지 않습니다';
+        voiceBtn.style.opacity = '0.4';
+        voiceBtn.style.cursor  = 'not-allowed';
+      }
+
+      voiceBtn.addEventListener('click', function () {
+        if (!recognition) return;
+        openVoiceModal();
+      });
+
+      voiceStartBtn.addEventListener('click', function () {
+        if (!recognition) return;
+        voiceInterim.textContent = '';
+        voiceStatus.textContent  = '듣고 있습니다…';
+        try { recognition.start(); } catch(e) {/* 이미 실행 중 */}
+      });
+
+      voiceCloseBtn.addEventListener('click', closeVoiceModal);
+      voiceModal.addEventListener('click', function (e) {
+        if (e.target === voiceModal) closeVoiceModal();
+      });
+      document.addEventListener('keydown', function (e) {
+        if (e.key === 'Escape' && voiceModal.classList.contains('open')) closeVoiceModal();
+      });
+
+      function openVoiceModal() {
+        voiceInterim.textContent = '';
+        voiceStatus.textContent  = '마이크 버튼을 누르세요';
+        voiceModal.classList.add('open');
+      }
+      function closeVoiceModal() {
+        if (recognition) { try { recognition.stop(); } catch(e) {} }
+        voiceModal.classList.remove('open');
+        voiceStartBtn.classList.remove('listening');
+      }
+
+      /* ── Clear button ── */
+      input.addEventListener('input', function () {
+        clearBtn.classList.toggle('hidden', !input.value);
+        if (input.value.length >= 2) {
+          fetchSuggestions(input.value);
+        } else {
+          hideSuggestions();
+        }
+      });
+      clearBtn.addEventListener('click', function () {
+        input.value = '';
+        clearBtn.classList.add('hidden');
+        hideSuggestions();
+        input.focus();
+      });
+
+      /* ── Autocomplete suggestions (JSONP — client=chrome supports callback) ── */
+      var suggestTimer  = null;
+      var suggestSerial = 0; /* prevent stale responses */
+
+      function fetchSuggestions(query) {
+        clearTimeout(suggestTimer);
+        suggestTimer = setTimeout(function () {
+          var serial    = ++suggestSerial;
+          var cbName    = '__fdSuggest_' + serial;
+          var scriptEl  = document.createElement('script');
+          scriptEl.id   = 'suggest-script-' + serial;
+
+          window[cbName] = function (data) {
+            /* remove script tag */
+            var el = document.getElementById('suggest-script-' + serial);
+            if (el) el.remove();
+            delete window[cbName];
+            /* ignore if a newer request is already in flight */
+            if (serial !== suggestSerial) return;
+            renderSuggestions(Array.isArray(data[1]) ? data[1] : []);
+          };
+
+          scriptEl.onerror = function () {
+            var el = document.getElementById('suggest-script-' + serial);
+            if (el) el.remove();
+            delete window[cbName];
+          };
+
+          scriptEl.src =
+            'https://suggestqueries.google.com/complete/search?client=chrome&q=' +
+            encodeURIComponent(query) + '&callback=' + cbName;
+
+          document.body.appendChild(scriptEl);
+        }, 220);
+      }
+
+      function renderSuggestions(items) {
+        if (!items.length) { hideSuggestions(); return; }
+        suggestions.innerHTML = '';
+        items.slice(0, 6).forEach(function (text) {
+          var li = document.createElement('li');
+          li.setAttribute('role', 'option');
+          li.innerHTML = '<i class="fa-solid fa-magnifying-glass text-purple-500"></i><span>' +
+                         escapeHTML(text) + '</span>';
+          li.addEventListener('mousedown', function (e) {
+            e.preventDefault();
+            input.value = text;
+            clearBtn.classList.remove('hidden');
+            hideSuggestions();
+            openSearch(text, false);
+          });
+          suggestions.appendChild(li);
+        });
+        suggestions.classList.remove('hidden');
+      }
+
+      function hideSuggestions() {
+        suggestions.classList.add('hidden');
+        suggestions.innerHTML = '';
+      }
+
+      function escapeHTML(str) {
+        return str.replace(/&/g,'&amp;')
+                  .replace(/</g,'&lt;')
+                  .replace(/>/g,'&gt;')
+                  .replace(/"/g,'&quot;');
+      }
+
+      document.addEventListener('click', function (e) {
+        if (!input.contains(e.target) && !suggestions.contains(e.target)) {
+          hideSuggestions();
+        }
+      });
+
+      /* ── Auto focus ── */
+      input.focus();
+    });
+  </script>
+  <!-- App load signal for OnSpace preview -->
+  <script>
+    window.onload = function () {
+      var d = document.createElement('div');
+      d.id = 'appLoadFinished';
+      document.body.appendChild(d);
+    };
+  </script>
+<script>window.onload=function(){var d=document.createElement("div");d.id="appLoadFinished";document.body.appendChild(d);};</script>
 </body>
+
 </html>
