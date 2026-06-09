@@ -1,4 +1,4 @@
-name: GoldFireDragon Total Automated Engine
+name: GoldFireDragon Streamlined Auto Builder
 
 on:
   push:
@@ -9,124 +9,116 @@ permissions:
   contents: write
 
 jobs:
-  run-production:
+  run-express-server:
     runs-on: ubuntu-latest
     steps:
-      - name: 1. Checkout repository
+      - name: 1. 깃허브 리포지토리 소스코드 체크아웃
         uses: actions/checkout@v4
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: 2. Set up Node.js Environment
+      - name: 2. 클라우드 환경에 Node.js LTS 런타임 설치 (v20)
         uses: actions/setup-node@v4
         with:
           node-version: '20'
 
-      - name: 3. Install Core System Utilities
+      - name: 3. 시스템 필수 유틸리티 및 바이너리 설치 (unzip, openvpn)
         run: sudo apt-get update && sudo apt-get install -y unzip openvpn curl jq
 
-      - name: 4. Build standard package.json
+      - name: 4. 빌드 규격용 package.json 강제 자동 생성
         run: |
           cat << 'EOF' > package.json
           {
             "name": "goldfiredragon-browser-clone",
             "version": "1.0.0",
             "main": "bundle.js",
-            "scripts": { "start": "ts-node src/server.ts", "build": "webpack" },
-            "dependencies": { "@supabase/supabase-js": "^2.43.0", "express": "^4.19.2" },
-            "devDependencies": { "@types/express": "^4.17.21", "@types/node": "^20.12.7", "shx": "^0.3.4", "ts-loader": "^9.5.1", "ts-node": "^10.9.2", "typescript": "^5.4.5", "webpack": "^5.91.0", "webpack-cli": "^5.1.4" }
+            "scripts": {
+              "start": "ts-node src/server.ts",
+              "build": "webpack"
+            },
+            "dependencies": {
+              "@supabase/supabase-js": "^2.43.0",
+              "express": "^4.19.2"
+            },
+            "devDependencies": {
+              "@types/express": "^4.17.21",
+              "@types/node": "^20.12.7",
+              "shx": "^0.3.4",
+              "ts-loader": "^9.5.1",
+              "ts-node": "^10.9.2",
+              "typescript": "^5.4.5",
+              "webpack": "^5.91.0",
+              "webpack-cli": "^5.1.4"
+            }
           }
           EOF
 
-      - name: 5. Configure No-Dist webpack.config.js
+      - name: 5. No Dist 규격용 webpack.config.js 강제 자동 생성
         run: |
           cat << 'EOF' > webpack.config.js
-          const path = require('path');
-          module.exports = { entry: './src/app.ts', mode: 'production', target: 'web', module: { rules: [{ test: /\.tsx?$/, use: 'ts-loader', exclude: /node_modules/ }] }, resolve: { extensions: ['.ts', '.js'] }, output: { filename: 'bundle.js', path: path.resolve(__dirname, './') } };
+          const path = require('path'); 
+          module.exports = { 
+            entry: './src/app.ts', 
+            mode: 'production', 
+            target: 'web', 
+            module: { rules: [{ test: /\.tsx?$/, use: 'ts-loader', exclude: /node_modules/ }] }, 
+            resolve: { extensions: ['.ts', '.js'] }, 
+            output: { filename: 'bundle.js', path: path.resolve(__dirname, './') } 
+          };
           EOF
 
-      - name: 6. Configure tsconfig.json specification
+      - name: 6. 타입스크립트 컴파일 사양서 tsconfig.json 강제 자동 생성
         run: |
           cat << 'EOF' > tsconfig.json
-          { "compilerOptions": { "target": "es2020", "module": "commonjs", "lib": ["dom", "es2020"], "esModuleInterop": true, "skipLibCheck": true, "moduleResolution": "node" }, "include": ["src/**/*"] }
+          {
+            "compilerOptions": {
+              "target": "es2020",
+              "module": "commonjs",
+              "lib": ["dom", "es2020"],
+              "esModuleInterop": true,
+              "skipLibCheck": true,
+              "moduleResolution": "node"
+            },
+            "include": ["src/**/*"]
+          }
           EOF
 
-      - name: 7. Core npm installation
+      - name: 7. 리포지토리 파일 기준 실제 npm install 실행
         run: npm install
 
-      - name: 8. Unzip Embedded OpenVPN Core Modules
+      - name: 8. 저장소 보관소 내 2개 핵심 OpenVPN ZIP 압축 자동 해제
         run: |
           mkdir -p install/package/nodejs/files/zip
-          unzip -o install/package/nodejs/files/zip/node-openvpn-master.zip -d ./ || echo "Core ZIP missing"
-          unzip -o install/package/nodejs/files/zip/ovpn-nodejs-master.zip -d ./ || echo "Config ZIP missing"
+          unzip -o install/package/nodejs/files/zip/node-openvpn-master.zip -d ./ || echo "ZIP 생략"
+          unzip -o install/package/nodejs/files/zip/ovpn-nodejs-master.zip -d ./ || echo "ZIP 생략"
 
-      - name: 9. Safeguard source directory structure
+      - name: 9. 필수 소스코드 폴더 및 파일 강제 보정 생성
         run: |
           mkdir -p src
-          if [ ! -f src/app.ts ]; then echo "console.log('GoldFireDragon Browser Core System Ready');" > src/app.ts; fi
+          if [ ! -f src/app.ts ]; then echo "console.log('GoldFireDragon Online');" > src/app.ts; fi
 
-      - name: 10. Compile assets with Webpack
-        run: npx webpack --mode production || echo "Webpack build bypassed"
+      - name: 10. 설치된 라이브러리 기반 웹팩 번들링 가동
+        run: npx webpack --mode production || echo "웹팩 컴파일 스킵"
 
-      - name: 11. Inject Full-Version index.html directly into workspace
-        run: |
-          cat << 'EOF' > index.html
-          <!DOCTYPE html>
-          <html lang="ko">
-          <head>
-              <meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no"><title>GoldFireDragon Browser</title>
-              <script src="https://tailwindcss.com"></script><link href="https://googleapis.com" rel="stylesheet">
-              <style>body { font-family: 'Noto Sans KR', sans-serif; background: #0a0010 url('images/GoldFireDragonBrowser_home_page.jpg') center / cover no-repeat fixed; overflow-x: hidden; } .gold-title { font-family: 'Cinzel', serif; background: linear-gradient(135deg, #ffe066 0%, #f59e0b 50%, #b45309 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; text-shadow: 0 0 20px rgba(245, 158, 11, 0.3); }</style>
-          </head>
-          <body class="text-purple-100 min-h-screen flex flex-col justify-between p-4 bg-space">
-              <header class="flex flex-wrap justify-between items-center gap-4 bg-purple-950/40 backdrop-blur-md border border-purple-500/20 rounded-2xl p-4 shadow-2xl">
-                  <div class="text-xs font-semibold text-purple-200">🇯🇵 Japan WiFi IP Connected • Proxy Active</div>
-                  <div class="flex items-center gap-3"><button class="bg-purple-900/40 border border-purple-500/30 rounded-xl px-4 py-2 text-xs">Proxy Settings</button><button class="bg-purple-900/40 border border-purple-500/30 rounded-xl px-4 py-2 text-xs">Bookmarks</button></div>
-              </header>
-              <main class="flex-1 flex flex-col items-center justify-center my-8">
-                  <div class="text-center mb-8"><h1 class="gold-title text-4xl md:text-6xl font-black tracking-widest mb-2">GOLD FIRE DRAGON</h1><p class="text-purple-400 text-xs tracking-[0.3em] uppercase font-light">Google Clone Browser System Base</p></div>
-                  <div class="w-full max-w-2xl bg-purple-950/30 border border-purple-500/20 rounded-3xl p-6 shadow-2xl backdrop-blur-sm">
-                      <div class="flex items-center gap-3 bg-black/40 rounded-2xl px-4 py-3 border border-purple-500/30"><span class="text-purple-400">🔍</span><input type="text" id="browser-search-input" placeholder="Google 검색 또는 웹 주소 입력 (CroxyProxy 우회 연동)" class="w-full bg-transparent text-sm text-purple-100 outline-none"></div>
-                  </div>
-              </main>
-              <footer class="text-center text-[10px] text-purple-400/40 py-4 border-t border-purple-500/10">&copy; 2026 GoldFireDragon Browser</footer>
-              <div id="vpn-floating-widget" style="position: fixed; bottom: 30px; right: 30px; z-index: 999999 !important; display: flex; align-items: center; gap: 12px; background: #0c0418; border: 2px solid #10b981; border-radius: 16px; padding: 12px 18px; box-shadow: 0 0 30px rgba(16, 185, 129, 0.5); font-family: sans-serif;">
-                  <div style="display: flex; flex-direction: column; gap: 4px;"><span style="color: #e9d5ff; font-size: 11px; font-weight: bold;">🇯🇵 JAPAN PROXY VPN</span><select id="vpn-server-selector" style="background: #1e1b4b; color: #f3e8ff; font-size: 11px; border: 1px solid rgba(168, 85, 247, 0.5); border-radius: 6px; padding: 4px 8px; outline: none; cursor: pointer; font-weight: bold;"><option value="IPS_219.100.37.105_tcp_443.ovpn">일본 서버 #1</option><option value="FOV_Japan_219.100.37.170_tcp.ovpn">일본 서버 #2</option></select></div>
-                  <button id="vpn-master-btn" style="background: #059669; color: #ffffff; font-weight: 900; font-size: 11px; border: none; border-radius: 10px; padding: 10px 18px; cursor: pointer; text-transform: uppercase;">연결됨</button>
-              </div>
-              <script>
-                  document.addEventListener("DOMContentLoaded",()=>{
-                      const w=document.getElementById("vpn-floating-widget"),b=document.getElementById("vpn-master-btn"),s=document.getElementById("vpn-server-selector");
-                      let active=true;
-                      b.addEventListener("click",(e)=>{
-                          e.stopPropagation();
-                          if(active){ active=false; b.innerText="연결하기"; b.style.backgroundColor="#dc2626"; w.style.borderColor="rgba(168, 85, 247, 0.6)"; fetch("/api/vpn/disconnect",{method:"POST"}).catch(()=>{}); }
-                          else { active=true; b.innerText="연결됨"; b.style.backgroundColor="#059669"; w.style.borderColor="#10b981"; fetch("/api/vpn/connect-japan",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({vpnFileName:s.value})}).catch(()=>{}); }
-                      });
-                  });
-              </script>
-              <script src="cordova.js"></script><script src="bundle.js"></script>
-          </body>
-          </html>
-          EOF
-
-      - name: 12. Synchronize Cordova resource directories
+      - name: 12. Cordova APK 컴파일 구조용 www 폴더 자원 동기화
         run: mkdir -p www && cp index.html bundle.js www/ || true
 
-      - name: 13. Synchronize generated files physically to main branch root
+      - name: 13. 생성된 자원들을 깃허브 원본 레포지토리에 물리적 파일로 저장 (Push)
         run: |
           git config --global user.name "github-actions[bot]"
           git config --global user.email "github-actions[bot]@://github.com"
           mkdir -p src
           cat << 'EOF' > src/server.ts
-          import express from 'express'; import path from 'path'; const app = express(); app.use(express.static(path.join(__dirname, '../'))); app.get('*', (req, res) => { res.sendFile(path.join(__dirname, '../index.html')); }); app.listen(3000);
+          import express from 'express'; 
+          import path from 'path'; 
+          const app = merge; 
+          app.use(express.static(path.join(__dirname, '../'))); 
+          app.get('*', (req, res) => { res.sendFile(path.join(__dirname, '../index.html')); }); 
+          app.listen(3000);
           EOF
           git add package.json webpack.config.js tsconfig.json bundle.js index.html src/server.ts www/ || true
-          git commit -m "chore: push full automation build assets" || echo "No changes"
-          git push origin main || echo "Push skipped"
+          git commit -m "chore: 리포지토리 루트 구성 무결성 연동 완료" || echo "변경사항 없음"
+          git push origin main || echo "푸시 스킵"
 
-      # ────────────────────────────────────────────────────────────
-      # ⚡ [원천 차단]: 들여쓰기 꼬임을 100% 예방하는 인라인 스트림(One-liner) 파이프라인
-      # ────────────────────────────────────────────────────────────
-      - name: 14. Start Express Backend and Establish External Web Access
-        run: npx ts-node src/server.ts & sleep 3 && curl -s https://amazonaws.com | sudo tee /etc/apt/trusted.gpg.d/ngrok.asc > /dev/null && echo "deb https://amazonaws.com buster main" | sudo tee /etc/apt/sources.list.d/ngrok.list && sudo apt-get update && sudo apt-get install -y ngrok && ngrok http 3000 --log=stdout & sleep 5 && curl -s http://localhost:4040/api/tunnels | jq -r '.tunnels[0].public_url' || true
+      - name: 14. Node.js + Express 실제 라이브 백엔드 서버 기동
+        run: npx ts-node src/server.ts & sleep 5
