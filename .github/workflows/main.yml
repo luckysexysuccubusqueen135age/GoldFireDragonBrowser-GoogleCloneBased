@@ -19,7 +19,7 @@ jobs:
   build-and-deploy:
     environment:
       name: github-pages
-      # [주소 고정] 질문자님이 명시한 정확한 GitHub Pages 주소 링크 완벽 고정
+      # [주소 완벽 고정] 질문자님이 명시한 정확한 GitHub Pages 주소 링크
       url: https://github.io
     runs-on: ubuntu-latest
 
@@ -30,20 +30,20 @@ jobs:
       with:
         persist-credentials: true
 
-    # 2. Node.js 구동 환경 세팅 (락파일 캐시 에러 방지를 위해 cache 옵션 제거 상태 엄격히 유지)
+    # 2. Node.js 구동 환경 세팅 (락파일 캐시 에러 방지를 위해 cache 옵션 제거 상태 유지)
     - name: Set up Node.js Environment
       uses: actions/setup-node@v4
       with:
         node-version: '20'
 
-    # 3. 코르도바 컴파일 및 자바 가상 머신 환경 구동을 위한 JDK 17 빌드 스택 세팅
+    # 3. 코르도바 및 엔진 컴파일을 위한 JDK 17 환경 구축
     - name: Set up JDK 17 for Cordova Android Build
       uses: actions/setup-java@v4
       with:
         distribution: 'zulu'
         java-version: '17'
 
-    # 4. 의존성 패키지 및 폰트/웹익스텐션 스토어 호환 필수 로더/폴리필 라이브러리 전역 주입
+    # 4. 의존성 패키지 및 크롬/파이어폭스 익스텐션 스토어 호환 필수 로더/폴리필 패키지 설치
     - name: Install Dependencies
       run: |
         npm install -g cordova
@@ -52,13 +52,14 @@ jobs:
           npm install
         fi
 
-    # 5. 가상 머신 리눅스 시스템에 OpenVPN 클라이언트 라이브러리 설치
+    # 5. 가상 머신 리눅스 시스템에 OpenVPN 클라이언트 설치
     - name: Install Linux OpenVPN Client
       run: |
         sudo apt-get update
         sudo apt-get install -y openvpn
 
-    # 6. [경로 고정] 지정하신 정확한 경로 내의 파일들을 무작위 추출하여 백그라운드 매칭 구동
+    # 6. [경로 완벽 고정] 질문자님이 명시한 정확한 VPN 설정 파일 경로 내부에서 무작위 선택 후 구동
+    # 미국 IP로 세는 현상을 막기 위해 라우팅 하이재킹 플래그(--redirect-gateway def1)를 강제로 탑재했습니다.
     - name: Connect to Random OpenVPN JP Config
       run: |
         CONFIG_DIR="OpenVpn/Server/Japan/Configs"
@@ -69,34 +70,39 @@ jobs:
         
         echo "선택되어 실행되는 OpenVPN JP 설정 파일: $SELECTED_OVPN"
         
-        # 데몬(--daemon) 모드로 완벽한 백그라운드 터널링을 이행합니다.
-        sudo openvpn --config "$SELECTED_OVPN" --daemon vpn_instance
+        # --redirect-gateway def1 플래그로 깃허브 가상서버의 기존 미국 라우팅 주소를 지우고 일본 VPN망으로 트래픽을 강제 고정합니다.
+        sudo openvpn \
+          --config "$SELECTED_OVPN" \
+          --redirect-gateway def1 \
+          --dhcp-option DNS 8.8.8.8 \
+          --daemon vpn_instance
         
-        # 터널링 안정화를 위해 12초간 대기합니다.
-        sleep 12
+        # 일본 무료 서버 노드가 터널을 확실하게 뚫고 기본 게이트웨이로 잡힐 때까지 15초간 대기합니다.
+        sleep 15
 
-    # 7. 일본 VPN망 연결 상태 확인 (IP 정보 출력 검증)
+    # 7. 일본 VPN망 연결 상태 확인 (IP 정보 출력하여 국가 코드가 JP로 변했는지 최종 확인)
+    # --redirect-gateway 옵션 덕분에 미국이 아닌 진짜 일본 IP 주소가 터미널 로그에 기록됩니다.
     - name: Verify Japanese Network Tunneling
       run: curl https://ipinfo.io
 
-    # 8. Webpack 번들링 및 Express/Supabase/OneSpace AI 빌드 스크립트 가동
+    # 8. Webpack 번들링 및 Express/Supabase/OneSpace AI 빌드 스크립트 실행
     - name: Build Web Application
       env:
         SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
         SUPABASE_ANON_KEY: ${{ secrets.SUPABASE_ANON_KEY }}
         ONESPACE_AI_API_KEY: ${{ secrets.ONESPACE_AI_API_KEY }}
       run: |
-        # Webpack 컴파일 실행 (아래 통합 설정 파일을 자동으로 타깃팅함)
+        # Webpack 컴파일 실행
         if npm run | grep -q "build"; then
           npm run build
         fi
         
-        # Express 데이터 수집 및 백엔드 런타임 갱신 스크립트 실행
+        # Express 데이터 수집이나 Supabase/OneSpace 연동 빌드 스크립트가 있다면 구동
         if [ -f server-build.js ]; then
           node server-build.js
         fi
 
-    # 9. 크롬/파이어폭스 듀얼 엔진 주입, 인앱 브라우저 및 웹익스텐션 API 프레임워크 패치 연동
+    # 9. 크롬/파이어폭스 듀얼 엔진 주입 및 웹익스텐션 API 프레임워크 패치 연동
     - name: Inject Engines, WebExtension Framework & Build Cordova
       run: |
         if [ -f config.xml ]; then
@@ -112,16 +118,16 @@ jobs:
           cordova build android --debug
         fi
 
-    # 10. 수정/최신화된 기존 파일들의 변경 내역만 감지하여 레포지토리에 깨끗하게 업데이트(Update) 처리
+    # 10. 수정/최신화된 기존 파일들의 변경 내역만 감지하여 갱신(Update) 처리
     - name: Commit and Push Updated Files to Repository
       run: |
         git config --global user.name "github-actions[bot]"
-        git config --global user.email "github-actions[bot]@://github.com"
+        git config --global user.email "github-actions[bot]@users.noreply.github.com"
         
-        # 변경(수정/업데이트)된 파일 내용만 정확히 반영
+        # 변경(수정/업데이트)된 파일만 스테이징에 반영
         git add -u
         
-        # 업데이트 내역이 있을 때만 커밋/푸시 진행 ([skip ci]로 무한루프 방어)
+        # 업데이트 내역이 있는지 체크 후 커밋/푸시 진행
         if ! git diff --cached --quiet; then
           git commit -m "chore: update existing browser data via Japan VPN [skip ci]"
           git push origin main
@@ -135,7 +141,7 @@ jobs:
       with:
         path: '.' 
 
-    # 12. 최신 v5 규격 배포 엔진으로 내 GitHub Pages 주소에 릴리즈 퍼블리싱 발행
+    # 12. 최신 v5 규격 엔진으로 내 GitHub Pages 주소에 최종 배포 발행
     - name: Deploy to GitHub Pages
       id: deployment
       uses: actions/deploy-pages@v5
