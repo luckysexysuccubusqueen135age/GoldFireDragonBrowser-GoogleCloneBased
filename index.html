@@ -4,12 +4,12 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
     <title>GoldFireDragon Browser</title>
-    <!-- Tailwind CSS CDN 및 커스텀 폰트 명세 -->
+    <!-- Tailwind CSS CDN 인프라 및 전용 Cinzel 폰트 임베드 -->
     <script src="https://tailwindcss.com"></script>
     <link href="https://googleapis.com" rel="stylesheet">
     
     <style>
-        /* 골드 파이어드래곤 전용 마스터 스타일 시트 */
+        /* 골드 파이어드래곤 브라우저 통합 마스터 테마 시트 */
         body {
             font-family: 'Noto Sans KR', sans-serif;
             background: #0a0010 url('images/GoldFireDragonBrowser_home_page.jpg') center / cover no-repeat fixed;
@@ -28,7 +28,7 @@
             border-image: linear-gradient(to right, #f59e0b, #78350f) 1;
         }
 
-        /* 크롬 형태 커스텀 골드 스크롤바 디자인 */
+        /* 크롬 형태 커스텀 골드 스크롤바 메커니즘 */
         ::-webkit-scrollbar { width: 6px; height: 6px; }
         ::-webkit-scrollbar-track { background: rgba(10, 0, 16, 0.8); }
         ::-webkit-scrollbar-thumb { background: #f59e0b; border-radius: 3px; }
@@ -37,29 +37,36 @@
 </head>
 <body class="text-purple-100 min-h-screen flex flex-col justify-between p-4 bg-space">
 
+    <!-- 🔥 [독립형 무적 VPN 컨트롤러] 레이아웃 간섭을 완전 차단하여 무조건 강제 노출 -->
+    <div id="vpn-control-panel" 
+         style="position: fixed; top: 28px; left: 32px; z-index: 99999; display: flex; align-items: center; gap: 10px; background: #0c0418; border: 2px solid #10b981; border-radius: 9999px; padding: 6px 16px; box-shadow: 0 0 25px rgba(16, 185, 129, 0.3); backdrop-filter: blur(12px); font-family: sans-serif; transition: all 0.3s ease;">
+        
+        <!-- 상태 인디케이터 깜빡이 점 -->
+        <span style="color: #10b981; font-size: 14px; animation: pulse 2s infinite;">●</span>
+        <span style="color: #e9d5ff; font-size: 11px; font-weight: bold; letter-spacing: 0.5px; white-space: nowrap;">🇯🇵 JP VPN</span>
+        
+        <!-- 일본 서버 리스트 드롭다운 메뉴 (보유 자원 경로 매핑) -->
+        <select id="vpn-server-selector" 
+                style="background: #1e1b4b; color: #f3e8ff; font-size: 11px; border: 1px solid rgba(168, 85, 247, 0.5); border-radius: 6px; padding: 4px 8px; outline: none; cursor: pointer; font-weight: bold;">
+            <option value="IPS_219.100.37.105_tcp_443.ovpn">일본 서버 #1 (105 TCP)</option>
+            <option value="FOV_Japan_219.100.37.170_tcp.ovpn">일본 서버 #2 (170 TCP)</option>
+        </select>
+
+        <!-- ⚡ 최종 마스터 클릭 버튼 컴포넌트 -->
+        <button id="vpn-master-btn" 
+                style="background: #059669; color: #ffffff; font-weight: 900; font-size: 10px; border: none; border-radius: 9999px; padding: 6px 14px; cursor: pointer; text-transform: uppercase; letter-spacing: 0.5px; transition: background 0.2s ease;">
+            연결됨
+        </button>
+    </div>
+
     <!-- 1. TOP HEADER NAVIGATION BAR -->
     <header class="flex flex-wrap justify-between items-center gap-4 bg-purple-950/40 backdrop-blur-md border border-purple-500/20 rounded-2xl p-4 shadow-2xl">
-        
-        <!-- [정밀 개조 구역]: 기존 정적 뱃지를 지우고 '실제 작동하는 통합 VPN 스위치 컴포넌트' 결합 -->
+        <!-- 기존 헤더 왼쪽 디자인 정렬 유지 -->
         <div class="flex items-center gap-4 text-xs font-semibold text-purple-200">
-            <div id="vpn-control-panel" class="flex items-center gap-3 bg-black/60 border border-emerald-500/50 rounded-full px-4 py-2 shadow-inner transition-all duration-300">
-                <span class="text-emerald-400 font-bold animate-pulse text-[14px]">●</span>
-                <span class="text-purple-200 text-xs font-bold tracking-wide">🇯🇵 Japan VPN</span>
-                
-                <!-- 일본 서버 리스트 드롭다운 메뉴 (보유하신 일본 .ovpn 파일 매핑) -->
-                <select id="vpn-server-selector" class="bg-purple-950/80 text-purple-200 text-[11px] rounded-lg border border-purple-500/40 px-2.5 py-1 outline-none cursor-pointer focus:border-purple-300 transition">
-                    <option value="IPS_219.100.37.105_tcp_443.ovpn">일본 서버 #1 (105 TCP)</option>
-                    <option value="FOV_Japan_219.100.37.170_tcp.ovpn">일본 서버 #2 (170 TCP)</option>
-                </select>
-
-                <!-- 🔥 [독립 클릭 버튼]: 유저가 누르면 즉시 통신이 트리거되는 스위치 버튼 -->
-                <button id="vpn-master-btn" class="bg-emerald-600 hover:bg-emerald-500 text-white font-black px-3.5 py-1 rounded-full text-[10px] tracking-wider transition-all duration-200 shadow-md">
-                    연결됨
-                </button>
-            </div>
+            <div class="text-purple-300/80">GoldFireDragon Browser Infrastructure Engine v1.0</div>
         </div>
 
-        <!-- RIGHT BAR BUTTONS MENU -->
+        <!-- RIGHT BAR NAVIGATION MENU -->
         <div class="flex items-center gap-3">
             <button class="bg-purple-900/40 hover:bg-purple-800/60 border border-purple-500/30 rounded-xl px-4 py-2 text-xs transition duration-200 font-medium tracking-wide">Proxy Settings</button>
             <button class="bg-purple-900/40 hover:bg-purple-800/60 border border-purple-500/30 rounded-xl px-4 py-2 text-xs transition duration-200 font-medium tracking-wide">Bookmarks</button>
@@ -68,20 +75,20 @@
 
     <!-- 2. MAIN BROWSER CONTENT ENGINE -->
     <main class="flex-1 flex flex-col items-center justify-center my-8">
-        <!-- 메인 골드 파이어드래곤 엠블럼 타이틀 명세 -->
+        <!-- 메인 골드 로고 엠블럼 명세 -->
         <div class="text-center mb-8">
             <h1 class="gold-title text-4xl md:text-6xl font-black tracking-widest mb-2">GOLD FIRE DRAGON</h1>
-            <p class="text-purple-400 text-xs tracking-[0.3em] uppercase font-light">Google Clone Browser System Based</p>
+            <p class="text-purple-400 text-xs tracking-[0.3em] uppercase font-light">Google Clone Browser System Base</p>
         </div>
 
-        <!-- 구글 통합 검색 엔진 컴포넌트 + CroxyProxy 프록시 우회 가속 주소창 -->
+        <!-- 구글 검색바 인터페이스 + CroxyProxy 프록시 네트워크 주소창 -->
         <div class="w-full max-w-2xl bg-purple-950/30 border border-purple-500/20 rounded-3xl p-6 shadow-2xl backdrop-blur-sm">
             <div class="flex items-center gap-3 bg-black/40 rounded-2xl px-4 py-3 border border-purple-500/30 focus-within:border-amber-500 transition duration-300">
                 <span class="text-purple-400 text-lg">🔍</span>
-                <input type="text" id="browser-search-input" placeholder="Google 검색 또는 웹 주소 입력 (CroxyProxy 가속 자동 연결)" class="w-full bg-transparent text-sm text-purple-100 outline-none placeholder-purple-400/50">
+                <input type="text" id="browser-search-input" placeholder="Google 검색 또는 웹 주소 입력 (CroxyProxy 우회 연동)" class="w-full bg-transparent text-sm text-purple-100 outline-none placeholder-purple-400/50">
             </div>
             
-            <!-- 하단 퀵 링크 영역 -->
+            <!-- 하단 퀵 메뉴 앵커 링크 -->
             <div class="flex flex-wrap justify-center gap-4 mt-6 text-xs text-purple-300">
                 <a href="https://google.com" target="_blank" class="hover:text-amber-400 transition">Google</a>
                 <span class="text-purple-700">•</span>
@@ -92,12 +99,12 @@
         </div>
     </main>
 
-    <!-- 3. FOOTER PLATFORM INFRASTRUCTURE -->
+    <!-- 3. FOOTER INFO INTERFACE -->
     <footer class="text-center text-[10px] text-purple-400/40 tracking-wider py-4 border-t border-purple-500/10">
-        &copy; 2026 GoldFireDragon Browser • Powered by Cordova & Webpack Embedded Environment
+        &copy; 2026 GoldFireDragon Browser • Packaged with Cordova & Webpack Compiler Assets
     </footer>
 
-    <!-- ⚠️ [코드 누락 방지 핵심 장치]: Cordova 플러그인 엔진과 웹팩 결과물(bundle.js) 결합 링크 -->
+    <!-- ⚠️ [핵심 빌드 결합 장치]: Cordova 런타임 주입 및 웹팩 컴파일 스크립트 연결 -->
     <script src="cordova.js"></script>
     <script src="./bundle.js"></script>
 </body>
