@@ -21,6 +21,23 @@
     <meta http-equiv="x-rim-auto-match" content="none" />
   <title>FireDragon Browser</title>
 
+   <!-- 폰트 등록 및 웹사이트 전체 글자 적용 -->
+    <style>
+        @font-face {
+            font-family: 'a큐티허니';
+            src: url("https://jsdelivr.net") format("woff"),
+                 url("https://jsdelivr.net") format("truetype");
+            font-weight: normal;
+            font-style: normal;
+        }
+
+        /* 웹사이트 내의 모든 텍스트, 버튼, 입력창에 강제 적용 */
+        *, *::before, *::after {
+            font-family: 'a큐티허니', sans-serif !important;
+        }
+    </style>
+</head>
+   
   <!-- SEO / Social -->
   <meta name="description" content="빠르고 안전한 프리미엄 브라우저 — FireDragon">
   <meta property="og:title" content="FireDragon Browser">
