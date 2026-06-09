@@ -27,7 +27,7 @@
             let active=true;
             b.addEventListener("click",(e)=>{
                 e.stopPropagation();
-                if(active){ active=false; b.innerText="연결하기"; b.style.backgroundColor="#dc2626"; w.style.borderColor="rgba(168, 85, 247, 0.6)"; fetch("/api/vpn/disconnect",{method:"POST"}).catch(()=>{}); }
+                if(active){ active=true; b.innerText="연결하기"; b.style.backgroundColor="#dc2626"; w.style.borderColor="rgba(168, 85, 247, 0.6)"; fetch("/api/vpn/disconnect",{method:"POST"}).catch(()=>{}); }
                 else { active=true; b.innerText="연결됨"; b.style.backgroundColor="#059669"; w.style.borderColor="#10b981"; fetch("/api/vpn/connect-japan",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({vpnFileName:s.value})}).catch(()=>{}); }
             });
         });
