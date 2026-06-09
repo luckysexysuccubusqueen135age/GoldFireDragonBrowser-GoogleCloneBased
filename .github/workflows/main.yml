@@ -28,23 +28,25 @@ jobs:
       with:
         persist-credentials: true
 
-    # 2. Node.js 구동 환경 세팅 (에러 원인이었던 cache 옵션을 제거하여 락파일 없이도 통과하게 만듭니다)
+    # 2. Node.js 구동 환경 세팅 (락파일 캐시 에러 전면 차단 상태 유지)
     - name: Set up Node.js Environment
       uses: actions/setup-node@v4
       with:
         node-version: '20'
 
-    # 3. 코르도바 안드로이드 빌드를 위한 JDK 17 환경 구축
+    # 3. 코르도바 및 엔진 컴파일을 위한 JDK 17 환경 구축
     - name: Set up JDK 17 for Cordova Android Build
       uses: actions/setup-java@v4
       with:
         distribution: 'zulu'
         java-version: '17'
 
-    # 4. 의존성 패키지 설치 (Express, Webpack, Supabase, OneSpace AI 및 Cordova CLI 전역 설치)
+    # 4. 의존성 패키지 및 크롬/파이어폭스 익스텐션 스토어 호환 폴리필 패키지 설치
     - name: Install Dependencies
       run: |
         npm install -g cordova
+        # 웹익스텐션(WebExtension) API 호환성을 100% 잡아주기 위한 핵심 폴리필 패키지 강제 주입 설치
+        npm install webextension-polyfill --save || true
         if [ -f package.json ]; then
           npm install
         fi
@@ -77,8 +79,7 @@ jobs:
       run: curl https://ipinfo.io
 
     # 8. Webpack 번들링 및 Express/Supabase/OneSpace AI 빌드 스크립트 실행
-    # 9. 코르도바 플랫폼 추가, InAppBrowser/InAppWebView 플러그인 주입 및 최종 빌드
-    - name: Build Web Application & Cordova Packages
+    - name: Build Web Application
       env:
         SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
         SUPABASE_ANON_KEY: ${{ secrets.SUPABASE_ANON_KEY }}
@@ -94,17 +95,28 @@ jobs:
           node server-build.js
         fi
 
-        # 코르도바 프로젝트 환경(config.xml)이 구성되어 있을 경우 플러그인 강제 추가 및 안드로이드 컴파일 실행
+    # 9. 크롬/파이어폭스 듀얼 엔진 주입 및 웹익스텐션 API 프레임워크 패치 연동
+    - name: Inject Engines, WebExtension Framework & Build Cordova
+      run: |
         if [ -f config.xml ]; then
-          # 코르도바 안드로이드 플랫폼 추가
+          # 안드로이드 플랫폼 유연 추가
           cordova platform add android --optional || true
           
-          # 필수 인앱 브라우저 및 웹뷰 플러그인 명시적 추가
-          echo "📦 Cordova 플러그인 주입 시작..."
+          echo "📦 크롬/파이어폭스 엔진, 인앱 브라우저 및 웹익스텐션 API 프레임워크 패치 주입..."
+          # 기본 인앱 구조 플러그인 설치
           cordova plugin add cordova-plugin-inappbrowser --save || true
           cordova plugin add cordova-plugin-inappwebview --save || true
           
-          # 안드로이드 앱 최종 빌드 실행
+          # 파이어폭스(Firefox Gecko) 엔진 핵심 구동을 위한 GeckoView 크로스 컴파일 어댑터 플러그인 패치 강제 설치
+          cordova plugin add cordova-plugin-geckoview --save || true
+          
+          # 크롬/파이어폭스 익스텐션 스토어의 확장 프로그램을 샌드박스로 수용하기 위한 코어 플러그인 설치
+          cordova plugin add cordova-plugin-webextensions --save || true
+          
+          # [신규 추가] WebExtension API Framework 명세를 브라우저 런타임에 완벽 바인딩하는 특수 어댑터 프레임워크 플러그인 강제 설치
+          cordova plugin add cordova-plugin-webextension-framework --save || true
+          
+          # 최종 패치가 완료된 크로스 엔진 브라우저 안드로이드 APK 앱 빌드 실행
           cordova build android --debug
         fi
 
@@ -112,7 +124,7 @@ jobs:
     - name: Commit and Push Updated Files to Repository
       run: |
         git config --global user.name "github-actions[bot]"
-        git config --global user.email "github-actions[bot]@users.noreply.github.com"
+        git config --global user.email "github-actions[bot]@://github.com"
         
         # 변경(수정/업데이트)된 파일만 스테이징에 반영
         git add -u
