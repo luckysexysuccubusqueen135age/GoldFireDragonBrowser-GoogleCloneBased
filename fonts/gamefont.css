@@ -1,0 +1,13 @@
+  /* 1. 폰트 등록 */
+        @font-face {
+            font-family: 'a큐티허니';
+    src: url("https://cdn.jsdelivr.net/gh/luckysexyqueen/GoldFireDragonUnCensoredBrowser@main/fonts/a%ED%81%90%ED%8B%B0%ED%97%88%EB%8B%88.ttf");
+    src: url("https://cdn.jsdelivr.net/gh/luckysexyqueen/GoldFireDragonUnCensoredBrowser@main/fonts/a%ED%81%90%ED%8B%B0%ED%97%88%EB%8B%88.woff");
+}
+
+.IIV::-webkit-media-controls-play-button,
+video::-webkit-media-controls-start-playback-button {
+    opacity: 0;
+    pointer-events: none;
+    width: 5px;
+}
