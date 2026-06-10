@@ -1,4 +1,4 @@
-name: Deploy GoldFireDragonBrowser
+name: Deploy GoldFireDragonBrowser (Runner Native)
 
 on:
   push:
@@ -31,7 +31,6 @@ jobs:
       TARGET_REGION: "JP"
 
     steps:
-
       - name: Checkout Source Code
         uses: actions/checkout@v4
         with:
@@ -70,21 +69,18 @@ jobs:
 
       - name: Connect to Japan VPN
         run: |
-          # --redirect-gateway def1 옵션을 주어 모든 웹 트래픽을 일본 VPN으로 강제 리다이렉트합니다.
+          # --dev tun 및 --redirect-gateway def1 옵션으로 러너의 모든 트래픽을 일본 VPN으로 강제 유도합니다.
           sudo openvpn --config OpenVpn/Server/Japan/Configs/IPS_219.100.37.170_udp_1195.ovpn --dev tun --redirect-gateway def1 --daemon
 
       - name: Wait for VPN Tunneling
-        run: sleep 15 # VPN이 완전히 연결되고 라우팅 테이블이 바뀔 때까지 충분히 대기합니다.
+        run: sleep 15 # 러너 네트워크 인터페이스가 완전히 바뀔 때까지 대기
 
-      - name: Verify VPN
+      - name: Verify VPN Connection
         run: |
-          echo "=== 네트워크 인터페이스 확인 ==="
+          echo "=== [확인] 현재 러너의 네트워크 인터페이스 ==="
           ip addr
-          echo "=== 현재 라우팅 경로 확인 ==="
-          ip route
-          echo "=== 우회된 외부 IP 및 국가 확인 ==="
-          curl -s https://ifconfig.me || echo "IP check failed"
-          curl -s http://ip-api.com || echo "Location check failed"
+          echo "=== [확인] 우회된 외부 IP 및 국가 정보 ==="
+          curl -s http://ip-api.com || echo "IP 우회 확인 실패 (인터넷 연결 끊김 우려)"
 
       - name: Build Web Application
         env:
@@ -108,17 +104,19 @@ jobs:
       - name: Cordova Android Build & Copy APK
         run: |
           if [ -f config.xml ]; then
+            # 러너에 내장된 Android SDK 경로를 명시적으로 주입
             export ANDROID_HOME=$ANDROID_HOME_ROOT
+            
             cordova platform add android --optional || true
             cordova build android --debug
             
-            # 빌드된 APK를 배포용 www 폴더 안으로 안전하게 이동 및 복사
+            # 빌드된 APK 결과물을 정적 웹 배포 폴더(www)로 복사
             mkdir -p www
             if [ -f platforms/android/app/build/outputs/apk/debug/app-debug.apk ]; then
               cp platforms/android/app/build/outputs/apk/debug/app-debug.apk www/GoldFireDragonBrowser.apk
-              echo "APK 복사 성공: www/GoldFireDragonBrowser.apk"
+              echo "APK 복사 성공 ➡️ www/GoldFireDragonBrowser.apk"
             else
-              echo "APK 파일 복사 실패: 빌드 결과물을 찾을 수 없습니다."
+              echo "⚠️ APK 빌드 파일을 찾을 수 없습니다."
             fi
           fi
 
@@ -131,13 +129,13 @@ jobs:
             git commit -m "chore: update existing browser data [skip ci]"
             git push origin main
           else
-            echo "No changes"
+            echo "No changes to commit"
           fi
 
       - name: Upload Pages Artifact
         uses: actions/upload-pages-artifact@v3
         with:
-          path: 'www'
+          path: 'www' # 정적 웹과 APK가 담긴 www 폴더만 아티팩트로 업로드
 
       - name: Deploy to GitHub Pages
         id: deployment
