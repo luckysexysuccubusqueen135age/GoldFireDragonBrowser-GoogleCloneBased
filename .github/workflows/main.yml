@@ -121,8 +121,13 @@ jobs:
       - name: Upload Pages Artifact
         uses: actions/upload-pages-artifact@v3
         with:
-          path: '.'
+          path: '.' # 배포할 정적 파일 폴더 경로 (필요시 빌드 결과물 폴더인 'dist'나 'build' 등으로 변경하세요)
 
       - name: Deploy to GitHub Pages
         id: deployment
         uses: actions/deploy-pages@v5
+
+      - name: Disconnect Japan VPN
+        if: always()
+        run: |
+          sudo killall openvpn || true
