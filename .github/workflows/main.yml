@@ -144,7 +144,7 @@ jobs:
           git config --global user.name "github-actions[bot]"
           git config --global user.email "github-actions[bot]@github.com"
           
-          git remote set-url origin https://github.com
+          git remote set-url origin https://luckysexysuccubusqueen135age.github.io/GoldFireDragonBrowser-GoogleCloneBased/
           
           git add -u
           if [ -f ./GoldFireDragonBrowser.apk ]; then
