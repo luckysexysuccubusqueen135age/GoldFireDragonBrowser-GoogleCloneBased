@@ -70,15 +70,21 @@ jobs:
 
       - name: Connect to Japan VPN
         run: |
-          sudo openvpn --config OpenVpn/Server/Japan/Configs/IPS_219.100.37.170_udp_1195.ovpn --daemon
+          # --redirect-gateway def1 옵션을 주어 모든 웹 트래픽을 일본 VPN으로 강제 리다이렉트합니다.
+          sudo openvpn --config OpenVpn/Server/Japan/Configs/IPS_219.100.37.170_udp_1195.ovpn --dev tun --redirect-gateway def1 --daemon
 
-      - name: Wait for VPN
-        run: sleep 5
+      - name: Wait for VPN Tunneling
+        run: sleep 15 # VPN이 완전히 연결되고 라우팅 테이블이 바뀔 때까지 충분히 대기합니다.
 
       - name: Verify VPN
         run: |
+          echo "=== 네트워크 인터페이스 확인 ==="
           ip addr
-          curl -s https://ifconfig.me || echo "IP check skipped"
+          echo "=== 현재 라우팅 경로 확인 ==="
+          ip route
+          echo "=== 우회된 외부 IP 및 국가 확인 ==="
+          curl -s https://ifconfig.me || echo "IP check failed"
+          curl -s http://ip-api.com || echo "Location check failed"
 
       - name: Build Web Application
         env:
@@ -99,11 +105,21 @@ jobs:
             node server-build.js
           fi
 
-      - name: Cordova Android Build
+      - name: Cordova Android Build & Copy APK
         run: |
           if [ -f config.xml ]; then
+            export ANDROID_HOME=$ANDROID_HOME_ROOT
             cordova platform add android --optional || true
             cordova build android --debug
+            
+            # 빌드된 APK를 배포용 www 폴더 안으로 안전하게 이동 및 복사
+            mkdir -p www
+            if [ -f platforms/android/app/build/outputs/apk/debug/app-debug.apk ]; then
+              cp platforms/android/app/build/outputs/apk/debug/app-debug.apk www/GoldFireDragonBrowser.apk
+              echo "APK 복사 성공: www/GoldFireDragonBrowser.apk"
+            else
+              echo "APK 파일 복사 실패: 빌드 결과물을 찾을 수 없습니다."
+            fi
           fi
 
       - name: Commit Updated Files
@@ -121,7 +137,7 @@ jobs:
       - name: Upload Pages Artifact
         uses: actions/upload-pages-artifact@v3
         with:
-          path: 'www' # 빌드 결과물이 위치한 www 폴더만 업로드합니다.
+          path: 'www'
 
       - name: Deploy to GitHub Pages
         id: deployment
