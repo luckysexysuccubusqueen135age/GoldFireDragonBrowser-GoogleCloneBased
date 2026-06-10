@@ -21,8 +21,7 @@ jobs:
 
     environment:
       name: github-pages
-      # 🚨 요청하신 주소 그대로 오타 없이 완벽하게 고정 완료했습니다.
-      url: https://luckysexysuccubusqueen135age.github.io/GoldFireDragonBrowser-GoogleCloneBased/
+      url: https://github.io
 
     env:
       LANG: "ko_KR.UTF-8"
@@ -36,7 +35,6 @@ jobs:
       - name: Checkout Source Code
         uses: actions/checkout@v4
         with:
-          # 💡 별도 토큰 주입 없이 세션 자체 권한으로 커밋 푸시를 안전하게 처리합니다.
           persist-credentials: true
           fetch-depth: 0
 
@@ -71,23 +69,37 @@ jobs:
           sudo apt-get update
           sudo apt-get install -y openvpn
 
+      # 🇯🇵 강제 일본 네트워크 게이트웨이 유도 및 고정
       - name: Connect to Japan VPN (No Auth Required)
         run: |
+          # --redirect-gateway def1 bypass-dhcp 옵션으로 러너 본래의 네트워크 길목을 강제로 차단하고 일본 서버로만 흐르게 유도합니다.
           sudo openvpn --config OpenVpn/Server/Japan/Configs/IPS_219.100.37.170_udp_1195.ovpn \
                        --dev tun \
-                       --redirect-gateway def1 \
+                       --redirect-gateway def1 bypass-dhcp \
                        --resolv-retry infinite \
                        --daemon
 
       - name: Wait for VPN Tunneling
         run: sleep 15
 
+      # 🚨 강제 일본 검증 단계 (일본 IP가 아닐 시 빌드 즉시 셧다운)
       - name: Verify VPN Connection
         run: |
-          echo "=== 1. 네트워크 인터페이스 검증 ==="
+          echo "=== 1. 네트워크 인터페이스 및 라우팅 테이블 강제 검증 ==="
           ip addr
-          echo "=== 2. 변경된 일본 외부 IP 정보 ==="
-          curl -s --connect-timeout 10 http://ip-api.com || echo "VPN 연결로 인한 네트워크 일시 단절 발생"
+          ip route
+          
+          echo "=== 2. 변경된 일본 외부 IP 정보 확인 ==="
+          IP_INFO=$(curl -s --connect-timeout 10 http://ip-api.com)
+          echo "$IP_INFO"
+          
+          # 외부 IP 검증 결과 국가 코드가 'JP' 또는 'Japan'을 포함하는지 강제 체크합니다.
+          if echo "$IP_INFO" | grep -q -E '"countryCode":"JP"|"country":"Japan"'; then
+            echo "✅ 일본 VPN 우회 연결이 완벽하게 확인되었습니다. 빌드를 계속 진행합니다."
+          else
+            echo "❌ [위험] 일본 vpn 우회 적용에 실패했습니다. 보안을 위해 워크플로를 강제 종료합니다."
+            exit 1
+          fi
 
       - name: Build Web Application
         env:
@@ -110,7 +122,6 @@ jobs:
 
       - name: Cordova Android Build & Copy APK
         run: |
-          # 💡 깃헙 러너에 내장된 정확한 Android SDK 경로와 명령어 PATH 강제 주입
           export ANDROID_HOME=/usr/local/lib/android/sdk
           export ANDROID_SDK_ROOT=/usr/local/lib/android/sdk
           export PATH=$PATH:$ANDROID_HOME/cmdline-tools/latest/bin:$ANDROID_HOME/tools:$ANDROID_HOME/tools/bin:$ANDROID_HOME/platform-tools
@@ -146,17 +157,14 @@ jobs:
           git config --global user.name "github-actions[bot]"
           git config --global user.email "github-actions[bot]@github.com"
           
-          # 🚨 [수정] 주신 실제 GitHub 원본 리포지토리 주소 경로로 완벽 매핑 완료
           git remote set-url origin https://github.com
           
-          # 새로 생성된 APK 파일을 깃 추적 대상에 강제로 추가합니다.
           git add -u
           if [ -f ./GoldFireDragonBrowser.apk ]; then
             git add ./GoldFireDragonBrowser.apk
           fi
           
           if ! git diff --cached --quiet; then
-            # 변경점 또는 새로 추가된 APK 파일을 메인 리포에 강제로 푸시합니다. [skip ci]로 무한 루프 방지
             git commit -m "chore: update existing browser data and APK artifact [skip ci]"
             git push origin main
           else
