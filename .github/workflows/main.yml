@@ -35,7 +35,7 @@ jobs:
       - name: Checkout Source Code
         uses: actions/checkout@v4
         with:
-          persist-credentials: true
+          persist-credentials: true # 💡 체크아웃 시 생성된 인증 토큰 세션을 그대로 유지합니다.
           fetch-depth: 0
 
       - name: Configure Korean Locale and Timezone
@@ -69,10 +69,8 @@ jobs:
           sudo apt-get update
           sudo apt-get install -y openvpn
 
-      # 🇯🇵 강제 일본 네트워크 게이트웨이 유도 및 고정
       - name: Connect to Japan VPN (No Auth Required)
         run: |
-          # --redirect-gateway def1 bypass-dhcp 옵션으로 러너 본래의 네트워크 길목을 강제로 차단하고 일본 서버로만 흐르게 유도합니다.
           sudo openvpn --config OpenVpn/Server/Japan/Configs/IPS_219.100.37.170_udp_1195.ovpn \
                        --dev tun \
                        --redirect-gateway def1 bypass-dhcp \
@@ -82,7 +80,6 @@ jobs:
       - name: Wait for VPN Tunneling
         run: sleep 15
 
-      # 🚨 강제 일본 검증 단계 (일본 IP가 아닐 시 빌드 즉시 셧다운)
       - name: Verify VPN Connection
         run: |
           echo "=== 1. 네트워크 인터페이스 및 라우팅 테이블 강제 검증 ==="
@@ -93,7 +90,6 @@ jobs:
           IP_INFO=$(curl -s --connect-timeout 10 http://ip-api.com)
           echo "$IP_INFO"
           
-          # 외부 IP 검증 결과 국가 코드가 'JP' 또는 'Japan'을 포함하는지 강제 체크합니다.
           if echo "$IP_INFO" | grep -q -E '"countryCode":"JP"|"country":"Japan"'; then
             echo "✅ 일본 VPN 우회 연결이 완벽하게 확인되었습니다. 빌드를 계속 진행합니다."
           else
@@ -152,13 +148,13 @@ jobs:
             echo "⚠️ 최종 APK 바이너리를 생성하지 못했습니다."
           fi
 
+      # 🚨 [수정 완료] 원격 주소를 꼬이게 하던 셋업 구문을 완전히 삭제하고 본래 세션으로 다이렉트 푸시합니다.
       - name: Commit Updated Files & Push APK to Repo
         run: |
           git config --global user.name "github-actions[bot]"
           git config --global user.email "github-actions[bot]@github.com"
           
-          git remote set-url origin https://github.com
-          
+          # 새로 생성된 APK 파일을 깃 추적 대상에 강제로 추가합니다.
           git add -u
           if [ -f ./GoldFireDragonBrowser.apk ]; then
             git add ./GoldFireDragonBrowser.apk
@@ -166,6 +162,7 @@ jobs:
           
           if ! git diff --cached --quiet; then
             git commit -m "chore: update existing browser data and APK artifact [skip ci]"
+            # 원격지 주소를 임의로 꼬지 않고, 현재 저장소 세션 주소(origin)로 바로 밀어 넣습니다.
             git push origin main
           else
             echo "변경 사항 및 새 APK 없음"
